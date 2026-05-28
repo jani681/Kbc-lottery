@@ -1,6 +1,5 @@
 package com.example
 
-import android.app.Application
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -33,27 +32,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.data.KbcPrank
-import com.example.ui.KbcPrankViewModel
-import com.example.ui.KbcPrankViewModelFactory
 import com.example.ui.theme.MyApplicationTheme
+import org.json.JSONArray
+import org.json.JSONObject
+
+// Simple Data Structure to keep history safe
+data class LocalPrankModel(
+    val id: Long,
+    val victimName: String,
+    val victimNumber: String,
+    val generatedLink: String
+)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         
-        // Database Layer Restored Completely
-        val app = applicationContext as Application
-        val viewModelFactory = KbcPrankViewModelFactory(app)
-        val viewModel = androidx.lifecycle.ViewModelProvider(this, viewModelFactory)[KbcPrankViewModel::class.java]
-
         setContent {
             MyApplicationTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     KbcPrankApp(
-                        viewModel = viewModel,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -64,17 +63,39 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun KbcPrankApp(
-    viewModel: KbcPrankViewModel,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val sharedPreferences = remember { context.getSharedPreferences("kbc_prank_prefs", Context.MODE_PRIVATE) }
     
     var victimName by remember { mutableStateOf("") }
     var victimNumber by remember { mutableStateOf("") }
     var generatedLink by remember { mutableStateOf("") }
     var showSuccessDialog by remember { mutableStateOf(false) }
+    
+    // Independent History List State
+    val historyList = remember { mutableStateListOf<LocalPrankModel>() }
 
-    val historyList by viewModel.allPranks.collectAsStateWithLifecycle(initialValue = emptyList())
+    // Load History safely on Start up
+    LaunchedEffect(Unit) {
+        val savedJson = sharedPreferences.getString("prank_list_json", "[]") ?: "[]"
+        try {
+            val jsonArray = JSONArray(savedJson)
+            for (i in 0 until jsonArray.length()) {
+                val obj = jsonArray.getJSONObject(i)
+                historyList.add(
+                    LocalPrankModel(
+                        id = obj.getLong("id"),
+                        victimName = obj.getString("name"),
+                        victimNumber = obj.getString("num"),
+                        generatedLink = obj.getString("link")
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
     Box(
         modifier = modifier
@@ -87,7 +108,7 @@ fun KbcPrankApp(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header
+            // Header Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -166,14 +187,29 @@ fun KbcPrankApp(
                                 generatedLink = finalLink
                                 showSuccessDialog = true
 
-                                // Saving into standard database fields
-                                viewModel.insertPrank(
-                                    KbcPrank(
-                                        victimName = victimName.trim(),
-                                        victimNumber = victimNumber.trim(),
-                                        generatedLink = finalLink
-                                    )
+                                // Create new item
+                                val newItem = LocalPrankModel(
+                                    id = System.currentTimeMillis(),
+                                    victimName = victimName.trim(),
+                                    victimNumber = victimNumber.trim(),
+                                    generatedLink = finalLink
                                 )
+                                
+                                // Add to UI list
+                                historyList.add(0, newItem)
+
+                                // Save locally in Preferences immediately
+                                val jsonArray = JSONArray()
+                                historyList.forEach {
+                                    val obj = JSONObject().apply {
+                                        put("id", it.id)
+                                        put("name", it.victimName)
+                                        put("num", it.victimNumber)
+                                        put("link", it.generatedLink)
+                                    }
+                                    jsonArray.put(obj)
+                                }
+                                sharedPreferences.edit().putString("prank_list_json", jsonArray.toString()).apply()
                             }
                         },
                         modifier = Modifier
@@ -189,7 +225,7 @@ fun KbcPrankApp(
                 }
             }
 
-            // History Header
+            // History Header Row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -206,34 +242,40 @@ fun KbcPrankApp(
                 )
             }
 
-            // History List Streams Setup
+            // History Render List
             if (historyList.isEmpty()) {
                 Box(
-                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
                     Text("No history yet. Generated links will appear here.", color = Color.Gray, fontSize = 14.sp)
                 }
             } else {
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(historyList) { prank ->
+                    items(historyList, key = { it.id }) { prank ->
                         HistoryItemRow(prank = prank, context = context)
                     }
                 }
             }
         }
 
-        // Output Share Dialog
+        // Share Dialog Pop up
         if (showSuccessDialog) {
             Dialog(
                 onDismissRequest = { showSuccessDialog = false },
                 properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
             ) {
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
@@ -242,7 +284,12 @@ fun KbcPrankApp(
                         modifier = Modifier.padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color(0xFF10B981), modifier = Modifier.size(54.dp))
+                        Icon(
+                            Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = Color(0xFF10B981),
+                            modifier = Modifier.size(54.dp)
+                        )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text("Link Generated Successfully!", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1F2937))
                         Spacer(modifier = Modifier.height(12.dp))
@@ -253,7 +300,11 @@ fun KbcPrankApp(
                             readOnly = true,
                             modifier = Modifier.fillMaxWidth(),
                             textStyle = androidx.compose.ui.text.TextStyle(fontSize = 13.sp),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(0xFF2563EB),
+                                unfocusedBorderColor = Color.LightGray
+                            )
                         )
                         
                         Spacer(modifier = Modifier.height(20.dp))
@@ -302,7 +353,7 @@ fun KbcPrankApp(
 }
 
 @Composable
-fun HistoryItemRow(prank: KbcPrank, context: Context) {
+fun HistoryItemRow(prank: LocalPrankModel, context: Context) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -310,16 +361,34 @@ fun HistoryItemRow(prank: KbcPrank, context: Context) {
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = prank.victimName, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF1F2937))
-                Text(text = prank.victimNumber, fontSize = 13.sp, color = Color.Gray)
+                Text(
+                    text = prank.victimName,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
+                    color = Color(0xFF1F2937)
+                )
+                Text(
+                    text = prank.victimNumber,
+                    fontSize = 13.sp,
+                    color = Color.Gray
+                )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = prank.generatedLink, fontSize = 11.sp, color = Color(0xFF2563EB), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(
+                    text = prank.generatedLink,
+                    fontSize = 11.sp,
+                    color = Color(0xFF2563EB),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
+            
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 IconButton(onClick = {
                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -329,6 +398,7 @@ fun HistoryItemRow(prank: KbcPrank, context: Context) {
                 }) {
                     Icon(Icons.Default.Share, contentDescription = "Copy", tint = Color(0xFF4B5563))
                 }
+
                 IconButton(onClick = {
                     val intent = Intent(Intent.ACTION_SEND).apply {
                         type = "text/plain"
