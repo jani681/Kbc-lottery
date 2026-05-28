@@ -1,0 +1,8 @@
+{
+  "name": "KBC Prank Maker",
+  "description": "Create personalized Kaun Banega Crorepati (KBC) congratulations links to surprise and prank your friends!",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
