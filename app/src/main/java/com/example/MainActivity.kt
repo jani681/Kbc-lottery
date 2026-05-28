@@ -157,9 +157,7 @@ fun KbcPrankApp(
                             if (victimName.isBlank() || victimNumber.isBlank()) {
                                 Toast.makeText(context, "Please enter both details", Toast.LENGTH_SHORT).show()
                             } else {
-                                // Vercel live working base URL configured directly here
                                 val baseSharedUrl = "https://kbc-lottery.vercel.app/"
-                                
                                 val encodedName = Uri.encode(victimName.trim())
                                 val encodedNumber = Uri.encode(victimNumber.trim())
                                 
@@ -167,15 +165,12 @@ fun KbcPrankApp(
                                 generatedLink = finalLink
                                 showSuccessDialog = true
 
-                                // Save to Database via ViewModel
+                                // Database insertion matching default constructor rules
                                 viewModel.insertPrank(
                                     KbcPrank(
-                                        friendName = victimName.trim(),
-                                        friendNumber = victimNumber.trim(),
-                                        friendAddress = "",
-                                        senderName = "",
-                                        generatedUrl = finalLink,
-                                        timestamp = System.currentTimeMillis()
+                                        victimName = victimName.trim(),
+                                        victimNumber = victimNumber.trim(),
+                                        generatedLink = finalLink
                                     )
                                 )
                             }
@@ -227,7 +222,7 @@ fun KbcPrankApp(
                         .weight(1f),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(historyList, key = { it.id }) { prank ->
+                    items(historyList) { prank ->
                         HistoryItemRow(prank = prank, context = context)
                     }
                 }
@@ -337,19 +332,19 @@ fun HistoryItemRow(prank: KbcPrank, context: Context) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = prank.friendName,
+                    text = prank.victimName,
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp,
                     color = Color(0xFF1F2937)
                 )
                 Text(
-                    text = prank.friendNumber,
+                    text = prank.victimNumber,
                     fontSize = 13.sp,
                     color = Color.Gray
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = prank.generatedUrl,
+                    text = prank.generatedLink,
                     fontSize = 11.sp,
                     color = Color(0xFF2563EB),
                     maxLines = 1,
@@ -360,7 +355,7 @@ fun HistoryItemRow(prank: KbcPrank, context: Context) {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 IconButton(onClick = {
                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    val clip = ClipData.newPlainText("KBC Link", prank.generatedUrl)
+                    val clip = ClipData.newPlainText("KBC Link", prank.generatedLink)
                     clipboard.setPrimaryClip(clip)
                     Toast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show()
                 }) {
@@ -370,7 +365,7 @@ fun HistoryItemRow(prank: KbcPrank, context: Context) {
                 IconButton(onClick = {
                     val intent = Intent(Intent.ACTION_SEND).apply {
                         type = "text/plain"
-                        putExtra(Intent.EXTRA_TEXT, prank.generatedUrl)
+                        putExtra(Intent.EXTRA_TEXT, prank.generatedLink)
                     }
                     context.startActivity(Intent.createChooser(intent, "Share via"))
                 }) {
