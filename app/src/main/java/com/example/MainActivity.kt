@@ -11,13 +11,10 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -26,49 +23,30 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalTestTag
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.launch
 import com.example.data.KbcPrank
 import com.example.ui.KbcPrankViewModel
 import com.example.ui.KbcPrankViewModelFactory
 import com.example.ui.theme.MyApplicationTheme
-import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
-    override class onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         
-        // Initialize ViewModel using factory
-        val repository = (application as KbcApplication).repository
-        val viewModelFactory = KbcPrankViewModelFactory(repository)
-        val viewModel = androidx.lifecycle.viewmodel.compose.viewModel<KbcPrankViewModel>(
-            factory = viewModelFactory
-        )
+        val app = applicationContext as Application
+        val viewModelFactory = KbcPrankViewModelFactory(app)
+        val viewModel = androidx.lifecycle.ViewModelProvider(this, viewModelFactory)[KbcPrankViewModel::class.java]
 
         setContent {
             MyApplicationTheme {
@@ -89,7 +67,6 @@ fun KbcPrankApp(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
     
     var victimName by remember { mutableStateOf("") }
     var victimNumber by remember { mutableStateOf("") }
@@ -186,16 +163,19 @@ fun KbcPrankApp(
                                 val encodedName = Uri.encode(victimName.trim())
                                 val encodedNumber = Uri.encode(victimNumber.trim())
                                 
-                                val finalLink = "$baseSharedUrl?name=$encodedName&num=$encodedNumber"
+                                val finalLink = "${baseSharedUrl}?name=${encodedName}&num=${encodedNumber}"
                                 generatedLink = finalLink
                                 showSuccessDialog = true
 
                                 // Save to Database via ViewModel
                                 viewModel.insertPrank(
                                     KbcPrank(
-                                        victimName = victimName.trim(),
-                                        victimNumber = victimNumber.trim(),
-                                        generatedLink = finalLink
+                                        friendName = victimName.trim(),
+                                        friendNumber = victimNumber.trim(),
+                                        friendAddress = "",
+                                        senderName = "",
+                                        generatedUrl = finalLink,
+                                        timestamp = System.currentTimeMillis()
                                     )
                                 )
                             }
@@ -247,7 +227,7 @@ fun KbcPrankApp(
                         .weight(1f),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(historyList) { prank ->
+                    items(historyList, key = { it.id }) { prank ->
                         HistoryItemRow(prank = prank, context = context)
                     }
                 }
@@ -357,19 +337,19 @@ fun HistoryItemRow(prank: KbcPrank, context: Context) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = prank.victimName,
+                    text = prank.friendName,
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp,
                     color = Color(0xFF1F2937)
                 )
                 Text(
-                    text = prank.victimNumber,
+                    text = prank.friendNumber,
                     fontSize = 13.sp,
                     color = Color.Gray
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = prank.generatedLink,
+                    text = prank.generatedUrl,
                     fontSize = 11.sp,
                     color = Color(0xFF2563EB),
                     maxLines = 1,
@@ -380,7 +360,7 @@ fun HistoryItemRow(prank: KbcPrank, context: Context) {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 IconButton(onClick = {
                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    val clip = ClipData.newPlainText("KBC Link", prank.generatedLink)
+                    val clip = ClipData.newPlainText("KBC Link", prank.generatedUrl)
                     clipboard.setPrimaryClip(clip)
                     Toast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show()
                 }) {
@@ -390,7 +370,7 @@ fun HistoryItemRow(prank: KbcPrank, context: Context) {
                 IconButton(onClick = {
                     val intent = Intent(Intent.ACTION_SEND).apply {
                         type = "text/plain"
-                        putExtra(Intent.EXTRA_TEXT, prank.generatedLink)
+                        putExtra(Intent.EXTRA_TEXT, prank.generatedUrl)
                     }
                     context.startActivity(Intent.createChooser(intent, "Share via"))
                 }) {
