@@ -1,5 +1,6 @@
 package com.example
 
+import android.app.Application
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -12,6 +13,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -25,10 +28,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.data.KbcPrank
+import com.example.ui.KbcPrankViewModel
+import com.example.ui.KbcPrankViewModelFactory
 import com.example.ui.theme.MyApplicationTheme
 
 class MainActivity : ComponentActivity() {
@@ -36,10 +44,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         
+        // Database Layer Restored Completely
+        val app = applicationContext as Application
+        val viewModelFactory = KbcPrankViewModelFactory(app)
+        val viewModel = androidx.lifecycle.ViewModelProvider(this, viewModelFactory)[KbcPrankViewModel::class.java]
+
         setContent {
             MyApplicationTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     KbcPrankApp(
+                        viewModel = viewModel,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -50,6 +64,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun KbcPrankApp(
+    viewModel: KbcPrankViewModel,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -58,6 +73,8 @@ fun KbcPrankApp(
     var victimNumber by remember { mutableStateOf("") }
     var generatedLink by remember { mutableStateOf("") }
     var showSuccessDialog by remember { mutableStateOf(false) }
+
+    val historyList by viewModel.allPranks.collectAsStateWithLifecycle(initialValue = emptyList())
 
     Box(
         modifier = modifier
@@ -70,7 +87,7 @@ fun KbcPrankApp(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header Card
+            // Header
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -99,7 +116,7 @@ fun KbcPrankApp(
                 }
             }
 
-            // Input Section Card
+            // Input Fields Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -148,6 +165,15 @@ fun KbcPrankApp(
                                 val finalLink = "${baseSharedUrl}?name=${encodedName}&num=${encodedNumber}"
                                 generatedLink = finalLink
                                 showSuccessDialog = true
+
+                                // Saving into standard database fields
+                                viewModel.insertPrank(
+                                    KbcPrank(
+                                        victimName = victimName.trim(),
+                                        victimNumber = victimNumber.trim(),
+                                        generatedLink = finalLink
+                                    )
+                                )
                             }
                         },
                         modifier = Modifier
@@ -162,18 +188,52 @@ fun KbcPrankApp(
                     }
                 }
             }
+
+            // History Header
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(Icons.Default.Refresh, contentDescription = null, tint = Color.Gray)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Generated Links History",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.DarkGray
+                )
+            }
+
+            // History List Streams Setup
+            if (historyList.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("No history yet. Generated links will appear here.", color = Color.Gray, fontSize = 14.sp)
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(historyList) { prank ->
+                        HistoryItemRow(prank = prank, context = context)
+                    }
+                }
+            }
         }
 
-        // Custom Link Output Dialog
+        // Output Share Dialog
         if (showSuccessDialog) {
             Dialog(
                 onDismissRequest = { showSuccessDialog = false },
                 properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
             ) {
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
@@ -182,12 +242,7 @@ fun KbcPrankApp(
                         modifier = Modifier.padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Icon(
-                            Icons.Default.CheckCircle,
-                            contentDescription = null,
-                            tint = Color(0xFF10B981),
-                            modifier = Modifier.size(54.dp)
-                        )
+                        Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color(0xFF10B981), modifier = Modifier.size(54.dp))
                         Spacer(modifier = Modifier.height(16.dp))
                         Text("Link Generated Successfully!", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1F2937))
                         Spacer(modifier = Modifier.height(12.dp))
@@ -198,11 +253,7 @@ fun KbcPrankApp(
                             readOnly = true,
                             modifier = Modifier.fillMaxWidth(),
                             textStyle = androidx.compose.ui.text.TextStyle(fontSize = 13.sp),
-                            shape = RoundedCornerShape(8.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFF2563EB),
-                                unfocusedBorderColor = Color.LightGray
-                            )
+                            shape = RoundedCornerShape(8.dp)
                         )
                         
                         Spacer(modifier = Modifier.height(20.dp))
@@ -244,6 +295,48 @@ fun KbcPrankApp(
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun HistoryItemRow(prank: KbcPrank, context: Context) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = prank.victimName, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF1F2937))
+                Text(text = prank.victimNumber, fontSize = 13.sp, color = Color.Gray)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = prank.generatedLink, fontSize = 11.sp, color = Color(0xFF2563EB), maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                IconButton(onClick = {
+                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip = ClipData.newPlainText("KBC Link", prank.generatedLink)
+                    clipboard.setPrimaryClip(clip)
+                    Toast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show()
+                }) {
+                    Icon(Icons.Default.Share, contentDescription = "Copy", tint = Color(0xFF4B5563))
+                }
+                IconButton(onClick = {
+                    val intent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, prank.generatedLink)
+                    }
+                    context.startActivity(Intent.createChooser(intent, "Share via"))
+                }) {
+                    Icon(Icons.Default.Send, contentDescription = "Share", tint = Color(0xFF10B981))
                 }
             }
         }
