@@ -127,8 +127,8 @@ fun MainScreenContent(viewModel: KbcPrankViewModel) {
         viewModel.clearActivePrank()
     }
 
-    // Base shared URL allocated dynamically based on running environment to direct friends straight to the correct congratulations card
-    val baseSharedUrl = viewModel.dynamicBaseUrl
+    // DIRECTLY SETTING YOUR GITHUB PAGES LIVE LINK HERE
+    val baseSharedUrl = "https://jani681.github.io/Kbc-lottery/"
 
     Box(modifier = Modifier.fillMaxSize()) {
         Crossfade(
@@ -412,8 +412,8 @@ fun CreatorDashboardScreen(
                                 .fillMaxWidth()
                                 .padding(bottom = 12.dp)
                                 .testTag("friend_address_input"),
-                            shape = RoundedCornerShape(8.dp),
-                            singleLine = true
+                                shape = RoundedCornerShape(8.dp),
+                                singleLine = true
                         )
 
                         // Creator/Sender Name
