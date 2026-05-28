@@ -6,83 +6,57 @@
     <title>KBC Official Winner</title>
     <style>
         body { font-family: 'Arial', sans-serif; background: #000; color: #fff; text-align: center; margin: 0; padding: 15px; }
-        .container { max-width: 500px; margin: auto; background: linear-gradient(180deg, #111122 0%, #000000 100%); padding: 25px; border: 4px solid #ffd700; border-radius: 25px; box-shadow: 0 0 30px rgba(255, 215, 0, 0.4); }
-        
-        /* Fixed Logo Style */
-        .logo { width: 120px; height: 120px; border-radius: 50%; border: 3px solid #ffd700; object-fit: cover; margin-bottom: 10px; background: #0c1a30; }
-        
-        h1 { color: #ffd700; margin: 5px 0; font-size: 26px; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; }
-        p.sub-title { color: #00ffcc; margin: 0 0 20px 0; font-size: 14px; font-weight: bold; text-transform: uppercase; }
-        
-        /* Celebrity Grid Images Fixed */
+        .container { max-width: 500px; margin: auto; background: linear-gradient(180deg, #111122 0%, #000000 100%); padding: 25px; border: 4px solid #ffd700; border-radius: 25px; }
+        .logo { width: 120px; height: 120px; border-radius: 50%; border: 3px solid #ffd700; object-fit: cover; background: #fff; }
+        h1 { color: #ffd700; margin: 10px 0; font-size: 24px; text-transform: uppercase; font-weight: 900; }
         .celebrity-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
-        .celeb-card { text-align: center; }
-        .celeb { width: 100%; height: 110px; object-fit: cover; border-radius: 12px; border: 2px solid #ffd700; background: #222; }
-        .celeb-name { font-size: 11px; color: #ccc; margin-top: 4px; font-weight: bold; }
-        
-        /* Winner Display */
-        .winner-box { background: linear-gradient(90deg, #ffd700 0%, #ffa500 100%); color: #000; padding: 18px; border-radius: 15px; font-weight: bold; margin: 20px 0; font-size: 18px; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); line-height: 1.6; }
-        .winner-box span { color: #111122; font-weight: 900; background: rgba(255,255,255,0.4); padding: 2px 8px; border-radius: 5px; }
-        
-        /* Message Boxes */
-        .msg-box { background: #1a1a2e; padding: 14px; border-radius: 12px; margin: 12px 0; font-size: 13px; border-left: 5px solid #ffd700; text-align: left; box-shadow: 0 2px 8px rgba(0,0,0,0.5); }
-        .msg-box b { color: #ffd700; font-size: 14px; display: block; margin-bottom: 3px; }
-        
-        .status-tag { color: #00ff66; font-weight: bold; font-size: 16px; margin: 20px 0; text-transform: uppercase; letter-spacing: 1px; }
-        .footer { font-size: 10px; color: #555; margin-top: 25px; border-top: 1px solid #222; padding-top: 10px; }
+        .celeb { width: 100%; height: 90px; object-fit: cover; border-radius: 8px; border: 2px solid #ffd700; }
+        .celeb-name { font-size: 10px; color: #ccc; margin-top: 4px; }
+        .winner-box { background: #ffd700; color: #000; padding: 15px; border-radius: 15px; font-weight: bold; margin: 20px 0; font-size: 17px; }
+        .msg-box { background: #1a1a2e; padding: 12px; border-radius: 10px; margin: 10px 0; font-size: 12px; border-left: 4px solid #ffd700; text-align: left; }
+        .footer { font-size: 9px; color: #666; margin-top: 20px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- KBC Official Working Logo -->
-        <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=200&auto=format&fit=crop" class="logo" alt="KBC Logo" onerror="this.src='https://placehold.co/150x150/0d1b2a/ffd700?text=KBC+OFFICIAL'">
+        <!-- Official KBC Logo -->
+        <img src="https://upload.wikimedia.org/wikipedia/en/b/b5/Kaun_Banega_Crorepatititlecard.jpg" class="logo" alt="KBC Logo">
         
         <h1>KBC Mega Lottery</h1>
-        <p class="sub-title">Official Congratulation Portal</p>
         
         <div class="celebrity-grid">
-            <div class="celeb-card">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop" class="celeb" alt="Amitabh Bachchan">
-                <div class="celeb-name">A. Bachchan</div>
+            <div>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/9/90/Amitabh_Bachchan_promoting_Thugs_of_Hindostan.jpg" class="celeb">
+                <div class="celeb-name">Amitabh B.</div>
             </div>
-            <div class="celeb-card">
-                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop" class="celeb" alt="Mukesh Ambani">
+            <div>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/07/Mukesh_Ambani_at_the_2018_Antilia_party.jpg" class="celeb">
                 <div class="celeb-name">M. Ambani</div>
             </div>
-            <div class="celeb-card">
-                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop" class="celeb" alt="PM Modi">
+            <div>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/e/ed/Prime_Minister_Modi.jpg" class="celeb">
                 <div class="celeb-name">PM Modi</div>
             </div>
         </div>
 
         <div class="winner-box">
-            🎉 CONGRATULATIONS! 🎉<br>
-            Winner Name: <span id="victimName">User</span><br>
-            Prize Amount: 🌟 ₹25,00,000/- 🌟<br>
-            Ticket Reg No: <span id="victimNumber">N/A</span>
+            Congratulations! <span id="victimName" style="text-decoration:underline;">User</span><br>
+            Prize Won: ₹25,00,000<br>
+            Reg No: <span id="victimNumber">000000</span>
         </div>
 
-        <div class="msg-box">
-            <b>Host: Amitabh Bachchan</b>
-            "Adbhut! Aapki kismat aur hosle ko nman. Yeh jackpot rashi aapke saare sapne poore karegi."
-        </div>
-        <div class="msg-box">
-            <b>Chairman: Mukesh & Nita Ambani</b>
-            "We are absolutely delighted to award this grand prize. Digital transparency brings joy directly to you."
-        </div>
-        <div class="msg-box">
-            <b>Blessings: PM Narendra Modi</b>
-            "Digital India ke is daur mein hamare nagrik sashakt ho rahe hain. Is badi kamyabi par aapko dheron shubhkaamnaayein."
-        </div>
+        <div class="msg-box"><b>Amitabh Bachchan:</b> "Bahut bahut badhai! Aapki kismat chamak gayi hai."</div>
+        <div class="msg-box"><b>Nita Ambani:</b> "We congratulate the winner for this historic achievement."</div>
+        <div class="msg-box"><b>PM Narendra Modi:</b> "Digital India ke is daur mein aapki kamyabi par badhai."</div>
 
-        <div class="status-tag">Govt Verification Status: Approved ✅</div>
-        <div class="footer">© 2026 KBC Lottery Corporate Office Mumbai. Secured by Digital India Initiative.</div>
+        <p style="color: #0f0; font-weight: bold; font-size: 14px;">Status: Verification Successful ✅</p>
+        <div class="footer">© 2026 KBC Lottery Corporate Office Mumbai.</div>
     </div>
     
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        document.getElementById('victimName').innerText = decodeURIComponent(urlParams.get('name') || "Respected Winner");
-        document.getElementById('victimNumber').innerText = decodeURIComponent(urlParams.get('num') || "KBC-992341");
+        document.getElementById('victimName').innerText = decodeURIComponent(urlParams.get('name') || "Respected User");
+        document.getElementById('victimNumber').innerText = decodeURIComponent(urlParams.get('num') || "000000");
     </script>
 </body>
 </html>
