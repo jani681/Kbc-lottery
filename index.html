@@ -30,7 +30,7 @@
             position: relative;
         }
 
-        /* NAYA ADD KIYA GAYA: Live corner badge style aur breath animation */
+        /* Live corner badge style aur breath animation */
         .live-corner-badge {
             position: absolute;
             top: -12px;
@@ -69,7 +69,7 @@
             justify-content: space-between;
             margin-bottom: 10px;
             padding: 0 10px;
-            margin-top: 5px; /* Thoda space live badge ke liye */
+            margin-top: 5px;
         }
         
         .side-tag-left, .side-tag-right {
@@ -171,6 +171,39 @@
 
         h1 { color: #ffd700; margin: 10px 0; font-size: 24px; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         
+        /* NAYA ADD KIYA GAYA: Hindi Instruction Box Card Layout */
+        .hindi-instruction-card {
+            background: linear-gradient(135deg, rgba(26, 11, 54, 0.9) 0%, rgba(13, 6, 40, 0.95) 100%);
+            border: 2px solid #ffd700;
+            border-radius: 18px;
+            padding: 15px;
+            margin: 15px auto;
+            text-align: left;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.15);
+        }
+        .hindi-instruction-title {
+            color: #ff3333;
+            font-size: 14px;
+            font-weight: 900;
+            margin: 0 0 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px dashed rgba(255, 215, 0, 0.3);
+            padding-bottom: 5px;
+            text-shadow: 0 0 5px rgba(255, 51, 51, 0.3);
+        }
+        .hindi-instruction-text {
+            color: #ffffff;
+            font-size: 12.5px;
+            line-height: 1.5;
+            margin: 0;
+            font-weight: bold;
+        }
+        .hindi-instruction-text span {
+            color: #ffd700;
+        }
+
         .voice-btn {
             background: #1a0b36;
             color: #ffd700;
@@ -421,6 +454,13 @@
         </div>
         
         <h1>KBC Mega Lottery</h1>
+
+        <div class="hindi-instruction-card">
+            <p class="hindi-instruction-title">⚠️ महत्वपूर्ण निर्देश / Important Instructions:</p>
+            <p class="hindi-instruction-text">
+                सभी विजेताओं को सूचित किया जाता है कि नीचे दिए गए <span>"Verify My Secure Status"</span> बटन पर क्लिक करके अपनी वेरिफिकेशन प्रक्रिया को पूरा करें। इसके बाद तुरंत <span>"Claim On WhatsApp"</span> बटन पर क्लिक करके केबीसी मुख्य कार्यालय से संपर्क करें और अपना प्राइज सीधे बैंक खाते में प्राप्त करें।
+            </p>
+        </div>
         
         <button id="voiceBtn" class="voice-btn" onclick="playVoice()">🔊 Listen to Official Announcement</button>
         <audio id="amitabhVoice" src="assets/.aistudio/kbc_voice.mp3" preload="auto"></audio>
