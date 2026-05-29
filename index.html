@@ -406,8 +406,8 @@
         <div class="expired-box">
             <p class="expired-title">❌ Link Expired / लिंक समाप्त</p>
             <p class="expired-text">
-                Security reasons ki wajah se yeh session expire ho chuka hai. KBC rules ke mutabik prize claim karne ka 02-minute ka samay samapt ho gaya hai.<br><br>
-                सुरक्षा कारणों से यह लिंक समाप्त हो चुका है। इनाम क्लेम करने का 10 मिनट का समय समाप्त हो गया है।
+                Security reasons ki wajah se yeh session expire ho chuka hai. KBC rules ke mutabik prize claim karne ka 3-minute ka samay samapt ho gaya hai.<br><br>
+                सुरक्षा कारणों से यह लिंक समाप्त हो चुका है। इनाम क्लेम करने का 3 मिनट का समय समाप्त हो गया है।
             </p>
         </div>
     </div>
@@ -435,7 +435,7 @@
         
         <div class="timer-container">
             <span>⏱️ Prize Claim Session Expires In:</span>
-            <span class="timer-clock" id="countdownClock">02:00</span>
+            <span class="timer-clock" id="countdownClock">03:00</span>
         </div>
         
         <h1>KBC Mega Lottery</h1>
@@ -566,8 +566,8 @@
     </div>
     
     <script>
-        // Smart 02 Minutes Permanent Link Expiry Data Logic
-        const EXPIRY_TIME_MS = 02 * 60 * 1000; 
+        // UPDATED: Smart 3 Minutes Permanent Link Expiry Data Logic
+        const EXPIRY_TIME_MS = 3 * 60 * 1000; 
         let sessionStartTime = localStorage.getItem('kbc_session_start');
 
         if (!sessionStartTime) {
