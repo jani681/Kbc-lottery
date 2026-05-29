@@ -7,7 +7,7 @@
     <style>
         body { 
             font-family: 'Arial', sans-serif; 
-            /* UPDATED: Naya realistic KBC studio background lagaya gaya ha assets se */
+            /* Naya realistic KBC studio background lagaya gaya ha assets se */
             background: url('assets/.aistudio/image_2.png') no-repeat center center fixed; 
             background-size: cover;
             color: #fff; 
@@ -19,7 +19,7 @@
         .container { 
             max-width: 500px; 
             margin: auto; 
-            /* UPDATED: Semi-transparent background aur blur effect taake content background par suit kare */
+            /* Semi-transparent background aur blur effect taake content background par suit kare */
             background: rgba(13, 6, 40, 0.88); 
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -29,6 +29,39 @@
             box-shadow: 0 0 35px rgba(212, 175, 55, 0.3), inset 0 0 20px rgba(147, 51, 234, 0.4); 
             position: relative;
         }
+
+        /* NAYA ADD KIYA GAYA: Live corner badge style aur breath animation */
+        .live-corner-badge {
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #ef4444; /* Pure KBC Red Color */
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 900;
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            z-index: 10;
+        }
+        .live-badge-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #fff;
+            border-radius: 50%;
+            display: inline-block;
+            animation: liveBreath 1.8s infinite ease-in-out;
+        }
+        @keyframes liveBreath {
+            0% { transform: scale(0.8); opacity: 0.5; box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+            50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 0 6px rgba(255, 255, 255, 0); }
+            100% { transform: scale(0.8); opacity: 0.5; box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
         
         .header-row {
             display: flex;
@@ -36,6 +69,7 @@
             justify-content: space-between;
             margin-bottom: 10px;
             padding: 0 10px;
+            margin-top: 5px; /* Thoda space live badge ke liye */
         }
         
         .side-tag-left, .side-tag-right {
@@ -361,6 +395,10 @@
 </head>
 <body>
     <div class="container">
+        <div class="live-corner-badge">
+            <span class="live-badge-dot"></span> LIVE
+        </div>
+
         <div class="header-row">
             <div class="side-tag-left">👑 VIP List</div>
             <img src="assets/.aistudio/kbc_logo.png" class="logo" alt="KBC Logo">
