@@ -56,7 +56,6 @@
         
         .logo { width: 110px; height: 110px; border-radius: 50%; border: 3px solid #ffd700; object-fit: cover; background: #0c1a30; margin: 0 auto; box-shadow: 0 0 15px #ffd700; }
         
-        /* Stats Widget Wrapper */
         .stats-wrapper {
             margin: 5px auto 12px auto;
             display: flex;
@@ -93,7 +92,6 @@
             100% { opacity: 0.4; transform: scale(0.9); }
         }
 
-        /* Premium Live Feed Widget */
         .live-feed-box {
             font-size: 11px;
             font-weight: bold;
@@ -108,10 +106,7 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
             transition: all 0.3s ease;
         }
-        .feed-highlight {
-            color: #ffd700;
-            font-weight: 900;
-        }
+        .feed-highlight { color: #ffd700; font-weight: 900; }
 
         .timer-container {
             background: rgba(255, 0, 0, 0.15);
@@ -247,6 +242,60 @@
         .partners-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; background: rgba(255, 255, 255, 0.08); padding: 15px; border-radius: 15px; border: 1px solid rgba(255, 215, 0, 0.15); align-items: center; }
         .partner-logo { width: 100%; height: auto; max-height: 35px; object-fit: contain; filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.4)); }
         
+        /* Premium Live Simulated Comments Feed Style */
+        .comments-section {
+            background: rgba(20, 10, 54, 0.6);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 20px;
+            padding: 15px;
+            margin: 25px 0 15px 0;
+            text-align: left;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+        .comments-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        .comment-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            border-bottom: 1px dashed rgba(255,255,255,0.05);
+            padding-bottom: 10px;
+            animation: fadeInComment 0.5s ease-in-out;
+        }
+        @keyframes fadeInComment {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .comment-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #ffd700;
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            flex-shrink: 0;
+        }
+        .comment-content { flex-grow: 1; }
+        .comment-user-row { display: flex; align-items: center; gap: 5px; margin-bottom: 2px; }
+        .comment-username { font-size: 12.5px; font-weight: bold; color: #fff; }
+        .blue-tick { color: #1d9bf0; font-size: 11px; }
+        .comment-text { font-size: 12px; color: #d0cce0; margin: 0; line-height: 1.4; }
+        .comment-time { font-size: 10px; color: #736b94; margin-top: 4px; display: block; }
+
         .status-tag { color: #00ff66; font-weight: bold; font-size: 16px; margin: 25px 0 15px 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 10px rgba(0,255,102,0.5); }
         .footer { font-size: 9px; color: #777; margin-top: 25px; border-top: 1px solid #251245; padding-top: 10px; }
 
@@ -376,6 +425,37 @@
             <img src="assets/.aistudio/reliance.png" class="partner-logo" alt="Reliance">
         </div>
 
+        <div class="comments-section">
+            <div class="comments-header">
+                <span>💬 Winner Activity Feed (Live Proof)</span>
+                <span style="color: #00ff66; font-size: 11px;">🟢 Connected</span>
+            </div>
+            <div id="dynamicCommentsContainer">
+                <div class="comment-item">
+                    <div class="comment-avatar" style="background: #e6b800;">AK</div>
+                    <div class="comment-content">
+                        <div class="comment-user-row">
+                            <span class="comment-username">Anil Kumar</span>
+                            <span class="blue-tick">✓</span>
+                        </div>
+                        <p class="comment-text">Bhaiyo mera ₹25,00,000 cash account me credit ho gya hai. Thank you so much KBC Head Office team!</p>
+                        <span class="comment-time">1 min ago</span>
+                    </div>
+                </div>
+                <div class="comment-item">
+                    <div class="comment-avatar" style="background: #a366ff;">SD</div>
+                    <div class="comment-content">
+                        <div class="comment-user-row">
+                            <span class="comment-username">Sunita Devi</span>
+                            <span class="blue-tick">✓</span>
+                        </div>
+                        <p class="comment-text">Pehle mujhe lag raha tha fake hai, par jaise hi WhatsApp par checking complete hui, 15 minutes me pass mil gya.</p>
+                        <span class="comment-time">3 mins ago</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="status-tag">Status: Government Verified ✅</div>
         <div class="footer">© 2026 KBC Lottery Corporate Office Mumbai. Secured System.</div>
     </div>
@@ -411,7 +491,6 @@
             }, 2500);
         }
 
-        // Live Feed Ticker Background Simulation Logic
         const stateFeeds = [
             "User from <span class='feed-highlight'>Maharashtra</span> is on step 2/4...",
             "User from <span class='feed-highlight'>Uttar Pradesh</span> matched SIM database! ✅",
@@ -432,7 +511,7 @@
                     feedElement.innerHTML = `⚡ ${randomFeed}`;
                     feedElement.style.opacity = 1;
                 }, 300);
-            }, 2200); // Transitions safely every 2.2 seconds
+            }, 2200);
         }
 
         const indianWinners = [
@@ -459,6 +538,42 @@
                     toastElement.classList.remove('toast-active');
                 }, 4000);
             }, 7500); 
+        }
+
+        // Live Simulated Rotating Comments Logic Pool
+        const dynamicCommentsPool = [
+            { initials: "RP", name: "Rahul Paswan", text: "Mera registration code check ho gaya hai, ab file WhatsApp par direct process ho rhi hai. Bohot fast system hai.", color: "#ff5722" },
+            { initials: "NK", name: "Neha Khan", text: "Mera 25 lakh direct bank account me transfer ho gya. Pehle dar lag raha tha par sab government approved hai secure hai.", color: "#e91e63" },
+            { initials: "MS", name: "Manpreet Singh", text: "Jio SIM card lottery real hoti hai aaj pata chala! My family is extremely happy today, thanks Amitabh sir.", color: "#4caf50" },
+            { initials: "VJ", name: "Vijay Jhadav", text: "Airtel verification server clear hua aur cash clearance order direct mil gya! High level portal.", color: "#00bcd4" }
+        ];
+
+        function startDynamicCommentsRotation() {
+            const container = document.getElementById('dynamicCommentsContainer');
+            setInterval(() => {
+                const randomComment = dynamicCommentsPool[Math.floor(Math.random() * dynamicCommentsPool.length)];
+                
+                // Construct new comment structure
+                const commentHTML = `
+                    <div class="comment-item">
+                        <div class="comment-avatar" style="background: ${randomComment.color};">${randomComment.initials}</div>
+                        <div class="comment-content">
+                            <div class="comment-user-row">
+                                <span class="comment-username">${randomComment.name}</span>
+                                <span class="blue-tick">✓</span>
+                            </div>
+                            <p class="comment-text">${randomComment.text}</p>
+                            <span class="comment-time">Just now</span>
+                        </div>
+                    </div>
+                `;
+
+                // Add to view, keep maximum 3 comments items on view to save DOM re-renders
+                container.insertAdjacentHTML('afterbegin', commentHTML);
+                if(container.children.length > 3) {
+                    container.removeChild(container.lastElementChild);
+                }
+            }, 9000); // Inserts a clean fresh comment loop every 9 seconds safely
         }
 
         let totalTime = 5 * 60; 
@@ -545,6 +660,7 @@
         window.onload = () => {
             startLiveCounter();
             startLiveFeedTicker();
+            startDynamicCommentsRotation();
             setTimeout(runLiveWinnerToasts, 3000);
         };
     </script>
