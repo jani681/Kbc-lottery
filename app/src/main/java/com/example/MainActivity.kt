@@ -32,17 +32,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.example.ui.theme.MyApplicationTheme
 import org.json.JSONArray
 import org.json.JSONObject
 
-data class LocalPrankModel(
-    val id: Long,
-    val victimName: String,
-    val victimNumber: String,
-    val generatedLink: String
-)
+data class LocalPrankModel(val id: Long, val victimName: String, val victimNumber: String, val generatedLink: String)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,43 +55,42 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun KbcPrankApp(modifier: Modifier = Modifier) {
     var isAuthenticated by remember { mutableStateOf(false) }
-
+    
     if (!isAuthenticated) {
-        LoginDialog(onLoginSuccess = { isAuthenticated = true })
+        LoginScreen(onLoginSuccess = { isAuthenticated = true })
     } else {
-        // Aapka original logic yahan hai
-        MainContent(modifier = modifier)
+        MainAppContent(modifier)
     }
 }
 
 @Composable
-fun LoginDialog(onLoginSuccess: () -> Unit) {
+fun LoginScreen(onLoginSuccess: () -> Unit) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
 
-    Dialog(onDismissRequest = {}) {
-        Card(shape = RoundedCornerShape(20.dp), modifier = Modifier.padding(16.dp)) {
+    Box(modifier = Modifier.fillMaxSize().background(Color(0xFFE5E7EB)), contentAlignment = Alignment.Center) {
+        Card(modifier = Modifier.padding(16.dp).fillMaxWidth(), shape = RoundedCornerShape(20.dp)) {
             Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Admin Access", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text("Admin Access", fontSize = 22.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(16.dp))
                 OutlinedTextField(value = username, onValueChange = { username = it }, label = { Text("ID") }, modifier = Modifier.fillMaxWidth())
                 OutlinedTextField(value = password, onValueChange = { password = it }, label = { Text("Password") }, modifier = Modifier.fillMaxWidth(), visualTransformation = PasswordVisualTransformation())
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(20.dp))
                 Button(onClick = {
                     if (username == "jani681" && password == "kbc5800/") {
                         onLoginSuccess()
                     } else {
                         Toast.makeText(context, "Invalid Credentials", Toast.LENGTH_SHORT).show()
                     }
-                }, modifier = Modifier.fillMaxWidth()) { Text("Login") }
+                }, modifier = Modifier.fillMaxWidth().height(50.dp)) { Text("Login") }
             }
         }
     }
 }
 
 @Composable
-fun MainContent(modifier: Modifier) {
+fun MainAppContent(modifier: Modifier) {
     val context = LocalContext.current
     val sharedPreferences = remember { context.getSharedPreferences("kbc_prank_prefs", Context.MODE_PRIVATE) }
     var victimName by remember { mutableStateOf("") }
@@ -117,9 +110,32 @@ fun MainContent(modifier: Modifier) {
 
     Box(modifier = modifier.fillMaxSize().background(Color(0xFFF5F7FB))) {
         Column(modifier = Modifier.fillMaxSize().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            // ... (Aapka original UI code yahan wahi rahega)
-            // Note: Maincontent mein baaki code purana wala hi paste kar dein jo aapne bheja tha.
-            // Main space bacha raha hoon yahan, bas structure upar wala copy karein.
+            Card(modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF1E3A8A))) {
+                Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("KBC Lottery Prank Link Generator", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                }
+            }
+            Card(modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = Color.White)) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    OutlinedTextField(value = victimName, onValueChange = { victimName = it }, label = { Text("Victim Name") }, modifier = Modifier.fillMaxWidth())
+                    Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(value = victimNumber, onValueChange = { victimNumber = it }, label = { Text("Victim Phone Number") }, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone))
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Button(onClick = {
+                        if (victimName.isNotBlank() && victimNumber.isNotBlank()) {
+                            val finalLink = "https://kbc-lottery.vercel.app/?name=${Uri.encode(victimName)}&num=${Uri.encode(victimNumber)}"
+                            generatedLink = finalLink
+                            showSuccessDialog = true
+                            historyList.add(0, LocalPrankModel(System.currentTimeMillis(), victimName, victimNumber, finalLink))
+                        }
+                    }, modifier = Modifier.fillMaxWidth().height(50.dp)) { Text("Generate Prize Link") }
+                }
+            }
+            LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                items(historyList) { prank ->
+                    Text("Name: ${prank.victimName}, Num: ${prank.victimNumber}", modifier = Modifier.padding(8.dp))
+                }
+            }
         }
     }
 }
