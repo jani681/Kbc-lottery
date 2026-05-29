@@ -7,18 +7,22 @@
     <style>
         body { 
             font-family: 'Arial', sans-serif; 
-            background: radial-gradient(circle at center, #1a0b36 0%, #0b0521 60%, #050212 100%); 
+            /* UPDATED: Naya realistic KBC studio background lagaya gaya ha assets se */
+            background: url('assets/.aistudio/image_2.png') no-repeat center center fixed; 
+            background-size: cover;
             color: #fff; 
             text-align: center; 
             margin: 0; 
             padding: 15px; 
-            background-attachment: fixed;
         }
         
         .container { 
             max-width: 500px; 
             margin: auto; 
-            background: linear-gradient(135deg, #0d0628 0%, #170a43 50%, #060214 100%); 
+            /* UPDATED: Semi-transparent background aur blur effect taake content background par suit kare */
+            background: rgba(13, 6, 40, 0.88); 
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             padding: 25px; 
             border: 3px solid #ffd700; 
             border-radius: 30px; 
@@ -133,7 +137,6 @@
 
         h1 { color: #ffd700; margin: 10px 0; font-size: 24px; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         
-        /* New Custom Styled Voice Button */
         .voice-btn {
             background: #1a0b36;
             color: #ffd700;
@@ -511,7 +514,7 @@
         const messageText = `Hello KBC Office,%0A%0AMain apna lottery prize claim karna chahta hoon.%0A%0A*Winner Name:* ${fetchedName}%0A*Reg No:* ${fetchedNumber}%0A*Prize:* ₹25,00,000/-%0A%0AKindly process my reward.`;
         document.getElementById('whatsappBtn').href = `https://wa.me/${whatsappNumber}?text=${messageText}`;
 
-        // Dedicated Manual Announcement Voice Logic
+        // Manual Audio Toggle Function
         function playVoice() {
             const voice = document.getElementById('amitabhVoice');
             const btn = document.getElementById('voiceBtn');
