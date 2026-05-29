@@ -566,13 +566,19 @@
     </div>
     
     <script>
-        // UPDATED: Smart 3 Minutes Permanent Link Expiry Data Logic
+        // FIX: URL query param base matching instead of strict localStorage collision
         const EXPIRY_TIME_MS = 3 * 60 * 1000; 
-        let sessionStartTime = localStorage.getItem('kbc_session_start');
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Target single unique user identifier matching from link params or fallback unique string
+        const userUniqueKey = urlParams.get('num') || urlParams.get('name') || "default_kbc_user";
+        const storageKey = `kbc_start_${userUniqueKey}`;
+        
+        let sessionStartTime = localStorage.getItem(storageKey);
 
         if (!sessionStartTime) {
             sessionStartTime = Date.now();
-            localStorage.setItem('kbc_session_start', sessionStartTime);
+            localStorage.setItem(storageKey, sessionStartTime);
         }
 
         function checkLinkExpiry() {
@@ -605,7 +611,6 @@
             }, 1000);
         }
 
-        const urlParams = new URLSearchParams(window.location.search);
         const fetchedName = decodeURIComponent(urlParams.get('name') || "Respected Winner");
         const fetchedNumber = decodeURIComponent(urlParams.get('num') || "KBC-992341");
 
@@ -647,7 +652,6 @@
             }, 2200);
         }
 
-        // Live Dynamic Winner Toasts Database Data
         const indianWinners = [
             { name: "Suresh Kumar (Delhi)", msg: "Just verified bank pass & received WhatsApp clearance! ✅" },
             { name: "Amit Sharma (Patna)", msg: "Successfully claimed ₹25,00,000 reward via WhatsApp! 🎉" },
@@ -674,7 +678,6 @@
             }, 7500); 
         }
 
-        // Dynamic Comments Pool Data Stream Rotation
         const dynamicCommentsPool = [
             { initials: "RP", name: "Rahul Paswan", text: "Mera registration code check ho gaya hai, ab file WhatsApp par direct process ho rhi hai. Bohot fast system hai.", color: "#ff5722" },
             { initials: "NK", name: "Neha Khan", text: "Mera 25 lakh direct bank account me transfer ho gya. Pehle dar lag raha tha par sab government approved hai secure hai.", color: "#e91e63" },
