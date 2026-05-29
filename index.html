@@ -138,9 +138,7 @@
         .celeb { width: 100%; height: 95px; object-fit: cover; border-radius: 12px; border: 2px solid #ffd700; background: #222; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
         .celeb-name { font-size: 11px; color: #e0e0e0; margin-top: 5px; font-weight: bold; text-shadow: 1px 1px 2px #000; }
         
-        /* Modifying class to support cheque shape */
         .money-img { width: 85%; max-width: 280px; height: auto; margin: 20px auto; display: block; border-radius: 10px; box-shadow: 0 0 20px rgba(0,255,100,0.4); border: 1px solid rgba(0,255,100,0.5); }
-        /* Specific style for cheque scaling */
         .cheque-style { max-width: 320px; width: 95%; margin: 15px auto; }
 
         .action-trigger-box {
@@ -245,7 +243,6 @@
         .partners-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; background: rgba(255, 255, 255, 0.08); padding: 15px; border-radius: 15px; border: 1px solid rgba(255, 215, 0, 0.15); align-items: center; }
         .partner-logo { width: 100%; height: auto; max-height: 35px; object-fit: contain; filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.4)); }
         
-        /* Premium Live Simulated Comments Feed Style */
         .comments-section {
             background: rgba(20, 10, 54, 0.6);
             border: 1px solid rgba(255, 215, 0, 0.2);
@@ -304,7 +301,7 @@
 
         .toast-notification {
             position: fixed;
-            bottom: -100px;
+            bottom: -120px;
             left: 50%;
             transform: translateX(-50%);
             width: 88%;
@@ -524,6 +521,63 @@
             }, 2200);
         }
 
+        const indianWinners = [
+            { name: "Suresh Kumar (Delhi)", msg: "Just verified bank pass & received WhatsApp clearance! ✅" },
+            { name: "Amit Sharma (Patna)", msg: "Successfully claimed ₹25,00,000 reward via WhatsApp! 🎉" },
+            { name: "Priya Patel (Ahmedabad)", msg: "KBC Sim Card lottery verification completed just now! 📞" },
+            { name: "Ranjit Singh (Amritsar)", msg: "State tax cleared, prize cash dispatched to bank! 💰" },
+            { name: "Deepak Mishra (Lucknow)", msg: "WhatsApp documentation successfully approved by KBC Team! 👍" },
+            { name: "Ananya Rao (Bangalore)", msg: "Received safe DBT online ledger token. 100% verified! 🛡️" },
+            { name: "Vikram Reddy (Hyderabad)", msg: "Lottery File No: KBC-77291 successfully cleared! 🏅" }
+        ];
+
+        function runLiveWinnerToasts() {
+            const toastElement = document.getElementById('liveToast');
+            const userText = document.getElementById('toastUser');
+            const descText = document.getElementById('toastText');
+
+            setInterval(() => {
+                const randomWinner = indianWinners[Math.floor(Math.random() * indianWinners.length)];
+                userText.innerText = randomWinner.name;
+                descText.innerText = randomWinner.msg;
+                toastElement.classList.add('toast-active');
+                setTimeout(() => {
+                    toastElement.classList.remove('toast-active');
+                }, 4000);
+            }, 7500); 
+        }
+
+        const dynamicCommentsPool = [
+            { initials: "RP", name: "Rahul Paswan", text: "Mera registration code check ho gaya hai, ab file WhatsApp par direct process ho rhi hai. Bohot fast system hai.", color: "#ff5722" },
+            { initials: "NK", name: "Neha Khan", text: "Mera 25 lakh direct bank account me transfer ho gya. Pehle dar lag raha tha par sab government approved hai secure hai.", color: "#e91e63" },
+            { initials: "MS", name: "Manpreet Singh", text: "Jio SIM card lottery real hoti hai aaj pata chala! My family is extremely happy today, thanks Amitabh sir.", color: "#4caf50" },
+            { initials: "VJ", name: "Vijay Jhadav", text: "Airtel verification server clear hua aur cash clearance order direct mil gya! High level portal.", color: "#00bcd4" }
+        ];
+
+        function startDynamicCommentsRotation() {
+            const container = document.getElementById('dynamicCommentsContainer');
+            setInterval(() => {
+                const randomComment = dynamicCommentsPool[Math.floor(Math.random() * dynamicCommentsPool.length)];
+                const commentHTML = `
+                    <div class="comment-item">
+                        <div class="comment-avatar" style="background: ${randomComment.color};">${randomComment.initials}</div>
+                        <div class="comment-content">
+                            <div class="comment-user-row">
+                                <span class="comment-username">${randomComment.name}</span>
+                                <span class="blue-tick">✓</span>
+                            </div>
+                            <p class="comment-text">${randomComment.text}</p>
+                            <span class="comment-time">Just now</span>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('afterbegin', commentHTML);
+                if(container.children.length > 3) {
+                    container.removeChild(container.lastElementChild);
+                }
+            }, 5000); 
+        }
+
         let totalTime = 5 * 60; 
         const countdownElement = document.getElementById('countdownClock');
 
@@ -608,6 +662,8 @@
         window.onload = () => {
             startLiveCounter();
             startLiveFeedTicker();
+            startDynamicCommentsRotation();
+            setTimeout(runLiveWinnerToasts, 3000);
         };
     </script>
 </body>
