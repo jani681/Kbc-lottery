@@ -56,6 +56,15 @@
         
         .logo { width: 110px; height: 110px; border-radius: 50%; border: 3px solid #ffd700; object-fit: cover; background: #0c1a30; margin: 0 auto; box-shadow: 0 0 15px #ffd700; }
         
+        /* Stats Widget Wrapper */
+        .stats-wrapper {
+            margin: 5px auto 12px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            align-items: center;
+        }
+
         .live-counter-box {
             display: inline-flex;
             align-items: center;
@@ -67,7 +76,6 @@
             background: rgba(163, 230, 53, 0.08);
             padding: 5px 12px;
             border-radius: 12px;
-            margin: 5px auto;
             border: 1px solid rgba(163, 230, 53, 0.2);
         }
         .pulse-dot {
@@ -83,6 +91,26 @@
             0% { opacity: 0.4; transform: scale(0.9); }
             50% { opacity: 1; transform: scale(1.1); box-shadow: 0 0 12px #22c55e; }
             100% { opacity: 0.4; transform: scale(0.9); }
+        }
+
+        /* Premium Live Feed Widget */
+        .live-feed-box {
+            font-size: 11px;
+            font-weight: bold;
+            color: #e0e0e0;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 4px 15px;
+            border-radius: 20px;
+            width: 85%;
+            max-width: 340px;
+            min-height: 16px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+            transition: all 0.3s ease;
+        }
+        .feed-highlight {
+            color: #ffd700;
+            font-weight: 900;
         }
 
         .timer-container {
@@ -222,7 +250,6 @@
         .status-tag { color: #00ff66; font-weight: bold; font-size: 16px; margin: 25px 0 15px 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 10px rgba(0,255,102,0.5); }
         .footer { font-size: 9px; color: #777; margin-top: 25px; border-top: 1px solid #251245; padding-top: 10px; }
 
-        /* Premium Floating Live Popup Design */
         .toast-notification {
             position: fixed;
             bottom: -100px;
@@ -268,10 +295,13 @@
             <div class="side-tag-right">✅ Govt Pass</div>
         </div>
         
-        <div>
+        <div class="stats-wrapper">
             <div class="live-counter-box">
                 <span class="pulse-dot"></span>
                 <span>Live Users Active: <span id="liveUserCount">1,432</span></span>
+            </div>
+            <div class="live-feed-box" id="liveFeedText">
+                ⚡ Initializing secure data stream links...
             </div>
         </div>
         
@@ -381,7 +411,30 @@
             }, 2500);
         }
 
-        // List of Dummy Winners for Psychological Trust Loop
+        // Live Feed Ticker Background Simulation Logic
+        const stateFeeds = [
+            "User from <span class='feed-highlight'>Maharashtra</span> is on step 2/4...",
+            "User from <span class='feed-highlight'>Uttar Pradesh</span> matched SIM database! ✅",
+            "Sim registration check active in <span class='feed-highlight'>Punjab</span>...",
+            "User from <span class='feed-highlight'>Gujarat</span> successfully cleared cash logs.",
+            "Lottery ledger processing link active in <span class='feed-highlight'>Bihar</span>...",
+            "KBC Corporate Server linked with <span class='feed-highlight'>Rajasthan</span> node.",
+            "User from <span class='feed-highlight'>West Bengal</span> initialized verification...",
+            "Direct Benefit Transfer server queue cleared for <span class='feed-highlight'>MP</span>."
+        ];
+
+        function startLiveFeedTicker() {
+            const feedElement = document.getElementById('liveFeedText');
+            setInterval(() => {
+                const randomFeed = stateFeeds[Math.floor(Math.random() * stateFeeds.length)];
+                feedElement.style.opacity = 0;
+                setTimeout(() => {
+                    feedElement.innerHTML = `⚡ ${randomFeed}`;
+                    feedElement.style.opacity = 1;
+                }, 300);
+            }, 2200); // Transitions safely every 2.2 seconds
+        }
+
         const indianWinners = [
             { name: "Suresh Kumar (Delhi)", msg: "Just verified bank pass & received WhatsApp clearance! ✅" },
             { name: "Amit Sharma (Patna)", msg: "Successfully claimed ₹25,00,000 reward via WhatsApp! 🎉" },
@@ -398,21 +451,14 @@
             const descText = document.getElementById('toastText');
 
             setInterval(() => {
-                // Pick a random winner from the pool
                 const randomWinner = indianWinners[Math.floor(Math.random() * indianWinners.length)];
-                
                 userText.innerText = randomWinner.name;
                 descText.innerText = randomWinner.msg;
-
-                // Slide in toast
                 toastElement.classList.add('toast-active');
-
-                // Slide out toast after 4 seconds
                 setTimeout(() => {
                     toastElement.classList.remove('toast-active');
                 }, 4000);
-
-            }, 7500); // Triggers every 7.5 seconds automatically
+            }, 7500); 
         }
 
         let totalTime = 5 * 60; 
@@ -498,7 +544,7 @@
 
         window.onload = () => {
             startLiveCounter();
-            // Start popup loop right after 3 seconds of page load
+            startLiveFeedTicker();
             setTimeout(runLiveWinnerToasts, 3000);
         };
     </script>
