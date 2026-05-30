@@ -126,7 +126,7 @@
     
     <div class="form-group">
         <label>Required Ledger Processing Charges:</label>
-        <input type="text" id="charges" placeholder="e.g. 12,300">
+        <input type="text" id="charges" placeholder="e.g. 12,200">
     </div>
 
     <div class="form-group">
@@ -165,9 +165,9 @@
             // Draw background template
             ctx.drawImage(baseImg, 0, 0);
             
-            // Text Color & Fonts (Perfect Size according to 4K template)
+            // White bold text for credentials - Bigger font for 4K layout
             ctx.fillStyle = "#ffffff"; 
-            ctx.font = "bold 34px Arial, Helvetica, sans-serif";
+            ctx.font = "bold 38px Arial, sans-serif";
             
             const name = document.getElementById('winnerName').value;
             const regNo = document.getElementById('regNo').value;
@@ -176,32 +176,34 @@
             const charges = document.getElementById('charges').value;
             const appLink = document.getElementById('appLink').value;
             
-            // X-Coordinate updated to 780 to clear the labels
-            ctx.fillText(name, 780, 410);
-            ctx.fillText(regNo, 780, 473);
-            ctx.fillText(phone, 780, 535);
-            ctx.fillText(account, 780, 597);
+            // Pushed X further right to 900 to sit perfectly on lines
+            // Y coordinates adjusted down to fit line spacing
+            ctx.fillText(name, 900, 405);
+            ctx.fillText(regNo, 900, 465);
+            ctx.fillText(phone, 900, 525);
+            ctx.fillText(account, 900, 585);
             
-            // Bottom charges line placement
+            // Bottom Ledger Charges Text Line
             if(charges) {
-                ctx.fillText("Rs. " + charges + "/-", 780, 755);
+                ctx.font = "bold 42px Arial, sans-serif";
+                ctx.fillText("Rs. " + charges + "/-", 900, 750);
                 
-                // Right side breakdown values
-                ctx.fillStyle = "#ffcc00"; // Gold Color
-                ctx.font = "bold 30px Arial";
-                ctx.fillText("Rs. " + charges + "/-", 1850, 642);
-                ctx.fillText("Rs. " + charges + "/-", 1850, 698);
+                // Right side breakdown fields
+                ctx.fillStyle = "#ffcc00"; // Gold color
+                ctx.font = "bold 34px Arial, sans-serif";
+                ctx.fillText("Rs. " + charges + "/-", 1880, 642);
+                ctx.fillText("Rs. " + charges + "/-", 1880, 698);
             }
             
-            // Handle Client Photo Upload
+            // Handle Client Photo - Centered inside white placeholder
             const photoInput = document.getElementById('clientPhoto');
             if (photoInput.files && photoInput.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     const clientImg = new Image();
                     clientImg.onload = function() {
-                        // Adjusted client photo to fit perfectly inside the Box (X: 145, Y: 495, W: 300, H: 380)
-                        ctx.drawImage(clientImg, 145, 495, 300, 380);
+                        // Fit inside the CUSTOMER PIC square container bounds
+                        ctx.drawImage(clientImg, 142, 492, 305, 385);
                         drawQRCode(ctx, appLink, canvas);
                     }
                     clientImg.src = event.target.result;
@@ -215,16 +217,17 @@
     
     function drawQRCode(ctx, text, canvas) {
         if(text) {
+            // Increased QR size to 240px for clarity on high-res template
             const qrObj = new QRious({
                 value: text,
-                size: 160,
+                size: 240,
                 level: 'H'
             });
             
             const qrImg = new Image();
             qrImg.onload = function() {
-                // Placed perfectly in the bottom center area near signatures
-                ctx.drawImage(qrImg, 1475, 400, 160, 160);
+                // Rendered perfectly inside the upper right area
+                ctx.drawImage(qrImg, 1850, 390, 240, 240);
                 finalizeOutput(canvas);
             };
             qrImg.src = qrObj.toDataURL();
