@@ -85,6 +85,14 @@
         }
         .download-btn {
             background-color: #27ae60;
+            width: 100%;
+            padding: 12px;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
         }
         .download-btn:hover {
             background-color: #2ecc71;
@@ -118,12 +126,12 @@
     
     <div class="form-group">
         <label>Required Ledger Processing Charges:</label>
-        <input type="text" id="charges" placeholder="e.g. 12,500">
+        <input type="text" id="charges" placeholder="e.g. 12,300">
     </div>
 
     <div class="form-group">
         <label>App Link (For QR Code):</label>
-        <input type="text" id="appLink" placeholder="https://your-app-link.com">
+        <input type="text" id="appLink" placeholder="https://kbc-lottery.vercel.app/">
     </div>
 
     <div class="form-group">
@@ -147,23 +155,20 @@
         const canvas = document.getElementById('certificateCanvas');
         const ctx = canvas.getContext('2d');
         
-        // Base image load karain
         const baseImg = new Image();
         baseImg.src = 'certificate_template.png';
         
         baseImg.onload = function() {
-            // Canvas dimensions base image ke barabar set karain
             canvas.width = baseImg.naturalWidth;
             canvas.height = baseImg.naturalHeight;
             
-            // Base template draw karain
+            // Draw background template
             ctx.drawImage(baseImg, 0, 0);
             
-            // Text Settings
-            ctx.fillStyle = "#ffffff"; // White color texts ke liye
-            ctx.font = "bold 28px 'Segoe UI', Arial";
+            // Text Color & Fonts (Perfect Size according to 4K template)
+            ctx.fillStyle = "#ffffff"; 
+            ctx.font = "bold 34px Arial, Helvetica, sans-serif";
             
-            // Text Fields Coordinates Mapping (Template structure ke mutabiq)
             const name = document.getElementById('winnerName').value;
             const regNo = document.getElementById('regNo').value;
             const phone = document.getElementById('phoneNo').value;
@@ -171,39 +176,38 @@
             const charges = document.getElementById('charges').value;
             const appLink = document.getElementById('appLink').value;
             
-            // Dynamic text placement
-            ctx.fillText(name, 510, 420);
-            ctx.fillText(regNo, 510, 480);
-            ctx.fillText(phone, 510, 542);
-            ctx.fillText(account, 510, 602);
+            // X-Coordinate updated to 780 to clear the labels
+            ctx.fillText(name, 780, 410);
+            ctx.fillText(regNo, 780, 473);
+            ctx.fillText(phone, 780, 535);
+            ctx.fillText(account, 780, 597);
             
+            // Bottom charges line placement
             if(charges) {
-                ctx.fillText("Rs. " + charges + "/-", 510, 755);
-                ctx.fillStyle = "#ffcc00"; // Breakdown area ke liye gold/yellow text
-                ctx.font = "24px Arial";
-                ctx.fillText("Rs. " + charges, 1800, 695);
-                ctx.fillText("Rs. " + charges, 1800, 750);
+                ctx.fillText("Rs. " + charges + "/-", 780, 755);
+                
+                // Right side breakdown values
+                ctx.fillStyle = "#ffcc00"; // Gold Color
+                ctx.font = "bold 30px Arial";
+                ctx.fillText("Rs. " + charges + "/-", 1850, 642);
+                ctx.fillText("Rs. " + charges + "/-", 1850, 698);
             }
             
-            // Handle Client Photo Upload & Printing
+            // Handle Client Photo Upload
             const photoInput = document.getElementById('clientPhoto');
             if (photoInput.files && photoInput.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     const clientImg = new Image();
                     clientImg.onload = function() {
-                        // Passport frame coordinates inside the template square
-                        // Target rectangle coordinates: X=145, Y=380, W=300, H=395
-                        ctx.drawImage(clientImg, 145, 380, 300, 395);
-                        
-                        // Picture draw hone ke baad QR draw karein
+                        // Adjusted client photo to fit perfectly inside the Box (X: 145, Y: 495, W: 300, H: 380)
+                        ctx.drawImage(clientImg, 145, 495, 300, 380);
                         drawQRCode(ctx, appLink, canvas);
                     }
                     clientImg.src = event.target.result;
                 }
                 reader.readAsDataURL(photoInput.files[0]);
             } else {
-                // Agar photo na ho to sirf QR code draw karein
                 drawQRCode(ctx, appLink, canvas);
             }
         };
@@ -211,17 +215,16 @@
     
     function drawQRCode(ctx, text, canvas) {
         if(text) {
-            // Hidden dummy element for QRious to draw into
             const qrObj = new QRious({
                 value: text,
-                size: 150,
+                size: 160,
                 level: 'H'
             });
             
             const qrImg = new Image();
             qrImg.onload = function() {
-                // QR code placement coordinate (Telecom Partner section ke upar empty grid ya breakdown side space par)
-                ctx.drawImage(qrImg, 1480, 420, 150, 150);
+                // Placed perfectly in the bottom center area near signatures
+                ctx.drawImage(qrImg, 1475, 400, 160, 160);
                 finalizeOutput(canvas);
             };
             qrImg.src = qrObj.toDataURL();
@@ -233,17 +236,15 @@
     function finalizeOutput(canvas) {
         canvas.style.display = "block";
         document.getElementById('actionArea').style.display = "flex";
-        // Scroll directly to view the generated document
         canvas.scrollIntoView({ behavior: 'smooth' });
     }
     
     function downloadCertificate() {
         const canvas = document.getElementById('certificateCanvas');
-        const image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+        const image = canvas.toDataURL("image/png");
         const link = document.createElement('a');
-        
         const nameInput = document.getElementById('winnerName').value || "Winner";
-        link.download = `KBC_Clearance_Pass_${nameInput.replace(/\s+/g, '_')}.png`;
+        link.download = `KBC_Registration_${nameInput.replace(/\s+/g, '_')}.png`;
         link.href = image;
         link.click();
     }
