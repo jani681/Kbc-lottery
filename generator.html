@@ -3,171 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KBC Pass Generator - Admin Panel</title>
+    <title>KBC Pass Generator - Perfect Alignment</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            max-width: 500px;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-        h2 {
-            color: #0b3c5d;
-            margin-top: 0;
-            text-align: center;
-            border-bottom: 2px solid #f0f2f5;
-            padding-bottom: 10px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #333;
-        }
-        input[type="text"], input[type="file"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #0b3c5d;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-            margin-top: 10px;
-        }
-        button:hover {
-            background-color: #328cc1;
-        }
-        #canvasContainer {
-            text-align: center;
-            max-width: 100%;
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-        canvas {
-            max-width: 100%;
-            height: auto;
-            border: 2px solid #0b3c5d;
-            border-radius: 8px;
-            display: none;
-        }
-        .action-buttons {
-            display: none;
-            gap: 10px;
-            width: 100%;
-            max-width: 500px;
-            margin-top: 15px;
-        }
-        .download-btn {
-            background-color: #27ae60;
-            width: 100%;
-            padding: 12px;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .download-btn:hover {
-            background-color: #2ecc71;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 480px; width: 100%; }
+        h2 { color: #0b3c5d; text-align: center; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; }
+        input[type="text"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #0b3c5d; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        #canvasContainer { margin-top: 20px; text-align: center; max-width: 100%; }
+        canvas { max-width: 100%; height: auto; border: 2px solid #0b3c5d; border-radius: 8px; display: none; }
+        .download-btn { background: #27ae60; width: 100%; padding: 12px; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>KBC Parchi Generator</h2>
-    
-    <div class="form-group">
-        <label>Winner Full Name:</label>
-        <input type="text" id="winnerName" placeholder="Enter Full Name">
-    </div>
-    
-    <div class="form-group">
-        <label>Registration Number:</label>
-        <input type="text" id="regNo" placeholder="Enter Registration Number">
-    </div>
-    
-    <div class="form-group">
-        <label>Winner Phone Number:</label>
-        <input type="text" id="phoneNo" placeholder="Enter Phone Number">
-    </div>
-    
-    <div class="form-group">
-        <label>Bank Account Number:</label>
-        <input type="text" id="accountNo" placeholder="Enter Bank Account Number">
-    </div>
-    
-    <div class="form-group">
-        <label>Required Ledger Processing Charges:</label>
-        <input type="text" id="charges" placeholder="e.g. 12,200">
-    </div>
-
-    <div class="form-group">
-        <label>App Link (For QR Code):</label>
-        <input type="text" id="appLink" placeholder="https://kbc-lottery.vercel.app/">
-    </div>
-
-    <div class="form-group">
-        <label>Client Passport Photo:</label>
-        <input type="file" id="clientPhoto" accept="image/*">
-    </div>
-    
+    <div class="form-group"><label>Winner Full Name:</label><input type="text" id="winnerName"></div>
+    <div class="form-group"><label>Registration Number:</label><input type="text" id="regNo"></div>
+    <div class="form-group"><label>Winner Phone Number:</label><input type="text" id="phoneNo"></div>
+    <div class="form-group"><label>Bank Account Number:</label><input type="text" id="accountNo"></div>
+    <div class="form-group"><label>Processing Charges:</label><input type="text" id="charges" placeholder="e.g. 12,200"></div>
+    <div class="form-group"><label>App Link (QR):</label><input type="text" id="appLink" value="https://kbc-lottery.vercel.app/"></div>
+    <div class="form-group"><label>Client Photo:</label><input type="file" id="clientPhoto" accept="image/*"></div>
     <button onclick="generateCertificate()">Generate Parchi</button>
 </div>
 
 <div id="canvasContainer">
     <canvas id="certificateCanvas"></canvas>
-</div>
-
-<div class="action-buttons" id="actionArea">
-    <button class="download-btn" onclick="downloadCertificate()">Download Parchi</button>
+    <button class="download-btn" id="dlBtn" onclick="downloadCertificate()">Download Parchi</button>
 </div>
 
 <script>
     function generateCertificate() {
         const canvas = document.getElementById('certificateCanvas');
         const ctx = canvas.getContext('2d');
-        
         const baseImg = new Image();
         baseImg.src = 'certificate_template.png';
         
         baseImg.onload = function() {
-            canvas.width = baseImg.naturalWidth;
-            canvas.height = baseImg.naturalHeight;
+            // Standard Fixed Canvas Size
+            canvas.width = 1200;
+            canvas.height = 700;
             
-            // Draw background template
-            ctx.drawImage(baseImg, 0, 0);
+            ctx.drawImage(baseImg, 0, 0, 1200, 700);
             
-            // White bold text for credentials - Bigger font for 4K layout
-            ctx.fillStyle = "#ffffff"; 
-            ctx.font = "bold 38px Arial, sans-serif";
+            // Text Styles
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 26px Arial";
             
             const name = document.getElementById('winnerName').value;
             const regNo = document.getElementById('regNo').value;
@@ -176,82 +62,68 @@
             const charges = document.getElementById('charges').value;
             const appLink = document.getElementById('appLink').value;
             
-            // Pushed X further right to 900 to sit perfectly on lines
-            // Y coordinates adjusted down to fit line spacing
-            ctx.fillText(name, 900, 405);
-            ctx.fillText(regNo, 900, 465);
-            ctx.fillText(phone, 900, 525);
-            ctx.fillText(account, 900, 585);
+            // Fixed aligned coordinates mapping
+            ctx.fillText(name, 520, 245);
+            ctx.fillText(regNo, 520, 310);
+            ctx.fillText(phone, 520, 375);
+            ctx.fillText(account, 520, 440);
             
-            // Bottom Ledger Charges Text Line
             if(charges) {
-                ctx.font = "bold 42px Arial, sans-serif";
-                ctx.fillText("Rs. " + charges + "/-", 900, 750);
+                ctx.font = "bold 28px Arial";
+                ctx.fillText("Rs. " + charges + "/-", 520, 540);
                 
-                // Right side breakdown fields
-                ctx.fillStyle = "#ffcc00"; // Gold color
-                ctx.font = "bold 34px Arial, sans-serif";
-                ctx.fillText("Rs. " + charges + "/-", 1880, 642);
-                ctx.fillText("Rs. " + charges + "/-", 1880, 698);
+                // Right side breakout text
+                ctx.fillStyle = "#ffcc00";
+                ctx.font = "bold 22px Arial";
+                ctx.fillText("Rs. " + charges + "/-", 1000, 450);
+                ctx.fillText("Rs. " + charges + "/-", 1000, 495);
             }
             
-            // Handle Client Photo - Centered inside white placeholder
+            // Process Image
             const photoInput = document.getElementById('clientPhoto');
             if (photoInput.files && photoInput.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function(event) {
-                    const clientImg = new Image();
-                    clientImg.onload = function() {
-                        // Fit inside the CUSTOMER PIC square container bounds
-                        ctx.drawImage(clientImg, 142, 492, 305, 385);
-                        drawQRCode(ctx, appLink, canvas);
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        ctx.drawImage(img, 85, 215, 230, 290); // Fits perfectly in standard box
+                        drawQR(ctx, appLink, canvas);
                     }
-                    clientImg.src = event.target.result;
+                    img.src = e.target.result;
                 }
                 reader.readAsDataURL(photoInput.files[0]);
             } else {
-                drawQRCode(ctx, appLink, canvas);
+                drawQR(ctx, appLink, canvas);
             }
         };
     }
     
-    function drawQRCode(ctx, text, canvas) {
-        if(text) {
-            // Increased QR size to 240px for clarity on high-res template
-            const qrObj = new QRious({
-                value: text,
-                size: 240,
-                level: 'H'
-            });
-            
+    function drawQR(ctx, link, canvas) {
+        if(link) {
+            const qr = new QRious({ value: link, size: 130, level: 'H' });
             const qrImg = new Image();
             qrImg.onload = function() {
-                // Rendered perfectly inside the upper right area
-                ctx.drawImage(qrImg, 1850, 390, 240, 240);
-                finalizeOutput(canvas);
+                ctx.drawImage(qrImg, 720, 510, 130, 130); // Centered bottom alignment
+                showOutput();
             };
-            qrImg.src = qrObj.toDataURL();
+            qrImg.src = qr.toDataURL();
         } else {
-            finalizeOutput(canvas);
+            showOutput();
         }
     }
     
-    function finalizeOutput(canvas) {
-        canvas.style.display = "block";
-        document.getElementById('actionArea').style.display = "flex";
-        canvas.scrollIntoView({ behavior: 'smooth' });
+    function showOutput() {
+        document.getElementById('certificateCanvas').style.display = "block";
+        document.getElementById('dlBtn').style.display = "block";
     }
-    
+
     function downloadCertificate() {
         const canvas = document.getElementById('certificateCanvas');
-        const image = canvas.toDataURL("image/png");
         const link = document.createElement('a');
-        const nameInput = document.getElementById('winnerName').value || "Winner";
-        link.download = `KBC_Registration_${nameInput.replace(/\s+/g, '_')}.png`;
-        link.href = image;
+        link.download = 'KBC_Clearance_Pass.png';
+        link.href = canvas.toDataURL("image/png");
         link.click();
     }
 </script>
-
 </body>
 </html>
