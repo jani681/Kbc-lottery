@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KBC Pass Generator - Admin Panel</title>
+    <title>KBC Pass Generator - Final Fixed</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         body {
@@ -95,9 +95,6 @@
             cursor: pointer;
             width: 100%;
         }
-        .download-btn:hover {
-            background-color: #2ecc71;
-        }
     </style>
 </head>
 <body>
@@ -160,16 +157,15 @@
         baseImg.src = 'certificate_template.png';
         
         baseImg.onload = function() {
-            // Read actual template dimensions to maintain pixel aspect ratio
             canvas.width = baseImg.naturalWidth;
             canvas.height = baseImg.naturalHeight;
             
-            // Draw background template
+            // Background drawing
             ctx.drawImage(baseImg, 0, 0);
             
-            // Text Color adjusted to Dark Navy Blue/Black for light paper background readability
-            ctx.fillStyle = "#0c2340"; 
-            ctx.font = "bold 32px Arial, Helvetica, sans-serif";
+            // Text typography adjustments - Bold Dark Navy Blue for lines
+            ctx.fillStyle = "#1e293b"; 
+            ctx.font = "bold 24px Arial, sans-serif";
             
             const name = document.getElementById('winnerName').value;
             const regNo = document.getElementById('regNo').value;
@@ -178,32 +174,33 @@
             const charges = document.getElementById('charges').value;
             const appLink = document.getElementById('appLink').value;
             
-            // New pixel perfect mapping coordinates for the cream textured fields
-            ctx.fillText(name, 820, 415);
-            ctx.fillText(regNo, 820, 480);
-            ctx.fillText(phone, 820, 545);
-            ctx.fillText(account, 820, 610);
+            // Mapped to fit exactly into the white spaces across template lines
+            ctx.fillText(name, 560, 412);
+            ctx.fillText(regNo, 560, 458);
+            ctx.fillText(phone, 560, 508);
+            ctx.fillText(account, 560, 555);
             
-            // Bottom processing ledger fee location calibration
             if(charges) {
-                ctx.fillText("Rs. " + charges + "/-", 820, 740);
+                // Bottom charges position shift
+                ctx.font = "bold 26px Arial, sans-serif";
+                ctx.fillText("Rs. " + charges + "/-", 610, 650);
                 
-                // Sidebar broken down calculation values (Gold contrast zone)
-                ctx.fillStyle = "#b8860b"; 
-                ctx.font = "bold 28px Arial, sans-serif";
-                ctx.fillText("Rs. " + charges + "/-", 1820, 642);
-                ctx.fillText("Rs. " + charges + "/-", 1820, 700);
+                // Processing charges breakdown block on the right panel
+                ctx.fillStyle = "#1e293b";
+                ctx.font = "bold 20px Arial, sans-serif";
+                ctx.fillText("Rs. " + charges + "/-", 915, 665);
+                ctx.fillText("Rs. " + charges + "/-", 915, 693);
             }
             
-            // Handle Client Photo scaling inside the specific card container box
+            // Client image positioning box adjustments
             const photoInput = document.getElementById('clientPhoto');
             if (photoInput.files && photoInput.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     const clientImg = new Image();
                     clientImg.onload = function() {
-                        // Positioned precisely inside the designated frame borders
-                        ctx.drawImage(clientImg, 145, 410, 310, 380);
+                        // Positioned strictly within the borders of the custom photo holder
+                        ctx.drawImage(clientImg, 82, 410, 168, 205);
                         drawQRCode(ctx, appLink, canvas);
                     }
                     clientImg.src = event.target.result;
@@ -217,17 +214,16 @@
     
     function drawQRCode(ctx, text, canvas) {
         if(text) {
-            // Enhanced layout scale multiplier for high density rendering
             const qrObj = new QRious({
                 value: text,
-                size: 200,
+                size: 110,
                 level: 'M'
             });
             
             const qrImg = new Image();
             qrImg.onload = function() {
-                // Placed smoothly inside its dedicated layout field grid bounds
-                ctx.drawImage(qrImg, 1170, 745, 200, 200);
+                // Shifted away from base image QR code container bounds to avoid clipping issues
+                ctx.drawImage(qrImg, 580, 715, 110, 110);
                 finalizeOutput(canvas);
             };
             qrImg.src = qrObj.toDataURL();
