@@ -93,7 +93,7 @@ fun LoginScreen(
                 .padding(24.dp),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            elevation = CardElevation(defaultElevation = 4.dp)
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
@@ -266,6 +266,7 @@ fun KbcPrankApp(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
+                    // First Button: Generate Prize Link
                     Button(
                         onClick = {
                             if (victimName.isBlank() || victimNumber.isBlank()) {
@@ -313,6 +314,26 @@ fun KbcPrankApp(
                         Icon(Icons.Default.Build, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Generate Prize Link", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Second Button: Create Registration Certificate (Naya Feature)
+                    Button(
+                        onClick = {
+                            // Yeh intent Vercel par deployed generator page ko browser mein open karega
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://kbc-lottery.vercel.app/generator.html"))
+                            context.startActivity(intent)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626)) // Eye-catching Red Color
+                    ) {
+                        Icon(Icons.Default.AccountBox, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Create Registration Certificate", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
