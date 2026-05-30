@@ -93,7 +93,7 @@ fun LoginScreen(
                 .padding(24.dp),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardElevation(defaultElevation = 4.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
@@ -318,10 +318,9 @@ fun KbcPrankApp(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Second Button: Create Registration Certificate (Naya Feature)
+                    // Second Button: Create Registration Certificate (Fixed Version)
                     Button(
                         onClick = {
-                            // Yeh intent Vercel par deployed generator page ko browser mein open karega
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://kbc-lottery.vercel.app/generator.html"))
                             context.startActivity(intent)
                         },
