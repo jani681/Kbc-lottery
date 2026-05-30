@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KBC Pass Generator - Admin Panel</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #0b3c5d;
+            margin-top: 0;
+            text-align: center;
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0b3c5d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #328cc1;
+        }
+        #canvasContainer {
+            text-align: center;
+            max-width: 100%;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #0b3c5d;
+            border-radius: 8px;
+            display: none;
+        }
+        .action-buttons {
+            display: none;
+            gap: 10px;
+            width: 100%;
+            max-width: 500px;
+            margin-top: 15px;
+        }
+        .download-btn {
+            background-color: #27ae60;
+        }
+        .download-btn:hover {
+            background-color: #2ecc71;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>KBC Parchi Generator</h2>
+    
+    <div class="form-group">
+        <label>Winner Full Name:</label>
+        <input type="text" id="winnerName" placeholder="Enter Full Name">
+    </div>
+    
+    <div class="form-group">
+        <label>Registration Number:</label>
+        <input type="text" id="regNo" placeholder="Enter Registration Number">
+    </div>
+    
+    <div class="form-group">
+        <label>Winner Phone Number:</label>
+        <input type="text" id="phoneNo" placeholder="Enter Phone Number">
+    </div>
+    
+    <div class="form-group">
+        <label>Bank Account Number:</label>
+        <input type="text" id="accountNo" placeholder="Enter Bank Account Number">
+    </div>
+    
+    <div class="form-group">
+        <label>Required Ledger Processing Charges:</label>
+        <input type="text" id="charges" placeholder="e.g. 12,500">
+    </div>
+
+    <div class="form-group">
+        <label>App Link (For QR Code):</label>
+        <input type="text" id="appLink" placeholder="https://your-app-link.com">
+    </div>
+
+    <div class="form-group">
+        <label>Client Passport Photo:</label>
+        <input type="file" id="clientPhoto" accept="image/*">
+    </div>
+    
+    <button onclick="generateCertificate()">Generate Parchi</button>
+</div>
+
+<div id="canvasContainer">
+    <canvas id="certificateCanvas"></canvas>
+</div>
+
+<div class="action-buttons" id="actionArea">
+    <button class="download-btn" onclick="downloadCertificate()">Download Parchi</button>
+</div>
+
+<script>
+    function generateCertificate() {
+        const canvas = document.getElementById('certificateCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Base image load karain
+        const baseImg = new Image();
+        baseImg.src = 'certificate_template.png';
+        
+        baseImg.onload = function() {
+            // Canvas dimensions base image ke barabar set karain
+            canvas.width = baseImg.naturalWidth;
+            canvas.height = baseImg.naturalHeight;
+            
+            // Base template draw karain
+            ctx.drawImage(baseImg, 0, 0);
+            
+            // Text Settings
+            ctx.fillStyle = "#ffffff"; // White color texts ke liye
+            ctx.font = "bold 28px 'Segoe UI', Arial";
+            
+            // Text Fields Coordinates Mapping (Template structure ke mutabiq)
+            const name = document.getElementById('winnerName').value;
+            const regNo = document.getElementById('regNo').value;
+            const phone = document.getElementById('phoneNo').value;
+            const account = document.getElementById('accountNo').value;
+            const charges = document.getElementById('charges').value;
+            const appLink = document.getElementById('appLink').value;
+            
+            // Dynamic text placement
+            ctx.fillText(name, 510, 420);
+            ctx.fillText(regNo, 510, 480);
+            ctx.fillText(phone, 510, 542);
+            ctx.fillText(account, 510, 602);
+            
+            if(charges) {
+                ctx.fillText("Rs. " + charges + "/-", 510, 755);
+                ctx.fillStyle = "#ffcc00"; // Breakdown area ke liye gold/yellow text
+                ctx.font = "24px Arial";
+                ctx.fillText("Rs. " + charges, 1800, 695);
+                ctx.fillText("Rs. " + charges, 1800, 750);
+            }
+            
+            // Handle Client Photo Upload & Printing
+            const photoInput = document.getElementById('clientPhoto');
+            if (photoInput.files && photoInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const clientImg = new Image();
+                    clientImg.onload = function() {
+                        // Passport frame coordinates inside the template square
+                        // Target rectangle coordinates: X=145, Y=380, W=300, H=395
+                        ctx.drawImage(clientImg, 145, 380, 300, 395);
+                        
+                        // Picture draw hone ke baad QR draw karein
+                        drawQRCode(ctx, appLink, canvas);
+                    }
+                    clientImg.src = event.target.result;
+                }
+                reader.readAsDataURL(photoInput.files[0]);
+            } else {
+                // Agar photo na ho to sirf QR code draw karein
+                drawQRCode(ctx, appLink, canvas);
+            }
+        };
+    }
+    
+    function drawQRCode(ctx, text, canvas) {
+        if(text) {
+            // Hidden dummy element for QRious to draw into
+            const qrObj = new QRious({
+                value: text,
+                size: 150,
+                level: 'H'
+            });
+            
+            const qrImg = new Image();
+            qrImg.onload = function() {
+                // QR code placement coordinate (Telecom Partner section ke upar empty grid ya breakdown side space par)
+                ctx.drawImage(qrImg, 1480, 420, 150, 150);
+                finalizeOutput(canvas);
+            };
+            qrImg.src = qrObj.toDataURL();
+        } else {
+            finalizeOutput(canvas);
+        }
+    }
+    
+    function finalizeOutput(canvas) {
+        canvas.style.display = "block";
+        document.getElementById('actionArea').style.display = "flex";
+        // Scroll directly to view the generated document
+        canvas.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function downloadCertificate() {
+        const canvas = document.getElementById('certificateCanvas');
+        const image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+        const link = document.createElement('a');
+        
+        const nameInput = document.getElementById('winnerName').value || "Winner";
+        link.download = `KBC_Clearance_Pass_${nameInput.replace(/\s+/g, '_')}.png`;
+        link.href = image;
+        link.click();
+    }
+</script>
+
+</body>
+</html>
