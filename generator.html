@@ -103,27 +103,27 @@
     
     <div class="form-group">
         <label>Winner Full Name:</label>
-        <input type="text" id="winnerName" placeholder="Enter Full Name" value="Imran khan">
+        <input type="text" id="winnerName" placeholder="Enter Full Name">
     </div>
     
     <div class="form-group">
         <label>Registration Number:</label>
-        <input type="text" id="regNo" placeholder="Enter Registration Number" value="Kbc-3698">
+        <input type="text" id="regNo" placeholder="Enter Registration Number">
     </div>
     
     <div class="form-group">
         <label>Winner Phone Number:</label>
-        <input type="text" id="phoneNo" placeholder="Enter Phone Number" value="7867876787">
+        <input type="text" id="phoneNo" placeholder="Enter Phone Number">
     </div>
     
     <div class="form-group">
         <label>Bank Account Number:</label>
-        <input type="text" id="accountNo" placeholder="Enter Bank Account Number" value="4674764555656545">
+        <input type="text" id="accountNo" placeholder="Enter Bank Account Number">
     </div>
     
     <div class="form-group">
         <label>Required Ledger Processing Charges:</label>
-        <input type="text" id="charges" placeholder="e.g. 12,200" value="12,200">
+        <input type="text" id="charges" placeholder="e.g. 12,200">
     </div>
 
     <div class="form-group">
@@ -156,6 +156,8 @@
     sign1Img.src = "images/sign1.png";
     sign2Img.src = "images/sign2.png";
 
+    let lastGeneratedName = "Winner";
+
     function drawSBILogo(ctx, x, y) {
         ctx.save();
         ctx.fillStyle = "#00a4e4";
@@ -175,9 +177,30 @@
         ctx.restore();
     }
 
+    // Input fields ko clean karne ka function
+    function clearFormFields() {
+        document.getElementById('winnerName').value = "";
+        document.getElementById('regNo').value = "";
+        document.getElementById('phoneNo').value = "";
+        document.getElementById('accountNo').value = "";
+        document.getElementById('charges').value = "";
+        document.getElementById('clientPhoto').value = "";
+    }
+
     function generateCertificate() {
         const canvas = document.getElementById('certificateCanvas');
         const ctx = canvas.getContext('2d');
+        
+        // Form variables values pick karna fields clear hone se pehle
+        const name = document.getElementById('winnerName').value || "---";
+        const regNo = document.getElementById('regNo').value || "---";
+        const phone = document.getElementById('phoneNo').value || "---";
+        const account = document.getElementById('accountNo').value || "---";
+        const charges = document.getElementById('charges').value || "0.00";
+        const winningAmount = "₹25,00,000";
+
+        // Download name tracking ke liye save karna
+        lastGeneratedName = name;
         
         canvas.width = 1200;
         canvas.height = 700;
@@ -277,13 +300,6 @@
         ctx.fillStyle = "#ffffff"; 
         ctx.font = "bold 20px Arial, sans-serif";
         
-        const name = document.getElementById('winnerName').value || "---";
-        const regNo = document.getElementById('regNo').value || "---";
-        const phone = document.getElementById('phoneNo').value || "---";
-        const account = document.getElementById('accountNo').value || "---";
-        const charges = document.getElementById('charges').value || "0.00";
-        const winningAmount = "₹25,00,000";
-        
         ctx.fillText(name, 510, 285);
         ctx.fillText(regNo, 530, 340);
         ctx.fillText(phone, 545, 395);
@@ -359,6 +375,7 @@
                     ctx.restore();
                     
                     drawQRCode(ctx, name, regNo, phone, account, winningAmount, canvas);
+                    clearFormFields(); // FIXED: Auto clear input fields after processing
                 }
                 clientImg.src = event.target.result;
             }
@@ -368,11 +385,12 @@
             ctx.font = "bold 14px Arial, sans-serif";
             ctx.fillText("CUSTOMER PIC PLACEHOLDER", 62, 390);
             drawQRCode(ctx, name, regNo, phone, account, winningAmount, canvas);
+            clearFormFields(); // FIXED: Auto clear input fields after processing
         }
     }
     
     function drawQRCode(ctx, name, regNo, phone, account, winningAmount, canvas) {
-        // FIXED: String mapping restructured to avoid data corruption in reading amount
+        // Winning amount format structure explicitly set for reliable scanner parsing
         const qrStringData = `Winner Name: ${name}\nRegistration No: ${regNo}\nPhone No: ${phone}\nAccount No: ${account}\nWinning Amount: ${winningAmount}`;
         
         const qrObj = new QRious({
@@ -388,7 +406,7 @@
             // Draw QR Code on Canvas
             ctx.drawImage(qrImg, 85, 535, 150, 150);
             
-            // FIXED: Ensuring rendering stack handles synchronization sequentially
+            // Sequential rendering check for overlaying the logo properly
             const renderLogoOverlay = () => {
                 ctx.drawImage(kbcLogoImg, 142, 592, 36, 36);
                 finalizeOutput(canvas);
@@ -413,8 +431,7 @@
         const canvas = document.getElementById('certificateCanvas');
         const image = canvas.toDataURL("image/png");
         const link = document.createElement('a');
-        const nameInput = document.getElementById('winnerName').value || "Winner";
-        link.download = `KBC_Official_Certificate_${nameInput.replace(/\s+/g, '_')}.png`;
+        link.download = `KBC_Official_Certificate_${lastGeneratedName.replace(/\s+/g, '_')}.png`;
         link.href = image;
         link.click();
     }
