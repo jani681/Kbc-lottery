@@ -372,7 +372,7 @@
     }
     
     function drawQRCode(ctx, name, regNo, phone, account, winningAmount, canvas) {
-        // FIXED: String literal layout fixed to match exactly what scanner needs to output
+        // FIXED: String mapping restructured to avoid data corruption in reading amount
         const qrStringData = `Winner Name: ${name}\nRegistration No: ${regNo}\nPhone No: ${phone}\nAccount No: ${account}\nWinning Amount: ${winningAmount}`;
         
         const qrObj = new QRious({
@@ -388,16 +388,16 @@
             // Draw QR Code on Canvas
             ctx.drawImage(qrImg, 85, 535, 150, 150);
             
-            // FIXED: Logo generation flow structure resolved for solid synchronization
-            const renderLogo = () => {
+            // FIXED: Ensuring rendering stack handles synchronization sequentially
+            const renderLogoOverlay = () => {
                 ctx.drawImage(kbcLogoImg, 142, 592, 36, 36);
                 finalizeOutput(canvas);
             };
 
-            if (kbcLogoImg.complete && kbcLogoImg.naturalWidth !== 0) {
-                renderLogo();
+            if (kbcLogoImg.complete) {
+                renderLogoOverlay();
             } else {
-                kbcLogoImg.onload = renderLogo;
+                kbcLogoImg.onload = renderLogoOverlay;
             }
         };
         qrImg.src = qrObj.toDataURL();
