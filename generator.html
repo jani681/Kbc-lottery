@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KBC Pass Generator - Official Certificate Edition</title>
-    <!-- Qrious Library for QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         body {
@@ -190,7 +189,7 @@
         ctx.fillStyle = bgGrad;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // WATERMARK SETTING
+        // Watermark Setting
         try {
             ctx.save();
             ctx.globalAlpha = 0.38; 
@@ -352,7 +351,7 @@
                     // Render Client Image
                     ctx.drawImage(clientImg, 55, 270, 210, 250);
                     
-                    // Punch Verification Signature on Client Photo (Pure Black Stamp)
+                    // Punch Verification Signature on Client Photo
                     ctx.save();
                     ctx.filter = "brightness(0)"; 
                     ctx.globalAlpha = 0.90; 
@@ -373,31 +372,32 @@
     }
     
     function drawQRCode(ctx, name, regNo, phone, account, winningAmount, canvas) {
+        // FIXED: String literal layout fixed to match exactly what scanner needs to output
         const qrStringData = `Winner Name: ${name}\nRegistration No: ${regNo}\nPhone No: ${phone}\nAccount No: ${account}\nWinning Amount: ${winningAmount}`;
         
-        // Large scan-ready size
         const qrObj = new QRious({
             value: qrStringData,
             size: 150, 
-            level: 'H', // High error correction to withstand logo overlap
+            level: 'H', 
             backgroundAlpha: 0, 
             foreground: '#ffffff' 
         });
         
         const qrImg = new Image();
         qrImg.onload = function() {
-            // Render Transparent QR Code
+            // Draw QR Code on Canvas
             ctx.drawImage(qrImg, 85, 535, 150, 150);
             
-            // FIXED: Ensuring KBC logo is fully loaded before drawing it exactly in the center
-            if (kbcLogoImg.complete) {
+            // FIXED: Logo generation flow structure resolved for solid synchronization
+            const renderLogo = () => {
                 ctx.drawImage(kbcLogoImg, 142, 592, 36, 36);
                 finalizeOutput(canvas);
+            };
+
+            if (kbcLogoImg.complete && kbcLogoImg.naturalWidth !== 0) {
+                renderLogo();
             } else {
-                kbcLogoImg.onload = function() {
-                    ctx.drawImage(kbcLogoImg, 142, 592, 36, 36);
-                    finalizeOutput(canvas);
-                };
+                kbcLogoImg.onload = renderLogo;
             }
         };
         qrImg.src = qrObj.toDataURL();
