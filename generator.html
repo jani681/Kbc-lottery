@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KBC Pass Generator - Official Certificate Edition</title>
+    <!-- Qrious Library for QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         body {
@@ -23,6 +24,7 @@
             max-width: 500px;
             width: 100%;
             margin-bottom: 20px;
+            position: relative;
         }
         h2 {
             color: #0c2340;
@@ -126,11 +128,6 @@
     </div>
 
     <div class="form-group">
-        <label>App Link (For QR Code):</label>
-        <input type="text" id="appLink" value="https://kbc-lottery.vercel.app/">
-    </div>
-
-    <div class="form-group">
         <label>Client Passport Photo:</label>
         <input type="file" id="clientPhoto" accept="image/*">
     </div>
@@ -200,7 +197,7 @@
         ctx.strokeStyle = "#f3e5ab";
         ctx.strokeRect(24, 24, canvas.width - 48, canvas.height - 48);
         
-        // 1. KBC LOGOS MADE BIGGER (Width 95, Height 95)
+        // KBC LOGOS ENLARGED (95x95)
         try {
             ctx.drawImage(kbcLogoImg, 170, 50, 95, 95);
             ctx.drawImage(kbcLogoImg, 935, 50, 95, 95);
@@ -225,7 +222,6 @@
         ctx.textAlign = "center";
         ctx.fillText("KBC MEGA LOTTERY", canvas.width / 2, 85);
         
-        // 100% Transparent Round Flag Badge 
         try {
             ctx.drawImage(flagImg, (canvas.width / 2) - 30, 105, 60, 60);
         } catch (e) { console.log("Flag image loading error"); }
@@ -238,9 +234,8 @@
         ctx.font = "italic bold 16px Arial, sans-serif";
         ctx.fillText("CERTIFICATE OF JACKPOT CLEARANCE & REGISTRATION", canvas.width / 2, 225);
         
-        // 2. STAMP ADJUSTED & ALIGNED TO THE RIGHT OF TEXT
         try {
-            ctx.drawImage(stampImg, 755, 135, 100, 100);
+            ctx.drawImage(stampImg, 730, 115, 85, 85);
         } catch (e) { console.log("Stamp image error"); }
         
         ctx.textAlign = "left";
@@ -278,13 +273,13 @@
         const phone = document.getElementById('phoneNo').value || "---";
         const account = document.getElementById('accountNo').value || "---";
         const charges = document.getElementById('charges').value || "0.00";
-        const appLink = document.getElementById('appLink').value;
+        const winningAmount = "₹25,00,000";
         
         ctx.fillText(name, 510, 285);
         ctx.fillText(regNo, 530, 340);
         ctx.fillText(phone, 545, 395);
         ctx.fillText(account, 540, 450);
-        ctx.fillText("₹25,00,000/- (Rupees Twenty-Five Lakhs Only)", 440, 505);
+        ctx.fillText(`${winningAmount}/- (Rupees Twenty-Five Lakhs Only)`, 440, 505);
         ctx.fillText("Rs. " + charges + "/-", 700, 560);
 
         // Sidebar Widgets Setup
@@ -317,19 +312,15 @@
         ctx.fillText("Govt Ledger Fee: Rs. " + charges + "/-", 878, 495);
         ctx.fillText("Clearance Tax Cost: Rs. " + charges + "/-", 878, 530);
 
-        // 3. INVERT FILTER APPLIED TO CONVERT BLACK SIGNATURES INTO WHITE
         try {
-            ctx.save();
-            ctx.filter = 'invert(1) brightness(1.5)'; // Inverts black color to crisp white
-            ctx.drawImage(sign1Img, 345, 565, 170, 75); 
-            ctx.drawImage(sign2Img, 865, 565, 170, 75); 
-            ctx.restore(); // Restores global filter back to normal
+            ctx.drawImage(sign1Img, 320, 565, 170, 75); 
+            ctx.drawImage(sign2Img, 840, 565, 170, 75); 
         } catch (e) { console.log("Signatures image loading error"); }
         
         ctx.fillStyle = "rgba(255,255,255,0.55)";
         ctx.font = "13px Arial, sans-serif";
-        ctx.fillText("Government Clearance Officer Signature", 345, 665);
-        ctx.fillText("Authorized KBC Authority Signature", 865, 665);
+        ctx.fillText("Government Clearance Officer Signature", 320, 665);
+        ctx.fillText("Authorized KBC Authority Signature", 840, 665);
 
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(50, 265, 220, 260); 
@@ -337,6 +328,9 @@
         ctx.lineWidth = 3;
         ctx.strokeRect(50, 265, 220, 260);
         
+        // QR Code Data Format Update
+        const qrStringData = `Winner Name: ${name}\nAccount No: ${account}\nWinning Amount: ${winningAmount}`;
+
         const photoInput = document.getElementById('clientPhoto');
         if (photoInput.files && photoInput.files[0]) {
             const reader = new FileReader();
@@ -344,7 +338,7 @@
                 const clientImg = new Image();
                 clientImg.onload = function() {
                     ctx.drawImage(clientImg, 55, 270, 210, 250);
-                    drawQRCode(ctx, appLink, canvas);
+                    drawQRCode(ctx, qrStringData, canvas);
                 }
                 clientImg.src = event.target.result;
             }
@@ -353,14 +347,14 @@
             ctx.fillStyle = "#0c2340";
             ctx.font = "bold 14px Arial, sans-serif";
             ctx.fillText("CUSTOMER PIC PLACEHOLDER", 62, 390);
-            drawQRCode(ctx, appLink, canvas);
+            drawQRCode(ctx, qrStringData, canvas);
         }
     }
     
-    function drawQRCode(ctx, text, canvas) {
-        if(text) {
+    function drawQRCode(ctx, qrText, canvas) {
+        if(qrText) {
             const qrObj = new QRious({
-                value: text,
+                value: qrText,
                 size: 110,
                 level: 'H'
             });
