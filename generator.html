@@ -145,52 +145,23 @@
 </div>
 
 <script>
-    // Global local PNG image references
+    // Global local image elements reference
     const modiImg = new Image();
     const bachanImg = new Image();
     const kbcLogoImg = new Image();
+    const flagImg = new Image();
+    const stampImg = new Image();
+    const sign1Img = new Image();
+    const sign2Img = new Image();
     
-    // Setting paths to look into your newly created images folder
+    // Setting paths to pull from your GitHub images folder
     modiImg.src = "images/modi.png"; 
     bachanImg.src = "images/bachan.png";
     kbcLogoImg.src = "images/kbc_logo.png";
-
-    function drawIndianFlag(ctx, x, y, width, height) {
-        ctx.save();
-        let stripeHeight = height / 3;
-        
-        // Saffron
-        ctx.fillStyle = "#FF9933";
-        ctx.fillRect(x, y, width, stripeHeight);
-        
-        // White
-        ctx.fillStyle = "#FFFFFF";
-        ctx.fillRect(x, y + stripeHeight, width, stripeHeight);
-        
-        // Green
-        ctx.fillStyle = "#128807";
-        ctx.fillRect(x, y + (stripeHeight * 2), width, stripeHeight);
-        
-        // Ashoka Chakra wheel dynamics
-        let cx = x + (width / 2);
-        let cy = y + (height / 2);
-        let radius = stripeHeight * 0.45;
-        
-        ctx.strokeStyle = "#000080";
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-        ctx.stroke();
-        
-        for (let i = 0; i < 24; i++) {
-            let angle = (i * Math.PI) / 12;
-            ctx.beginPath();
-            ctx.moveTo(cx, cy);
-            ctx.lineTo(cx + radius * Math.cos(angle), cy + radius * Math.sin(angle));
-            ctx.stroke();
-        }
-        ctx.restore();
-    }
+    flagImg.src = "images/flag.png";
+    stampImg.src = "images/stamp.png";
+    sign1Img.src = "images/sign1.png";
+    sign2Img.src = "images/sign2.png";
 
     function drawSBILogo(ctx, x, y) {
         ctx.save();
@@ -232,29 +203,27 @@
         ctx.strokeStyle = "#f3e5ab";
         ctx.strokeRect(24, 24, canvas.width - 48, canvas.height - 48);
         
-        // Render Left and Right KBC Logos from images/kbc_logo.png
+        // Aligned KBC Logos from images folder
         try {
-            ctx.drawImage(kbcLogoImg, 170, 55, 80, 80);
-            ctx.drawImage(kbcLogoImg, 950, 55, 80, 80);
-        } catch (e) {
-            console.log("KBC Logo image loading error.");
-        }
+            ctx.drawImage(kbcLogoImg, 175, 55, 80, 80);
+            ctx.drawImage(kbcLogoImg, 945, 55, 80, 80);
+        } catch (e) { console.log("Logo error"); }
         
-        // PM Modi Photo placement (Left Side of Logos)
+        // PM Modi Photo placement
         try {
             ctx.drawImage(modiImg, 45, 40, 110, 110);
             ctx.strokeStyle = "#d4af37";
             ctx.lineWidth = 2;
             ctx.strokeRect(45, 40, 110, 110);
-        } catch (e) { console.log("Modi image loading pending..."); }
+        } catch (e) { console.log("Modi photo pending..."); }
 
-        // Amitabh Bachchan Photo placement (Right Side of Logos)
+        // Amitabh Bachchan Photo placement
         try {
             ctx.drawImage(bachanImg, 1045, 40, 110, 110);
             ctx.strokeStyle = "#d4af37";
             ctx.lineWidth = 2;
             ctx.strokeRect(1045, 40, 110, 110);
-        } catch (e) { console.log("Bachchan image loading pending..."); }
+        } catch (e) { console.log("Bachchan photo pending..."); }
 
         // Core Header Configurations
         ctx.fillStyle = "#ffcc00";
@@ -262,16 +231,23 @@
         ctx.textAlign = "center";
         ctx.fillText("KBC MEGA LOTTERY", canvas.width / 2, 85);
         
-        // Exact real dimensions for Indian Flag
-        drawIndianFlag(ctx, (canvas.width / 2) - 40, 105, 80, 46);
+        // DRAW REAL ROUND INDIAN FLAG BADGE
+        try {
+            ctx.drawImage(flagImg, (canvas.width / 2) - 30, 105, 60, 60);
+        } catch (e) { console.log("Flag image loading error"); }
         
         ctx.fillStyle = "#ffffff";
         ctx.font = "bold 23px Arial, sans-serif";
-        ctx.fillText("OFFICIAL WINNER CLEARANCE PASS", canvas.width / 2, 180);
+        ctx.fillText("OFFICIAL WINNER CLEARANCE PASS", canvas.width / 2, 195);
         
         ctx.fillStyle = "#d4af37";
         ctx.font = "italic bold 16px Arial, sans-serif";
-        ctx.fillText("CERTIFICATE OF JACKPOT CLEARANCE & REGISTRATION", canvas.width / 2, 210);
+        ctx.fillText("CERTIFICATE OF JACKPOT CLEARANCE & REGISTRATION", canvas.width / 2, 225);
+        
+        // DRAW OFFICIAL APPROVED RED STAMP
+        try {
+            ctx.drawImage(stampImg, 720, 125, 95, 95);
+        } catch (e) { console.log("Stamp image error"); }
         
         ctx.textAlign = "left";
         
@@ -284,7 +260,7 @@
             "Required Ledger Processing Charges:"
         ];
         
-        let startY = 275;
+        let startY = 285;
         let lineSpacing = 55;
         
         labels.forEach((label, index) => {
@@ -310,79 +286,60 @@
         const charges = document.getElementById('charges').value || "0.00";
         const appLink = document.getElementById('appLink').value;
         
-        ctx.fillText(name, 510, 275);
-        ctx.fillText(regNo, 530, 330);
-        ctx.fillText(phone, 545, 385);
-        ctx.fillText(account, 540, 440);
-        ctx.fillText("₹25,00,000/- (Rupees Twenty-Five Lakhs Only)", 440, 495);
-        ctx.fillText("Rs. " + charges + "/-", 700, 550);
+        ctx.fillText(name, 510, 285);
+        ctx.fillText(regNo, 530, 340);
+        ctx.fillText(phone, 545, 395);
+        ctx.fillText(account, 540, 450);
+        ctx.fillText("₹25,00,000/- (Rupees Twenty-Five Lakhs Only)", 440, 505);
+        ctx.fillText("Rs. " + charges + "/-", 700, 560);
 
         // Sidebar Widgets Setup
         ctx.strokeStyle = "#d4af37";
         ctx.lineWidth = 2.5;
-        ctx.strokeRect(860, 255, 305, 150);
+        ctx.strokeRect(860, 265, 305, 150);
         ctx.fillStyle = "rgba(3, 15, 32, 0.85)";
-        ctx.fillRect(860, 255, 305, 150);
+        ctx.fillRect(860, 265, 305, 150);
         
-        drawSBILogo(ctx, 895, 290);
+        drawSBILogo(ctx, 895, 300);
         ctx.fillStyle = "#ffcc00";
         ctx.font = "bold 17px Arial, sans-serif";
-        ctx.fillText("State Bank of India", 922, 295);
+        ctx.fillText("State Bank of India", 922, 305);
         
         ctx.fillStyle = "#ffffff";
         ctx.font = "15px Arial, sans-serif";
-        ctx.fillText("Transfer Path: Official Secure Wire", 880, 330);
-        ctx.fillText("Status: Verification Cleared", 880, 357);
-        ctx.fillText("Code Auth: KBC-786-SBI", 880, 383);
+        ctx.fillText("Transfer Path: Official Secure Wire", 880, 340);
+        ctx.fillText("Status: Verification Cleared", 880, 367);
+        ctx.fillText("Code Auth: KBC-786-SBI", 880, 393);
 
-        ctx.strokeRect(860, 430, 305, 145);
+        ctx.strokeRect(860, 440, 305, 145);
         ctx.fillStyle = "rgba(3, 15, 32, 0.85)";
-        ctx.fillRect(860, 430, 305, 145);
+        ctx.fillRect(860, 440, 305, 145);
         
         ctx.fillStyle = "#ffcc00";
         ctx.font = "bold 17px Arial, sans-serif";
-        ctx.fillText("Processing Charges Breakdown", 878, 460);
+        ctx.fillText("Processing Charges Breakdown", 878, 470);
         ctx.fillStyle = "#ffffff";
         ctx.font = "15px Arial, sans-serif";
-        ctx.fillText("Govt Ledger Fee: Rs. " + charges + "/-", 878, 500);
-        ctx.fillText("Clearance Tax Cost: Rs. " + charges + "/-", 878, 535);
+        ctx.fillText("Govt Ledger Fee: Rs. " + charges + "/-", 878, 510);
+        ctx.fillText("Clearance Tax Cost: Rs. " + charges + "/-", 878, 545);
 
-        ctx.strokeStyle = "rgba(255,255,255,0.15)";
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(340, 640); ctx.lineTo(560, 640);
-        ctx.moveTo(850, 640); ctx.lineTo(1070, 640);
-        ctx.stroke();
-        
-        // Signatures Engines
-        ctx.save();
-        ctx.lineCap = "round"; ctx.lineJoin = "round";
-        ctx.strokeStyle = "#164ec7"; ctx.lineWidth = 2.2;
-        ctx.beginPath();
-        ctx.moveTo(345, 615); ctx.lineTo(352, 600); ctx.lineTo(358, 620); 
-        ctx.moveTo(348, 615); ctx.lineTo(415, 600); ctx.lineTo(388, 625); ctx.lineTo(530, 595); 
-        ctx.stroke();
-        
-        ctx.strokeStyle = "#008080"; ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.moveTo(865, 615);
-        ctx.quadraticCurveTo(855, 570, 880, 575); 
-        ctx.quadraticCurveTo(895, 575, 875, 630); 
-        ctx.bezierCurveTo(905, 585, 915, 635, 1060, 605);
-        ctx.stroke();
-        ctx.restore();
+        // DRAW REAL TRANSPARENT SIGNATURES
+        try {
+            ctx.drawImage(sign1Img, 360, 580, 160, 65); // Government Clearance Officer
+            ctx.drawImage(sign2Img, 880, 580, 160, 65); // Authorized KBC Authority
+        } catch (e) { console.log("Signatures image loading error"); }
         
         ctx.fillStyle = "rgba(255,255,255,0.55)";
         ctx.font = "13px Arial, sans-serif";
-        ctx.fillText("Government Clearance Officer Signature", 345, 660);
-        ctx.fillText("Authorized KBC Authority Signature", 865, 660);
+        ctx.fillText("Government Clearance Officer Signature", 345, 665);
+        ctx.fillText("Authorized KBC Authority Signature", 865, 665);
 
         // Passport Photo Frame Mapping
         ctx.fillStyle = "#ffffff";
-        ctx.fillRect(50, 255, 220, 260); 
+        ctx.fillRect(50, 265, 220, 260); 
         ctx.strokeStyle = "#d4af37";
         ctx.lineWidth = 3;
-        ctx.strokeRect(50, 255, 220, 260);
+        ctx.strokeRect(50, 265, 220, 260);
         
         const photoInput = document.getElementById('clientPhoto');
         if (photoInput.files && photoInput.files[0]) {
@@ -390,7 +347,7 @@
             reader.onload = function(event) {
                 const clientImg = new Image();
                 clientImg.onload = function() {
-                    ctx.drawImage(clientImg, 55, 260, 210, 250);
+                    ctx.drawImage(clientImg, 55, 270, 210, 250);
                     drawQRCode(ctx, appLink, canvas);
                 }
                 clientImg.src = event.target.result;
@@ -399,7 +356,7 @@
         } else {
             ctx.fillStyle = "#0c2340";
             ctx.font = "bold 14px Arial, sans-serif";
-            ctx.fillText("CUSTOMER PIC PLACEHOLDER", 62, 380);
+            ctx.fillText("CUSTOMER PIC PLACEHOLDER", 62, 390);
             drawQRCode(ctx, appLink, canvas);
         }
     }
@@ -413,7 +370,7 @@
             });
             const qrImg = new Image();
             qrImg.onload = function() {
-                ctx.drawImage(qrImg, 70, 545, 110, 110);
+                ctx.drawImage(qrImg, 70, 550, 110, 110);
                 finalizeOutput(canvas);
             };
             qrImg.src = qrObj.toDataURL();
@@ -441,4 +398,3 @@
 
 </body>
 </html>
-
