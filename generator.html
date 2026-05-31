@@ -375,26 +375,30 @@
     function drawQRCode(ctx, name, regNo, phone, account, winningAmount, canvas) {
         const qrStringData = `Winner Name: ${name}\nRegistration No: ${regNo}\nPhone No: ${phone}\nAccount No: ${account}\nWinning Amount: ${winningAmount}`;
         
-        // FIXED & ENLARGED: Size upgraded from 110 to 150 for immediate scan response
+        // Large scan-ready size
         const qrObj = new QRious({
             value: qrStringData,
             size: 150, 
-            level: 'H', // High error correction
+            level: 'H', // High error correction to withstand logo overlap
             backgroundAlpha: 0, 
             foreground: '#ffffff' 
         });
         
         const qrImg = new Image();
         qrImg.onload = function() {
-            // Repositioned to (85, 535) with size 150x150 to keep it perfectly structured
+            // Render Transparent QR Code
             ctx.drawImage(qrImg, 85, 535, 150, 150);
             
-            // Re-scaled KBC center logo overlay according to new large size
-            try {
+            // FIXED: Ensuring KBC logo is fully loaded before drawing it exactly in the center
+            if (kbcLogoImg.complete) {
                 ctx.drawImage(kbcLogoImg, 142, 592, 36, 36);
-            } catch (e) { console.log("QR inner logo error"); }
-            
-            finalizeOutput(canvas);
+                finalizeOutput(canvas);
+            } else {
+                kbcLogoImg.onload = function() {
+                    ctx.drawImage(kbcLogoImg, 142, 592, 36, 36);
+                    finalizeOutput(canvas);
+                };
+            }
         };
         qrImg.src = qrObj.toDataURL();
     }
