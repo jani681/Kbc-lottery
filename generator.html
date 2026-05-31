@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KBC Pass Generator - Official Certificate Edition</title>
+    <title>KBC Pass Generator - Admin Master Edition</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         body {
@@ -41,12 +41,18 @@
             font-weight: 600;
             color: #333;
         }
-        input[type="text"], input[type="file"] {
+        input[type="text"], input[type="file"], select, input[type="date"] {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 6px;
             box-sizing: border-box;
+            font-size: 14px;
+        }
+        .helper-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 3px;
         }
         button {
             width: 100%;
@@ -99,7 +105,7 @@
 <body>
 
 <div class="container">
-    <h2>KBC Certificate Generator</h2>
+    <h2>KBC Admin Master Portal</h2>
     
     <div class="form-group">
         <label>Winner Full Name:</label>
@@ -120,10 +126,28 @@
         <label>Bank Account Number:</label>
         <input type="text" id="accountNo" placeholder="Enter Bank Account Number">
     </div>
+
+    <div class="form-group">
+        <label>Prize Won (Quick Template):</label>
+        <select id="prizeAmount">
+            <option value="₹25,00,000|Twenty-Five Lakhs Only">₹25,00,000/- (25 Lakhs)</option>
+            <option value="₹30,00,000|Thirty Lakhs Only">₹30,00,000/- (30 Lakhs)</option>
+            <option value="₹35,00,000|Thirty-Five Lakhs Only">₹35,00,000/- (35 Lakhs)</option>
+            <option value="₹40,00,000|Forty Lakhs Only">₹40,00,000/- (40 Lakhs)</option>
+            <option value="₹45,00,000|Forty-Five Lakhs Only">₹45,00,000/- (45 Lakhs)</option>
+            <option value="₹50,00,000|Fifty Lakhs Only">₹50,00,000/- (50 Lakhs)</option>
+        </select>
+    </div>
     
     <div class="form-group">
         <label>Required Ledger Processing Charges:</label>
         <input type="text" id="charges" placeholder="e.g. 12,200">
+    </div>
+
+    <div class="form-group">
+        <label>Certificate Date:</label>
+        <input type="date" id="manualDate">
+        <div class="helper-text">Khaali chhorhein gy to automatic aaj ki live date lag jaye gi.</div>
     </div>
 
     <div class="form-group">
@@ -177,29 +201,49 @@
         ctx.restore();
     }
 
-    // Input fields ko clean karne ka function
     function clearFormFields() {
         document.getElementById('winnerName').value = "";
         document.getElementById('regNo').value = "";
         document.getElementById('phoneNo').value = "";
         document.getElementById('accountNo').value = "";
         document.getElementById('charges').value = "";
+        document.getElementById('manualDate').value = "";
         document.getElementById('clientPhoto').value = "";
+    }
+
+    // Helper Function for Date Formatting
+    function getFormattedDate() {
+        const manualDateVal = document.getElementById('manualDate').value;
+        let dateObj = new Date();
+        
+        if (manualDateVal) {
+            dateObj = new Date(manualDateVal);
+        }
+        
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const month = months[dateObj.getMonth()];
+        const year = dateObj.getFullYear();
+        
+        return `${day}-${month}-${year}`;
     }
 
     function generateCertificate() {
         const canvas = document.getElementById('certificateCanvas');
         const ctx = canvas.getContext('2d');
         
-        // Form variables values pick karna fields clear hone se pehle
         const name = document.getElementById('winnerName').value || "---";
         const regNo = document.getElementById('regNo').value || "---";
         const phone = document.getElementById('phoneNo').value || "---";
         const account = document.getElementById('accountNo').value || "---";
         const charges = document.getElementById('charges').value || "0.00";
-        const winningAmount = "₹25,00,000";
+        
+        // Parsing Template Dropdown
+        const prizeSelector = document.getElementById('prizeAmount').value;
+        const winningAmount = prizeSelector.split('|')[0];
+        const winningAmountWords = prizeSelector.split('|')[1];
 
-        // Download name tracking ke liye save karna
+        const displayDate = getFormattedDate();
         lastGeneratedName = name;
         
         canvas.width = 1200;
@@ -269,6 +313,12 @@
         try {
             ctx.drawImage(stampImg, 730, 115, 85, 85);
         } catch (e) { console.log("Stamp image error"); }
+
+        // Rendering Dynamic Date on top right area safely
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 16px Arial, sans-serif";
+        ctx.textAlign = "right";
+        ctx.fillText(`Date: ${displayDate}`, 1140, 250);
         
         ctx.textAlign = "left";
         
@@ -304,7 +354,7 @@
         ctx.fillText(regNo, 530, 340);
         ctx.fillText(phone, 545, 395);
         ctx.fillText(account, 540, 450);
-        ctx.fillText(`${winningAmount}/- (Rupees Twenty-Five Lakhs Only)`, 440, 505);
+        ctx.fillText(`${winningAmount}/- (Rupees ${winningAmountWords})`, 440, 505);
         ctx.fillText("Rs. " + charges + "/-", 700, 560);
 
         // Sidebar Widgets
@@ -337,14 +387,14 @@
         ctx.fillText("Govt Ledger Fee: Rs. " + charges + "/-", 878, 495);
         ctx.fillText("Clearance Tax Cost: Rs. " + charges + "/-", 878, 530);
 
-        // Bottom Base Signatures (Transparent White)
+        // Bottom Base Signatures
         try {
             ctx.save();
             ctx.filter = "invert(1) brightness(3)";
             ctx.drawImage(sign1Img, 320, 565, 170, 75); 
             ctx.drawImage(sign2Img, 840, 565, 170, 75); 
             ctx.restore();
-        } catch (e) { console.log("Signatures image loading error"); }
+        } catch (e) { console.log("Signatures loading error"); }
         
         ctx.fillStyle = "rgba(255,255,255,0.55)";
         ctx.font = "13px Arial, sans-serif";
@@ -364,18 +414,16 @@
             reader.onload = function(event) {
                 const clientImg = new Image();
                 clientImg.onload = function() {
-                    // Render Client Image
                     ctx.drawImage(clientImg, 55, 270, 210, 250);
                     
-                    // Punch Verification Signature on Client Photo
                     ctx.save();
                     ctx.filter = "brightness(0)"; 
                     ctx.globalAlpha = 0.90; 
                     ctx.drawImage(sign2Img, 80, 430, 160, 65);
                     ctx.restore();
                     
-                    drawQRCode(ctx, name, regNo, phone, account, winningAmount, canvas);
-                    clearFormFields(); // FIXED: Auto clear input fields after processing
+                    drawQRCode(ctx, name, regNo, phone, account, winningAmount, displayDate, canvas);
+                    clearFormFields(); 
                 }
                 clientImg.src = event.target.result;
             }
@@ -384,14 +432,14 @@
             ctx.fillStyle = "#0c2340";
             ctx.font = "bold 14px Arial, sans-serif";
             ctx.fillText("CUSTOMER PIC PLACEHOLDER", 62, 390);
-            drawQRCode(ctx, name, regNo, phone, account, winningAmount, canvas);
-            clearFormFields(); // FIXED: Auto clear input fields after processing
+            drawQRCode(ctx, name, regNo, phone, account, winningAmount, displayDate, canvas);
+            clearFormFields(); 
         }
     }
     
-    function drawQRCode(ctx, name, regNo, phone, account, winningAmount, canvas) {
-        // Winning amount format structure explicitly set for reliable scanner parsing
-        const qrStringData = `Winner Name: ${name}\nRegistration No: ${regNo}\nPhone No: ${phone}\nAccount No: ${account}\nWinning Amount: ${winningAmount}`;
+    function drawQRCode(ctx, name, regNo, phone, account, winningAmount, displayDate, canvas) {
+        // QR text mapping updated with date reference smoothly
+        const qrStringData = `Winner Name: ${name}\nRegistration No: ${regNo}\nPhone No: ${phone}\nAccount No: ${account}\nWinning Amount: ${winningAmount}\nIssue Date: ${displayDate}`;
         
         const qrObj = new QRious({
             value: qrStringData,
@@ -403,10 +451,8 @@
         
         const qrImg = new Image();
         qrImg.onload = function() {
-            // Draw QR Code on Canvas
             ctx.drawImage(qrImg, 85, 535, 150, 150);
             
-            // Sequential rendering check for overlaying the logo properly
             const renderLogoOverlay = () => {
                 ctx.drawImage(kbcLogoImg, 142, 592, 36, 36);
                 finalizeOutput(canvas);
