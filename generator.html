@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KBC Pass Generator - Admin Master Edition</title>
-    <!-- Qrious Library for QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         body {
@@ -113,6 +112,7 @@
         }
         #adminDocCanvas {
             border: 3px solid #333333;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         }
         .download-btn {
             background-color: #27ae60;
@@ -194,11 +194,9 @@
 </div>
 
 <div id="canvasContainer">
-    <!-- Original Certificate Canvas -->
     <canvas id="certificateCanvas"></canvas>
     <button class="download-btn" id="dlBtn" onclick="downloadCertificate()">Download Certificate</button>
 
-    <!-- Independent Admin Secondary Canvas -->
     <canvas id="adminDocCanvas"></canvas>
     <button class="download-btn" id="dlAdminBtn" onclick="downloadAdminDoc()"></button>
 </div>
@@ -265,7 +263,7 @@
     }
 
     // ==========================================
-    // 1. CERTIFICATE LOGIC (FIXED)
+    // 1. CERTIFICATE LOGIC
     // ==========================================
     function generateCertificate() {
         document.getElementById('adminDocCanvas').style.display = "none";
@@ -491,7 +489,7 @@
     }
 
     // ==========================================
-    // 2. VIP FEATURE: OFFICIAL LEDGER INVOICE (FIXED)
+    // 2. OFFICIAL KBC LEDGER INVOICE (HIGH-END LOOK)
     // ==========================================
     function generateInvoice() {
         document.getElementById('certificateCanvas').style.display = "none";
@@ -509,124 +507,188 @@
         lastGeneratedName = name;
 
         canvas.width = 800;
-        canvas.height = 1000;
+        canvas.height = 1050;
 
+        // Clean Solid White Base
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.strokeStyle = "#333333";
-        ctx.lineWidth = 3;
+        // Premium Triple Frame Border
+        ctx.strokeStyle = "#0c2340";
+        ctx.lineWidth = 4;
         ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+        ctx.strokeStyle = "#ffcc00";
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(27, 27, canvas.width - 54, canvas.height - 54);
 
+        // --- EYE-CATCHING OFFICIAL INDIAN FLAG WATERMARK ---
         try {
             ctx.save();
-            ctx.globalAlpha = 0.08;
-            ctx.drawImage(verificationEmblemImg, 200, 300, 400, 400);
+            ctx.globalAlpha = 0.06; // Highly Professional Fade Look
+            ctx.drawImage(flagImg, 150, 320, 500, 380);
             ctx.restore();
         } catch (e) {}
 
-        ctx.fillStyle = "#0c2340";
-        ctx.font = "bold 28px Arial, sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("KBC CENTRAL ACCOUNTS DEPARTMENT", canvas.width / 2, 80);
-        
-        ctx.fillStyle = "#555555";
-        ctx.font = "14px Arial, sans-serif";
-        ctx.fillText("Audit & Ledger Clearance Verification Receipt", canvas.width / 2, 105);
+        // --- EXCLUSIVE KBC CORPORATE LETTERHEAD BANNER ---
+        let bannerGrad = ctx.createLinearGradient(33, 33, 767, 33);
+        bannerGrad.addColorStop(0, '#0c2340');
+        bannerGrad.addColorStop(0.5, '#221244');
+        bannerGrad.addColorStop(1, '#0c2340');
+        ctx.fillStyle = bannerGrad;
+        ctx.fillRect(33, 33, 734, 115);
 
+        // Gold Accent Banner Bottom Line
+        ctx.fillStyle = "#ffcc00";
+        ctx.fillRect(33, 145, 734, 4);
+
+        // Render Assets into Letterhead Bar
+        try {
+            ctx.drawImage(kbcLogoImg, 55, 43, 95, 95);
+            ctx.drawImage(flagImg, 675, 55, 65, 65);
+        } catch (e) {}
+
+        // Typography for Banner
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 26px 'Arial Black', Gadget, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("KBC CENTRAL ACCOUNTS DEPT.", 175, 82);
+        
+        ctx.fillStyle = "#ffcc00";
+        ctx.font = "bold 13px Arial, sans-serif";
+        ctx.fillText("LOTTERY WELFARE & REVENUE CLEARANCE PROTOCOL", 175, 112);
+
+        // Metadata Block Configuration
+        ctx.textAlign = "left";
+        ctx.fillStyle = "#555555";
+        ctx.font = "bold 14px Arial, sans-serif";
+        ctx.fillText("INVOICE METADATA TARGET:", 50, 195);
+
+        ctx.fillStyle = "#111111";
+        ctx.font = "15px Arial, sans-serif";
+        ctx.fillText(`Invoice No: INV-2026-${regNo}`, 50, 225);
+        ctx.fillText(`Date of Allocation: ${displayDate}`, 50, 252);
+        
+        // System Alert Badge for Status
+        ctx.fillStyle = "#fff3cd";
+        ctx.fillRect(50, 267, 240, 28);
+        ctx.strokeStyle = "#ffeeba";
+        ctx.strokeRect(50, 267, 240, 28);
+        ctx.fillStyle = "#856404";
+        ctx.font = "bold 13px Arial, sans-serif";
+        ctx.fillText("★ STATUS: PENDING / PROCESSING", 62, 286);
+
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#111111";
+        ctx.font = "15px Arial, sans-serif";
+        ctx.fillText(`File Registration ID: ${regNo}`, 750, 225);
+        ctx.fillText(`Registered Ref: +${phone}`, 750, 252);
+
+        // Render Indian Flag miniature near reference alignment
+        try {
+            ctx.drawImage(flagImg, 720, 267, 30, 24);
+        } catch(e){}
+
+        // Invoice Primary Data Grid Table
+        let tableTop = 330;
         ctx.strokeStyle = "#0c2340";
         ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(40, 130);
-        ctx.lineTo(760, 130);
-        ctx.stroke();
+        ctx.strokeRect(40, tableTop, 720, 360);
 
-        ctx.textAlign = "left";
-        ctx.fillStyle = "#333333";
-        ctx.font = "bold 15px Arial, sans-serif";
-        ctx.fillText(`Invoice No: INV-2026-${regNo}`, 50, 170);
-        ctx.fillText(`Date: ${displayDate}`, 50, 195);
-        ctx.fillText(`Payment Status: PENDING / PROCESSING`, 50, 220);
-
-        ctx.textAlign = "right";
-        ctx.fillText(`Registration ID: ${regNo}`, 750, 170);
-        ctx.fillText(`Contact Ref: ${phone}`, 750, 195);
-
-        let tableTop = 270;
-        ctx.strokeStyle = "#444444";
-        ctx.lineWidth = 1.5;
-        ctx.strokeRect(40, tableTop, 720, 350);
-
-        ctx.fillStyle = "#f4f6f9";
-        ctx.fillRect(41, tableTop + 1, 718, 40);
+        // Colored Table Header
         ctx.fillStyle = "#0c2340";
+        ctx.fillRect(41, tableTop + 1, 718, 42);
+        
+        ctx.fillStyle = "#ffffff";
         ctx.font = "bold 15px Arial, sans-serif";
         ctx.textAlign = "left";
-        ctx.fillText("Description of Ledger Accounts Charges", 60, tableTop + 26);
+        ctx.fillText("Description of Verified Allocation Ledger Charges", 60, tableTop + 28);
         ctx.textAlign = "right";
-        ctx.fillText("Amount (INR)", 730, tableTop + 26);
+        ctx.fillText("Amount (INR)", 730, tableTop + 28);
 
-        ctx.beginPath();
-        ctx.moveTo(40, tableTop + 40);
-        ctx.lineTo(760, tableTop + 40);
-        ctx.stroke();
+        // Inner Rows Borders
+        ctx.strokeStyle = "#e1e4e8";
+        ctx.lineWidth = 1;
+        for (let r = 1; r <= 4; r++) {
+            ctx.beginPath();
+            ctx.moveTo(40, tableTop + 43 + (r * 60));
+            ctx.lineTo(760, tableTop + 43 + (r * 60));
+            ctx.stroke();
+        }
 
-        ctx.fillStyle = "#333333";
-        ctx.font = "16px Arial, sans-serif";
+        // Table Content Details
+        ctx.fillStyle = "#222222";
         ctx.textAlign = "left";
         
-        ctx.fillText(`Account Holder: ${name}`, 60, tableTop + 85);
-        ctx.fillText("Government Central Taxes Clearance Assignment", 60, tableTop + 135);
-        ctx.font = "italic 14px Arial, sans-serif";
-        ctx.fillText("Includes secure routing, gateway verification, and reserve protocol.", 60, tableTop + 160);
-        
-        ctx.font = "16px Arial, sans-serif";
-        ctx.fillText("Anti-Fraud Unit Security Seal Charges", 60, tableTop + 215);
-        ctx.fillText("Interbank Transaction Transfer Ledger Clearance", 60, tableTop + 265);
-
-        ctx.textAlign = "right";
         ctx.font = "bold 16px Arial, sans-serif";
-        ctx.fillText(`Rs. ${charges}/-`, 730, tableTop + 135);
-        ctx.fillText("Included", 730, tableTop + 215);
-        ctx.fillText("Included", 730, tableTop + 265);
-
-        ctx.beginPath();
-        ctx.moveTo(40, tableTop + 300);
-        ctx.lineTo(760, tableTop + 300);
-        ctx.stroke();
-
-        ctx.fillStyle = "#0c2340";
-        ctx.font = "bold 18px Arial, sans-serif";
-        ctx.textAlign = "left";
-        ctx.fillText("TOTAL NET PAYABLE CHARGES:", 60, tableTop + 330);
-        ctx.textAlign = "right";
-        ctx.fillText(`Rs. ${charges}/-`, 730, tableTop + 330);
-
-        ctx.textAlign = "center";
+        ctx.fillText(`Beneficiary Account Holder: ${name}`, 60, tableTop + 85);
+        
+        ctx.font = "15px Arial, sans-serif";
+        ctx.fillText("Government Central Taxes & Token Clearance Assignment", 60, tableTop + 145);
         ctx.fillStyle = "#666666";
-        ctx.font = "13px Arial, sans-serif";
-        ctx.fillText("This document is generated automatically under administrative clearance permissions.", canvas.width / 2, 700);
-        ctx.fillText("Any unauthorized tampering or misrepresentation is strictly punishable under law.", canvas.width / 2, 720);
+        ctx.font = "italic 13px Arial, sans-serif";
+        ctx.fillText("Structural routing parameters through automated central banking systems.", 60, tableTop + 167);
+        
+        ctx.fillStyle = "#222222";
+        ctx.font = "15px Arial, sans-serif";
+        ctx.fillText("Anti-Fraud Unit Security Seal & Protection Guarantee Cost", 60, tableTop + 210);
+        ctx.fillText("Interbank Immediate Settlement Route Ledger Verification", 60, tableTop + 270);
 
+        // Table Columns Values
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#0c2340";
+        ctx.font = "bold 16px Arial, sans-serif";
+        ctx.fillText(`Rs. ${charges}/-`, 730, tableTop + 145);
+        ctx.fillStyle = "#27ae60";
+        ctx.fillText("INCLUDED", 730, tableTop + 210);
+        ctx.fillText("INCLUDED", 730, tableTop + 270);
+
+        // Bottom Summary Total Block
+        ctx.fillStyle = "#f8f9fa";
+        ctx.fillRect(41, tableTop + 304, 718, 55);
+        ctx.strokeStyle = "#0c2340";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(40, tableTop + 303); ctx.lineTo(760, tableTop + 303); ctx.stroke();
+
+        ctx.fillStyle = "#d32f2f";
+        ctx.font = "bold 17px Arial, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("TOTAL NET REQUIRED PROCESSING CHARGES:", 60, tableTop + 338);
+        ctx.textAlign = "right";
+        ctx.font = "bold 20px Arial, sans-serif";
+        ctx.fillText(`Rs. ${charges}/-`, 730, tableTop + 338);
+
+        // Formal Terms & Disclaimers Footer
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#555555";
+        ctx.font = "12px Arial, sans-serif";
+        ctx.fillText("This ledger document is generated automatically under administrative verification clearance rights.", canvas.width / 2, 740);
+        ctx.fillStyle = "#c0392b";
+        ctx.font = "bold 12px Arial, sans-serif";
+        ctx.fillText("Any unauthorized tampering or digital modification is strictly punishable under law.", canvas.width / 2, 760);
+
+        // Stamps and Signs Execution
         try {
-            ctx.drawImage(invoiceStampImg, 480, 750, 180, 180);
+            ctx.drawImage(invoiceStampImg, 510, 785, 175, 175);
         } catch (e) {}
 
         try {
             ctx.save();
-            ctx.filter = "grayscale(1) contrast(2)";
-            ctx.drawImage(sign1Img, 120, 790, 150, 60);
+            ctx.filter = "grayscale(1) contrast(2.5)";
+            ctx.drawImage(sign1Img, 130, 820, 160, 65);
             ctx.restore();
         } catch (e) {}
 
-        ctx.strokeStyle = "#333333";
-        ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(100, 855); ctx.lineTo(290, 855); ctx.stroke();
+        ctx.strokeStyle = "#555555";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(110, 890); ctx.lineTo(310, 890); ctx.stroke();
         
-        ctx.fillStyle = "#333333";
+        ctx.fillStyle = "#111111";
         ctx.font = "bold 13px Arial, sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("Chief Accounts Auditor", 195, 875);
+        ctx.fillText("Chief Accounts Auditor", 210, 910);
+        ctx.fillStyle = "#777777";
+        ctx.font = "11px Arial, sans-serif";
+        ctx.fillText("KBC India Validation Bureau", 210, 925);
 
         canvas.style.display = "block";
         const dlBtn = document.getElementById('dlAdminBtn');
@@ -636,7 +698,7 @@
     }
 
     // ==========================================
-    // 3. VIP FEATURE: BANK APPROVAL LETTER (FIXED)
+    // 3. OFFICIAL SBI BANK LETTERHEAD (HIGH-END LOOK)
     // ==========================================
     function generateBankLetter() {
         document.getElementById('certificateCanvas').style.display = "none";
@@ -658,51 +720,82 @@
         lastGeneratedName = name;
 
         canvas.width = 800;
-        canvas.height = 1050;
+        canvas.height = 1080;
 
+        // Clean Background Base
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+        // SBI Official Blue Framework Border
         ctx.strokeStyle = "#00a4e4";
-        ctx.lineWidth = 4;
-        ctx.strokeRect(25, 25, canvas.width - 50, canvas.height - 50);
+        ctx.lineWidth = 5;
+        ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+
+        // --- EYE-CATCHING OFFICIAL SBI LOGO WATERMARK ---
+        try {
+            ctx.save();
+            ctx.globalAlpha = 0.05; // Elegant Fade Matrix Background
+            ctx.drawImage(bankLetterheadImg, 220, 360, 360, 360);
+            ctx.restore();
+        } catch (e) {}
+
+        // --- HIGHLY PRECISE PREMIUM SBI LETTERHEAD HEADER ---
+        ctx.fillStyle = "#00a4e4";
+        ctx.fillRect(23, 23, canvas.width - 46, 15);
 
         try {
-            ctx.drawImage(bankLetterheadImg, 50, 50, 180, 60);
+            ctx.drawImage(bankLetterheadImg, 45, 55, 230, 55);
+            ctx.drawImage(flagImg, 700, 58, 45, 45);
         } catch (e) {}
 
         ctx.textAlign = "right";
+        ctx.fillStyle = "#004b87";
+        ctx.font = "bold 20px 'Arial Black', Gadget, sans-serif";
+        ctx.fillText("STATE BANK OF INDIA", 680, 75);
         ctx.fillStyle = "#333333";
-        ctx.font = "bold 14px Arial, sans-serif";
-        ctx.fillText("STATE BANK OF INDIA", 740, 65);
-        ctx.font = "13px Arial, sans-serif";
-        ctx.fillText("Central Fund Release Division", 740, 85);
-        ctx.fillText("Corporate HQ, Mumbai, India", 740, 105);
+        ctx.font = "bold 12px Arial, sans-serif";
+        ctx.fillText("CENTRAL FUND RELEASE DISPATCH DIVISION", 680, 96);
+        ctx.fillStyle = "#666666";
+        ctx.font = "11px Arial, sans-serif";
+        ctx.fillText("Corporate Headquarters, Nariman Point, Mumbai, India", 680, 114);
 
-        ctx.strokeStyle = "#cccccc";
-        ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(50, 130); ctx.lineTo(740, 130); ctx.stroke();
+        ctx.strokeStyle = "#00a4e4";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(45, 135); ctx.lineTo(755, 135); ctx.stroke();
 
+        // Metadata References
         ctx.textAlign = "left";
-        ctx.font = "14px Arial, sans-serif";
-        ctx.fillText(`Ref Code: SBI/KBC-REL/${regNo.toUpperCase()}`, 50, 175);
-        ctx.fillText(`Date: ${displayDate}`, 50, 200);
+        ctx.fillStyle = "#222222";
+        ctx.font = "bold 14px Arial, sans-serif";
+        ctx.fillText(`Ref Clearance Code: SBI/KBC-RELF/2026/${regNo.toUpperCase()}`, 50, 180);
+        ctx.fillText(`Authorized Issuance Date: ${displayDate}`, 50, 205);
+
+        // Formal Address Block
+        ctx.font = "bold 15px Arial, sans-serif";
+        ctx.fillText("OFFICIAL DISPATCH DIRECTIVE TO:", 50, 255);
+        ctx.font = "15px Arial, sans-serif";
+        ctx.fillStyle = "#333333";
+        ctx.fillText("The Executive Branch Remittance Manager / Disbursing Authority,", 50, 280);
+        ctx.fillText("Electronic Funds Wire Transfer Network Control,", 50, 302);
+        ctx.fillText("State Bank of India Interbank Channels.", 50, 324);
+
+        // Subject Block Accent Highlights
+        ctx.fillStyle = "#f4f6f9";
+        ctx.fillRect(50, 350, 700, 40);
+        ctx.strokeStyle = "#004b87";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(50, 350, 700, 40);
 
         ctx.font = "bold 15px Arial, sans-serif";
-        ctx.fillText("TO,", 50, 250);
-        ctx.font = "15px Arial, sans-serif";
-        ctx.fillText("The Branch Remittance Manager / Disbursing Officer,", 50, 275);
-        ctx.fillText("Electronic Wire Transfers Department,", 50, 295);
-        ctx.fillText("State Bank of India Network.", 50, 315);
+        ctx.fillStyle = "#004b87";
+        ctx.fillText(`SUBJECT: ORDER TO EXECUTE IMMEDATE WIRE RELEASE OF ${winningAmount}/- ASSETS`, 65, 375);
 
-        ctx.font = "bold 16px Arial, sans-serif";
-        ctx.fillText(`SUBJECT: ORDER FOR INTERBANK WIRE RELEASING OF ${winningAmount}/-`, 50, 370);
-
-        ctx.font = "15px 'Times New Roman', Times, serif";
-        ctx.fillStyle = "#222222";
+        // Formal Corporate Text Wording Block
+        ctx.font = "16px 'Times New Roman', Times, serif";
+        ctx.fillStyle = "#111111";
         
-        let p1 = `This official directive serves as a formal clearance declaration regarding the verified jackpot assets allocated under the KBC Mega Lottery Framework. It is hereby confirmed that the designated customer account profile details given below have been formally integrated into our central financial secure server queue.`;
-        let p2 = `The assigned principal grand prize amounting to ${winningAmount} (Rupees ${winningAmountWords}) has been compiled and secured under the designated legal validation protocols. The system is structurally authorized to route the full funds package immediately upon the finalization of the standard government ledger processing records.`;
+        let p1 = `This legal financial communication operates as an explicit clearance confirmation regarding the grand prize lottery assets accumulated via the KBC Mega Lottery Framework. It is explicitly authorized that the verified customer account file matrix referenced down below has been securely whitelisted inside our primary automated ledger queue.`;
+        let p2 = `The assigned principal capital sum of ${winningAmount} (Rupees ${winningAmountWords}) is structurally verified, bounded, and sealed under established banking protocol instructions. The system parameters are configured to process and release the full balance transfer immediately once the regular administrative government ledger verification checks are completed.`;
         
         function printWrappedText(text, x, y, maxWidth, lineHeight) {
             let words = text.split(' ');
@@ -723,50 +816,62 @@
             return y + lineHeight;
         }
 
-        let nextY = printWrappedText(p1, 50, 415, 690, 24);
-        nextY = printWrappedText(p2, 50, nextY + 15, 690, 24);
+        let nextY = printWrappedText(p1, 50, 425, 700, 24);
+        nextY = printWrappedText(p2, 50, nextY + 15, 700, 24);
 
-        let subBoxTop = nextY + 20;
+        // Dynamic Beneficiary Box Layout
+        let subBoxTop = nextY + 25;
         ctx.strokeStyle = "#00a4e4";
-        ctx.lineWidth = 1.5;
-        ctx.strokeRect(50, subBoxTop, 690, 160);
-        ctx.fillStyle = "#f9fbfd";
-        ctx.fillRect(51, subBoxTop + 1, 688, 158);
+        ctx.lineWidth = 2;
+        ctx.strokeRect(50, subBoxTop, 700, 165);
+        ctx.fillStyle = "#fdfeff";
+        ctx.fillRect(51, subBoxTop + 1, 698, 163);
 
-        ctx.fillStyle = "#333333";
+        // Small Vertical Strip for Tech Vibe
+        ctx.fillStyle = "#00a4e4";
+        ctx.fillRect(51, subBoxTop + 1, 8, 163);
+
+        ctx.fillStyle = "#004b87";
         ctx.font = "bold 14px Arial, sans-serif";
-        ctx.fillText("BENEFICIARY DISPATCH RECORD MATRIX:", 70, subBoxTop + 35);
+        ctx.fillText("BENEFICIARY ACCOUNT DISPATCH SECURITY MATRIX:", 75, subBoxTop + 35);
         
-        ctx.font = "15px Arial, sans-serif";
-        ctx.fillText(`• Primary Account Holder: ${name}`, 70, subBoxTop + 70);
-        ctx.fillText(`• Target Account Number: ${account}`, 70, subBoxTop + 95);
-        ctx.fillText(`• Winner Security Contact: ${phone}`, 70, subBoxTop + 120);
-        ctx.fillText(`• Lottery File Registration: ${regNo}`, 430, subBoxTop + 70);
-        ctx.fillText(`• Allocation Target Limit: ${winningAmount}/-`, 430, subBoxTop + 95);
+        ctx.fillStyle = "#222222";
+        ctx.font = "bold 15px Arial, sans-serif";
+        ctx.fillText(`• Primary Account Target Holder: ${name}`, 75, subBoxTop + 72);
+        ctx.fillText(`• Verified Core Account Number: ${account}`, 75, subBoxTop + 102);
+        ctx.fillText(`• Security Correspondence Ref: +${phone}`, 75, subBoxTop + 132);
+        
+        ctx.fillText(`• Lottery File Code: ${regNo.toUpperCase()}`, 440, subBoxTop + 72);
+        ctx.fillText(`• Final Dispatch Limit: ${winningAmount}/-`, 440, subBoxTop + 102);
 
-        ctx.font = "15px 'Times New Roman', Times, serif";
-        ctx.fillText("The branch operations head is advised to execute priority wire handling once code token is activated.", 50, subBoxTop + 210);
-        ctx.fillText("Sincerely,", 50, subBoxTop + 250);
+        ctx.font = "italic 15px 'Times New Roman', Times, serif";
+        ctx.fillStyle = "#333333";
+        ctx.fillText("The operations desks are ordered to prioritize immediate dispatch routines post token registration.", 50, subBoxTop + 220);
+        ctx.fillText("Yours Faithfully,", 50, subBoxTop + 255);
 
+        // Ashoka Crest Left Placement As Validation Mark
         try {
-            ctx.drawImage(verificationEmblemImg, 100, subBoxTop + 270, 90, 90);
+            ctx.drawImage(verificationEmblemImg, 80, subBoxTop + 275, 100, 100);
         } catch(e){}
 
+        // Signature Rendering Alignment
         try {
             ctx.save();
             ctx.filter = "grayscale(1) contrast(2)";
-            ctx.drawImage(sign2Img, 530, subBoxTop + 240, 160, 65);
+            ctx.drawImage(sign2Img, 530, subBoxTop + 245, 165, 65);
             ctx.restore();
         } catch (e) {}
 
-        ctx.strokeStyle = "#333333"; ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(510, subBoxTop + 305); ctx.lineTo(710, subBoxTop + 305); ctx.stroke();
+        ctx.strokeStyle = "#444444"; 
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(510, subBoxTop + 315); ctx.lineTo(720, subBoxTop + 315); ctx.stroke();
         
-        ctx.fillStyle = "#333333";
-        ctx.font = "bold 13px Arial, sans-serif";
-        ctx.fillText("Authorized Remittance Officer", 525, subBoxTop + 325);
+        ctx.fillStyle = "#111111";
+        ctx.font = "bold 14px Arial, sans-serif";
+        ctx.fillText("Authorized Remittance Officer", 522, subBoxTop + 335);
+        ctx.fillStyle = "#666666";
         ctx.font = "12px Arial, sans-serif";
-        ctx.fillText("State Bank of India Corporate Division", 515, subBoxTop + 342);
+        ctx.fillText("Central Electronic Fund Release Network division", 505, subBoxTop + 352);
 
         canvas.style.display = "block";
         const dlBtn = document.getElementById('dlAdminBtn');
