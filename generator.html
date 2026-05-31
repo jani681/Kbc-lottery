@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KBC Pass Generator - Official Certificate Edition</title>
-    <!-- Qrious Library for QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         body {
@@ -190,7 +189,7 @@
         ctx.fillStyle = bgGrad;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // WATERMARK SETTING (KBC Logo in center with balanced transparency)
+        // WATERMARK SETTING
         try {
             ctx.save();
             ctx.globalAlpha = 0.38; 
@@ -322,7 +321,7 @@
         ctx.fillText("Govt Ledger Fee: Rs. " + charges + "/-", 878, 495);
         ctx.fillText("Clearance Tax Cost: Rs. " + charges + "/-", 878, 530);
 
-        // Main Bottom Signatures (Transparent & White)
+        // Bottom Base Signatures (Transparent & High Visibility White)
         try {
             ctx.save();
             ctx.filter = "invert(1) brightness(3)";
@@ -336,7 +335,7 @@
         ctx.fillText("Government Clearance Officer Signature", 320, 665);
         ctx.fillText("Authorized KBC Authority Signature", 840, 665);
 
-        // Client Image Box Setup
+        // Client Image Container Box
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(50, 265, 220, 260); 
         ctx.strokeStyle = "#d4af37";
@@ -349,17 +348,16 @@
             reader.onload = function(event) {
                 const clientImg = new Image();
                 clientImg.onload = function() {
-                    // 1. Draw User Uploaded Image
+                    // Render Client Image
                     ctx.drawImage(clientImg, 55, 270, 210, 250);
                     
-                    // 2. Punch Verification Signature onto Client Photo
+                    // PUNCH SIGNATURE ON CLIENT PHOTO (PURE BLACK FILTER)
                     ctx.save();
-                    ctx.filter = "invert(1) brightness(3)"; // Converted to white overlay
-                    ctx.globalAlpha = 0.85; // Natural overlay stamp opacity
+                    ctx.filter = "brightness(0)"; // Darkened to absolute pure black stamp
+                    ctx.globalAlpha = 0.90; 
                     ctx.drawImage(sign2Img, 80, 430, 160, 65);
                     ctx.restore();
                     
-                    // 3. Render QR Code
                     drawQRCode(ctx, name, regNo, phone, account, winningAmount, canvas);
                 }
                 clientImg.src = event.target.result;
@@ -374,23 +372,25 @@
     }
     
     function drawQRCode(ctx, name, regNo, phone, account, winningAmount, canvas) {
-        // Updated text formatting to include KBC Registration Number
         const qrStringData = `Winner Name: ${name}\nRegistration No: ${regNo}\nPhone No: ${phone}\nAccount No: ${account}\nWinning Amount: ${winningAmount}`;
         
+        // Generating temporary QR canvas to keep background transparent
         const qrObj = new QRious({
             value: qrStringData,
             size: 110,
-            level: 'H' // High correction allows logo overlapping without breaking the scan
+            level: 'H',
+            backgroundAlpha: 0, // TRANSPARENT BACKGROUND APPLIED
+            foreground: '#ffffff' // Pure White QR lines to pop nicely on dark blue background
         });
         
         const qrImg = new Image();
         qrImg.onload = function() {
-            // Draw generated QR code
+            // Draw generated transparent QR code
             ctx.drawImage(qrImg, 70, 550, 110, 110);
             
-            // Draw branding KBC center logo precisely on top of the QR code
+            // Draw precise KBC branding center logo overlay
             try {
-                ctx.drawImage(kbcLogoImg, 110, 590, 30, 30);
+                ctx.drawImage(kbcLogoImg, 105, 585, 40, 40);
             } catch (e) { console.log("QR inner logo error"); }
             
             finalizeOutput(canvas);
