@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KBC Pass Generator - Official Certificate Edition</title>
+    <!-- Qrious Library for QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         body {
@@ -189,11 +190,11 @@
         ctx.fillStyle = bgGrad;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // WATERMARK SETTING (KBC Logo in center with very light transparency)
+        // WATERMARK SETTING (KBC Logo in center with increased transparency)
         try {
             ctx.save();
-            ctx.globalAlpha = 0.07; // Control light visibility here (0.01 to 1.0)
-            // Center calculation for 320x320 large watermark logo
+            ctx.globalAlpha = 0.35; // CONTROL VISIBILITY HERE (0.01 to 1.0) - Increased to 0.35
+            // Center calculation for a 320x320 watermark logo
             ctx.drawImage(kbcLogoImg, (canvas.width / 2) - 160, (canvas.height / 2) - 130, 320, 320);
             ctx.restore();
         } catch (e) { console.log("Watermark error"); }
@@ -205,6 +206,7 @@
         ctx.strokeStyle = "#f3e5ab";
         ctx.strokeRect(24, 24, canvas.width - 48, canvas.height - 48);
         
+        // KBC LOGOS SIZE MATCHED EXACTLY WITH MODI & BACHCHAN (110x110)
         try {
             ctx.drawImage(kbcLogoImg, 170, 40, 110, 110);
             ctx.drawImage(kbcLogoImg, 920, 40, 110, 110);
@@ -319,12 +321,13 @@
         ctx.fillText("Govt Ledger Fee: Rs. " + charges + "/-", 878, 495);
         ctx.fillText("Clearance Tax Cost: Rs. " + charges + "/-", 878, 530);
 
+        // FIX: SIGNATURE IMAGES ARE TRANSPARENT AND COLOR CHANGED TO WHITE
         try {
             ctx.save();
-            ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
-            ctx.fillRect(310, 560, 190, 80);
-            ctx.fillRect(830, 560, 190, 80);
+            // INVERT & BRIGHTNESS FILTER TO MAKE BLACK SIGNATURES PURE WHITE
+            ctx.filter = "invert(1) brightness(2)";
             
+            // DRAW ON TRANSPARENT BACKGROUND (No FillRect background)
             ctx.drawImage(sign1Img, 320, 565, 170, 75); 
             ctx.drawImage(sign2Img, 840, 565, 170, 75); 
             ctx.restore();
