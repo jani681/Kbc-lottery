@@ -190,15 +190,15 @@
         ctx.fillStyle = bgGrad;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // WATERMARK SETTING (KBC Logo in center with increased transparency)
+        // WATERMARK SETTING (KBC Logo in center with balanced transparency)
         try {
             ctx.save();
-            ctx.globalAlpha = 0.35; // CONTROL VISIBILITY HERE (0.01 to 1.0) - Increased to 0.35
-            // Center calculation for a 320x320 watermark logo
+            ctx.globalAlpha = 0.38; 
             ctx.drawImage(kbcLogoImg, (canvas.width / 2) - 160, (canvas.height / 2) - 130, 320, 320);
             ctx.restore();
         } catch (e) { console.log("Watermark error"); }
         
+        // Borders
         ctx.strokeStyle = "#d4af37";
         ctx.lineWidth = 6;
         ctx.strokeRect(15, 15, canvas.width - 30, canvas.height - 30);
@@ -206,7 +206,7 @@
         ctx.strokeStyle = "#f3e5ab";
         ctx.strokeRect(24, 24, canvas.width - 48, canvas.height - 48);
         
-        // KBC LOGOS SIZE MATCHED EXACTLY WITH MODI & BACHCHAN (110x110)
+        // Logos & Top Images
         try {
             ctx.drawImage(kbcLogoImg, 170, 40, 110, 110);
             ctx.drawImage(kbcLogoImg, 920, 40, 110, 110);
@@ -226,6 +226,7 @@
             ctx.strokeRect(1045, 40, 110, 110);
         } catch (e) { console.log("Bachchan photo pending..."); }
 
+        // Typography Header
         ctx.fillStyle = "#ffcc00";
         ctx.font = "bold 52px 'Times New Roman', serif";
         ctx.textAlign = "center";
@@ -291,7 +292,7 @@
         ctx.fillText(`${winningAmount}/- (Rupees Twenty-Five Lakhs Only)`, 440, 505);
         ctx.fillText("Rs. " + charges + "/-", 700, 560);
 
-        // Sidebar Widgets Setup
+        // Sidebar Widgets
         ctx.strokeStyle = "#d4af37";
         ctx.lineWidth = 2.5;
         ctx.strokeRect(860, 265, 305, 145);
@@ -321,13 +322,10 @@
         ctx.fillText("Govt Ledger Fee: Rs. " + charges + "/-", 878, 495);
         ctx.fillText("Clearance Tax Cost: Rs. " + charges + "/-", 878, 530);
 
-        // FIX: SIGNATURE IMAGES ARE TRANSPARENT AND COLOR CHANGED TO WHITE
+        // Main Bottom Signatures (Transparent & White)
         try {
             ctx.save();
-            // INVERT & BRIGHTNESS FILTER TO MAKE BLACK SIGNATURES PURE WHITE
-            ctx.filter = "invert(1) brightness(2)";
-            
-            // DRAW ON TRANSPARENT BACKGROUND (No FillRect background)
+            ctx.filter = "invert(1) brightness(3)";
             ctx.drawImage(sign1Img, 320, 565, 170, 75); 
             ctx.drawImage(sign2Img, 840, 565, 170, 75); 
             ctx.restore();
@@ -338,22 +336,31 @@
         ctx.fillText("Government Clearance Officer Signature", 320, 665);
         ctx.fillText("Authorized KBC Authority Signature", 840, 665);
 
+        // Client Image Box Setup
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(50, 265, 220, 260); 
         ctx.strokeStyle = "#d4af37";
         ctx.lineWidth = 3;
         ctx.strokeRect(50, 265, 220, 260);
         
-        const qrStringData = `Winner Name: ${name}\nAccount No: ${account}\nWinning Amount: ${winningAmount}`;
-
         const photoInput = document.getElementById('clientPhoto');
         if (photoInput.files && photoInput.files[0]) {
             const reader = new FileReader();
             reader.onload = function(event) {
                 const clientImg = new Image();
                 clientImg.onload = function() {
+                    // 1. Draw User Uploaded Image
                     ctx.drawImage(clientImg, 55, 270, 210, 250);
-                    drawQRCode(ctx, qrStringData, canvas);
+                    
+                    // 2. Punch Verification Signature onto Client Photo
+                    ctx.save();
+                    ctx.filter = "invert(1) brightness(3)"; // Converted to white overlay
+                    ctx.globalAlpha = 0.85; // Natural overlay stamp opacity
+                    ctx.drawImage(sign2Img, 80, 430, 160, 65);
+                    ctx.restore();
+                    
+                    // 3. Render QR Code
+                    drawQRCode(ctx, name, regNo, phone, account, winningAmount, canvas);
                 }
                 clientImg.src = event.target.result;
             }
@@ -362,26 +369,33 @@
             ctx.fillStyle = "#0c2340";
             ctx.font = "bold 14px Arial, sans-serif";
             ctx.fillText("CUSTOMER PIC PLACEHOLDER", 62, 390);
-            drawQRCode(ctx, qrStringData, canvas);
+            drawQRCode(ctx, name, regNo, phone, account, winningAmount, canvas);
         }
     }
     
-    function drawQRCode(ctx, qrText, canvas) {
-        if(qrText) {
-            const qrObj = new QRious({
-                value: qrText,
-                size: 110,
-                level: 'H'
-            });
-            const qrImg = new Image();
-            qrImg.onload = function() {
-                ctx.drawImage(qrImg, 70, 550, 110, 110);
-                finalizeOutput(canvas);
-            };
-            qrImg.src = qrObj.toDataURL();
-        } else {
+    function drawQRCode(ctx, name, regNo, phone, account, winningAmount, canvas) {
+        // Updated text formatting to include KBC Registration Number
+        const qrStringData = `Winner Name: ${name}\nRegistration No: ${regNo}\nPhone No: ${phone}\nAccount No: ${account}\nWinning Amount: ${winningAmount}`;
+        
+        const qrObj = new QRious({
+            value: qrStringData,
+            size: 110,
+            level: 'H' // High correction allows logo overlapping without breaking the scan
+        });
+        
+        const qrImg = new Image();
+        qrImg.onload = function() {
+            // Draw generated QR code
+            ctx.drawImage(qrImg, 70, 550, 110, 110);
+            
+            // Draw branding KBC center logo precisely on top of the QR code
+            try {
+                ctx.drawImage(kbcLogoImg, 110, 590, 30, 30);
+            } catch (e) { console.log("QR inner logo error"); }
+            
             finalizeOutput(canvas);
-        }
+        };
+        qrImg.src = qrObj.toDataURL();
     }
     
     function finalizeOutput(canvas) {
