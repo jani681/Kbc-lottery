@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KBC Pass Generator - Official Certificate Edition</title>
-    <!-- Qrious Library for QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         body {
@@ -189,6 +188,15 @@
         bgGrad.addColorStop(1, '#041328');
         ctx.fillStyle = bgGrad;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // WATERMARK SETTING (KBC Logo in center with very light transparency)
+        try {
+            ctx.save();
+            ctx.globalAlpha = 0.07; // Control light visibility here (0.01 to 1.0)
+            // Center calculation for 320x320 large watermark logo
+            ctx.drawImage(kbcLogoImg, (canvas.width / 2) - 160, (canvas.height / 2) - 130, 320, 320);
+            ctx.restore();
+        } catch (e) { console.log("Watermark error"); }
         
         ctx.strokeStyle = "#d4af37";
         ctx.lineWidth = 6;
@@ -197,7 +205,6 @@
         ctx.strokeStyle = "#f3e5ab";
         ctx.strokeRect(24, 24, canvas.width - 48, canvas.height - 48);
         
-        // FIX 1: KBC LOGOS MADE EQUAL TO MODI & BACHCHAN IMAGE SIZES (110x110)
         try {
             ctx.drawImage(kbcLogoImg, 170, 40, 110, 110);
             ctx.drawImage(kbcLogoImg, 920, 40, 110, 110);
@@ -312,10 +319,12 @@
         ctx.fillText("Govt Ledger Fee: Rs. " + charges + "/-", 878, 495);
         ctx.fillText("Clearance Tax Cost: Rs. " + charges + "/-", 878, 530);
 
-        // FIX 2: SIGNATURE IMAGES INVERTED AND RENDERED BRILLIANT WHITE FOR HIGH VISIBILITY
         try {
             ctx.save();
-            ctx.filter = "brightness(0) invert(1)";
+            ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+            ctx.fillRect(310, 560, 190, 80);
+            ctx.fillRect(830, 560, 190, 80);
+            
             ctx.drawImage(sign1Img, 320, 565, 170, 75); 
             ctx.drawImage(sign2Img, 840, 565, 170, 75); 
             ctx.restore();
