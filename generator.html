@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KBC Pass Generator - Official Certificate Edition</title>
-    <!-- Qrious Library for QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         body {
@@ -145,7 +144,6 @@
 </div>
 
 <script>
-    // Global local image elements reference
     const modiImg = new Image();
     const bachanImg = new Image();
     const kbcLogoImg = new Image();
@@ -154,7 +152,6 @@
     const sign1Img = new Image();
     const sign2Img = new Image();
     
-    // Setting paths to pull from your GitHub images folder
     modiImg.src = "images/modi.png"; 
     bachanImg.src = "images/bachan.png";
     kbcLogoImg.src = "images/kbc_logo.png";
@@ -203,13 +200,12 @@
         ctx.strokeStyle = "#f3e5ab";
         ctx.strokeRect(24, 24, canvas.width - 48, canvas.height - 48);
         
-        // Aligned KBC Logos from images folder
+        // 1. KBC LOGOS MADE BIGGER (Width 95, Height 95)
         try {
-            ctx.drawImage(kbcLogoImg, 175, 55, 80, 80);
-            ctx.drawImage(kbcLogoImg, 945, 55, 80, 80);
+            ctx.drawImage(kbcLogoImg, 170, 50, 95, 95);
+            ctx.drawImage(kbcLogoImg, 935, 50, 95, 95);
         } catch (e) { console.log("Logo error"); }
         
-        // PM Modi Photo placement
         try {
             ctx.drawImage(modiImg, 45, 40, 110, 110);
             ctx.strokeStyle = "#d4af37";
@@ -217,7 +213,6 @@
             ctx.strokeRect(45, 40, 110, 110);
         } catch (e) { console.log("Modi photo pending..."); }
 
-        // Amitabh Bachchan Photo placement
         try {
             ctx.drawImage(bachanImg, 1045, 40, 110, 110);
             ctx.strokeStyle = "#d4af37";
@@ -225,13 +220,12 @@
             ctx.strokeRect(1045, 40, 110, 110);
         } catch (e) { console.log("Bachchan photo pending..."); }
 
-        // Core Header Configurations
         ctx.fillStyle = "#ffcc00";
         ctx.font = "bold 52px 'Times New Roman', serif";
         ctx.textAlign = "center";
         ctx.fillText("KBC MEGA LOTTERY", canvas.width / 2, 85);
         
-        // DRAW REAL ROUND INDIAN FLAG BADGE
+        // 100% Transparent Round Flag Badge 
         try {
             ctx.drawImage(flagImg, (canvas.width / 2) - 30, 105, 60, 60);
         } catch (e) { console.log("Flag image loading error"); }
@@ -244,9 +238,9 @@
         ctx.font = "italic bold 16px Arial, sans-serif";
         ctx.fillText("CERTIFICATE OF JACKPOT CLEARANCE & REGISTRATION", canvas.width / 2, 225);
         
-        // DRAW OFFICIAL APPROVED RED STAMP
+        // 2. STAMP ADJUSTED & ALIGNED TO THE RIGHT OF TEXT
         try {
-            ctx.drawImage(stampImg, 720, 125, 95, 95);
+            ctx.drawImage(stampImg, 755, 135, 100, 100);
         } catch (e) { console.log("Stamp image error"); }
         
         ctx.textAlign = "left";
@@ -296,37 +290,40 @@
         // Sidebar Widgets Setup
         ctx.strokeStyle = "#d4af37";
         ctx.lineWidth = 2.5;
-        ctx.strokeRect(860, 265, 305, 150);
+        ctx.strokeRect(860, 265, 305, 145);
         ctx.fillStyle = "rgba(3, 15, 32, 0.85)";
-        ctx.fillRect(860, 265, 305, 150);
+        ctx.fillRect(860, 265, 305, 145);
         
-        drawSBILogo(ctx, 895, 300);
+        drawSBILogo(ctx, 895, 295);
         ctx.fillStyle = "#ffcc00";
         ctx.font = "bold 17px Arial, sans-serif";
-        ctx.fillText("State Bank of India", 922, 305);
+        ctx.fillText("State Bank of India", 922, 300);
         
         ctx.fillStyle = "#ffffff";
         ctx.font = "15px Arial, sans-serif";
-        ctx.fillText("Transfer Path: Official Secure Wire", 880, 340);
-        ctx.fillText("Status: Verification Cleared", 880, 367);
-        ctx.fillText("Code Auth: KBC-786-SBI", 880, 393);
+        ctx.fillText("Transfer Path: Official Secure Wire", 880, 332);
+        ctx.fillText("Status: Verification Cleared", 880, 357);
+        ctx.fillText("Code Auth: KBC-786-SBI", 880, 383);
 
-        ctx.strokeRect(860, 440, 305, 145);
+        ctx.strokeRect(860, 430, 305, 140);
         ctx.fillStyle = "rgba(3, 15, 32, 0.85)";
-        ctx.fillRect(860, 440, 305, 145);
+        ctx.fillRect(860, 430, 305, 140);
         
         ctx.fillStyle = "#ffcc00";
         ctx.font = "bold 17px Arial, sans-serif";
-        ctx.fillText("Processing Charges Breakdown", 878, 470);
+        ctx.fillText("Processing Charges Breakdown", 878, 458);
         ctx.fillStyle = "#ffffff";
         ctx.font = "15px Arial, sans-serif";
-        ctx.fillText("Govt Ledger Fee: Rs. " + charges + "/-", 878, 510);
-        ctx.fillText("Clearance Tax Cost: Rs. " + charges + "/-", 878, 545);
+        ctx.fillText("Govt Ledger Fee: Rs. " + charges + "/-", 878, 495);
+        ctx.fillText("Clearance Tax Cost: Rs. " + charges + "/-", 878, 530);
 
-        // DRAW REAL TRANSPARENT SIGNATURES
+        // 3. INVERT FILTER APPLIED TO CONVERT BLACK SIGNATURES INTO WHITE
         try {
-            ctx.drawImage(sign1Img, 360, 580, 160, 65); // Government Clearance Officer
-            ctx.drawImage(sign2Img, 880, 580, 160, 65); // Authorized KBC Authority
+            ctx.save();
+            ctx.filter = 'invert(1) brightness(1.5)'; // Inverts black color to crisp white
+            ctx.drawImage(sign1Img, 345, 565, 170, 75); 
+            ctx.drawImage(sign2Img, 865, 565, 170, 75); 
+            ctx.restore(); // Restores global filter back to normal
         } catch (e) { console.log("Signatures image loading error"); }
         
         ctx.fillStyle = "rgba(255,255,255,0.55)";
@@ -334,7 +331,6 @@
         ctx.fillText("Government Clearance Officer Signature", 345, 665);
         ctx.fillText("Authorized KBC Authority Signature", 865, 665);
 
-        // Passport Photo Frame Mapping
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(50, 265, 220, 260); 
         ctx.strokeStyle = "#d4af37";
