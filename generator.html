@@ -1,1 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KBC Pass Generator - Official Certificate Edition</title>
+    <!-- Qrious Library for QR Code -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #0c2340;
+            margin-top: 0;
+            text-align: center;
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0c2340;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #1d4ed8;
+        }
+        #canvasContainer {
+            text-align: center;
+            max-width: 100%;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border: 3px solid #b8860b;
+            border-radius: 8px;
+            display: none;
+        }
+        .download-btn {
+            background-color: #27ae60;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            max-width: 500px;
+            margin-top: 15px;
+            display: none;
+        }
+        .download-btn:hover {
+            background-color: #2ecc71;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>KBC Certificate Generator</h2>
+    
+    <div class="form-group">
+        <label>Winner Full Name:</label>
+        <input type="text" id="winnerName" placeholder="Enter Full Name" value="Imran khan">
+    </div>
+    
+    <div class="form-group">
+        <label>Registration Number:</label>
+        <input type="text" id="regNo" placeholder="Enter Registration Number" value="Kbc-3698">
+    </div>
+    
+    <div class="form-group">
+        <label>Winner Phone Number:</label>
+        <input type="text" id="phoneNo" placeholder="Enter Phone Number" value="7867876787">
+    </div>
+    
+    <div class="form-group">
+        <label>Bank Account Number:</label>
+        <input type="text" id="accountNo" placeholder="Enter Bank Account Number" value="4674764555656545">
+    </div>
+    
+    <div class="form-group">
+        <label>Required Ledger Processing Charges:</label>
+        <input type="text" id="charges" placeholder="e.g. 12,200" value="12,200">
+    </div>
+
+    <div class="form-group">
+        <label>App Link (For QR Code):</label>
+        <input type="text" id="appLink" value="https://kbc-lottery.vercel.app/">
+    </div>
+
+    <div class="form-group">
+        <label>Client Passport Photo:</label>
+        <input type="file" id="clientPhoto" accept="image/*">
+    </div>
+    
+    <button onclick="generateCertificate()">Generate Certificate</button>
+</div>
+
+<div id="canvasContainer">
+    <canvas id="certificateCanvas"></canvas>
+    <button class="download-btn" id="dlBtn" onclick="downloadCertificate()">Download Certificate</button>
+</div>
+
+<script>
+    // Global local PNG image references
+    const modiImg = new Image();
+    const bachanImg = new Image();
+    const kbcLogoImg = new Image();
+    
+    // Setting paths to look into your newly created images folder
+    modiImg.src = "images/modi.png"; 
+    bachanImg.src = "images/bachan.png";
+    kbcLogoImg.src = "images/kbc_logo.png";
+
+    function drawIndianFlag(ctx, x, y, width, height) {
+        ctx.save();
+        let stripeHeight = height / 3;
+        
+        // Saffron
+        ctx.fillStyle = "#FF9933";
+        ctx.fillRect(x, y, width, stripeHeight);
+        
+        // White
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillRect(x, y + stripeHeight, width, stripeHeight);
+        
+        // Green
+        ctx.fillStyle = "#128807";
+        ctx.fillRect(x, y + (stripeHeight * 2), width, stripeHeight);
+        
+        // Ashoka Chakra wheel dynamics
+        let cx = x + (width / 2);
+        let cy = y + (height / 2);
+        let radius = stripeHeight * 0.45;
+        
+        ctx.strokeStyle = "#000080";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        for (let i = 0; i < 24; i++) {
+            let angle = (i * Math.PI) / 12;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + radius * Math.cos(angle), cy + radius * Math.sin(angle));
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    function drawSBILogo(ctx, x, y) {
+        ctx.save();
+        ctx.fillStyle = "#00a4e4";
+        ctx.beginPath();
+        ctx.arc(x, y, 16, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#031124"; 
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#031124";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(x, y + 4);
+        ctx.lineTo(x, y + 17);
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    function generateCertificate() {
+        const canvas = document.getElementById('certificateCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = 1200;
+        canvas.height = 700;
+        
+        let bgGrad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        bgGrad.addColorStop(0, '#030f20');
+        bgGrad.addColorStop(0.5, '#071b35');
+        bgGrad.addColorStop(1, '#041328');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.strokeStyle = "#d4af37";
+        ctx.lineWidth = 6;
+        ctx.strokeRect(15, 15, canvas.width - 30, canvas.height - 30);
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = "#f3e5ab";
+        ctx.strokeRect(24, 24, canvas.width - 48, canvas.height - 48);
+        
+        // Render Left and Right KBC Logos from images/kbc_logo.png
+        try {
+            ctx.drawImage(kbcLogoImg, 170, 55, 80, 80);
+            ctx.drawImage(kbcLogoImg, 950, 55, 80, 80);
+        } catch (e) {
+            console.log("KBC Logo image loading error.");
+        }
+        
+        // PM Modi Photo placement (Left Side of Logos)
+        try {
+            ctx.drawImage(modiImg, 45, 40, 110, 110);
+            ctx.strokeStyle = "#d4af37";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(45, 40, 110, 110);
+        } catch (e) { console.log("Modi image loading pending..."); }
+
+        // Amitabh Bachchan Photo placement (Right Side of Logos)
+        try {
+            ctx.drawImage(bachanImg, 1045, 40, 110, 110);
+            ctx.strokeStyle = "#d4af37";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(1045, 40, 110, 110);
+        } catch (e) { console.log("Bachchan image loading pending..."); }
+
+        // Core Header Configurations
+        ctx.fillStyle = "#ffcc00";
+        ctx.font = "bold 52px 'Times New Roman', serif";
+        ctx.textAlign = "center";
+        ctx.fillText("KBC MEGA LOTTERY", canvas.width / 2, 85);
+        
+        // Exact real dimensions for Indian Flag
+        drawIndianFlag(ctx, (canvas.width / 2) - 40, 105, 80, 46);
+        
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 23px Arial, sans-serif";
+        ctx.fillText("OFFICIAL WINNER CLEARANCE PASS", canvas.width / 2, 180);
+        
+        ctx.fillStyle = "#d4af37";
+        ctx.font = "italic bold 16px Arial, sans-serif";
+        ctx.fillText("CERTIFICATE OF JACKPOT CLEARANCE & REGISTRATION", canvas.width / 2, 210);
+        
+        ctx.textAlign = "left";
+        
+        const labels = [
+            "Winner Full Name:",
+            "Registration Number:",
+            "Winner Phone Number:",
+            "Bank Account Number:",
+            "Prize Won:",
+            "Required Ledger Processing Charges:"
+        ];
+        
+        let startY = 275;
+        let lineSpacing = 55;
+        
+        labels.forEach((label, index) => {
+            ctx.fillStyle = "#d4af37";
+            ctx.font = "bold 19px Arial, sans-serif";
+            ctx.fillText(label, 320, startY + (index * lineSpacing));
+            
+            ctx.strokeStyle = "rgba(255,255,255,0.2)";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(320, startY + (index * lineSpacing) + 12);
+            ctx.lineTo(830, startY + (index * lineSpacing) + 12);
+            ctx.stroke();
+        });
+        
+        ctx.fillStyle = "#ffffff"; 
+        ctx.font = "bold 20px Arial, sans-serif";
+        
+        const name = document.getElementById('winnerName').value || "---";
+        const regNo = document.getElementById('regNo').value || "---";
+        const phone = document.getElementById('phoneNo').value || "---";
+        const account = document.getElementById('accountNo').value || "---";
+        const charges = document.getElementById('charges').value || "0.00";
+        const appLink = document.getElementById('appLink').value;
+        
+        ctx.fillText(name, 510, 275);
+        ctx.fillText(regNo, 530, 330);
+        ctx.fillText(phone, 545, 385);
+        ctx.fillText(account, 540, 440);
+        ctx.fillText("₹25,00,000/- (Rupees Twenty-Five Lakhs Only)", 440, 495);
+        ctx.fillText("Rs. " + charges + "/-", 700, 550);
+
+        // Sidebar Widgets Setup
+        ctx.strokeStyle = "#d4af37";
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(860, 255, 305, 150);
+        ctx.fillStyle = "rgba(3, 15, 32, 0.85)";
+        ctx.fillRect(860, 255, 305, 150);
+        
+        drawSBILogo(ctx, 895, 290);
+        ctx.fillStyle = "#ffcc00";
+        ctx.font = "bold 17px Arial, sans-serif";
+        ctx.fillText("State Bank of India", 922, 295);
+        
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "15px Arial, sans-serif";
+        ctx.fillText("Transfer Path: Official Secure Wire", 880, 330);
+        ctx.fillText("Status: Verification Cleared", 880, 357);
+        ctx.fillText("Code Auth: KBC-786-SBI", 880, 383);
+
+        ctx.strokeRect(860, 430, 305, 145);
+        ctx.fillStyle = "rgba(3, 15, 32, 0.85)";
+        ctx.fillRect(860, 430, 305, 145);
+        
+        ctx.fillStyle = "#ffcc00";
+        ctx.font = "bold 17px Arial, sans-serif";
+        ctx.fillText("Processing Charges Breakdown", 878, 460);
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "15px Arial, sans-serif";
+        ctx.fillText("Govt Ledger Fee: Rs. " + charges + "/-", 878, 500);
+        ctx.fillText("Clearance Tax Cost: Rs. " + charges + "/-", 878, 535);
+
+        ctx.strokeStyle = "rgba(255,255,255,0.15)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(340, 640); ctx.lineTo(560, 640);
+        ctx.moveTo(850, 640); ctx.lineTo(1070, 640);
+        ctx.stroke();
+        
+        // Signatures Engines
+        ctx.save();
+        ctx.lineCap = "round"; ctx.lineJoin = "round";
+        ctx.strokeStyle = "#164ec7"; ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.moveTo(345, 615); ctx.lineTo(352, 600); ctx.lineTo(358, 620); 
+        ctx.moveTo(348, 615); ctx.lineTo(415, 600); ctx.lineTo(388, 625); ctx.lineTo(530, 595); 
+        ctx.stroke();
+        
+        ctx.strokeStyle = "#008080"; ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(865, 615);
+        ctx.quadraticCurveTo(855, 570, 880, 575); 
+        ctx.quadraticCurveTo(895, 575, 875, 630); 
+        ctx.bezierCurveTo(905, 585, 915, 635, 1060, 605);
+        ctx.stroke();
+        ctx.restore();
+        
+        ctx.fillStyle = "rgba(255,255,255,0.55)";
+        ctx.font = "13px Arial, sans-serif";
+        ctx.fillText("Government Clearance Officer Signature", 345, 660);
+        ctx.fillText("Authorized KBC Authority Signature", 865, 660);
+
+        // Passport Photo Frame Mapping
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(50, 255, 220, 260); 
+        ctx.strokeStyle = "#d4af37";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(50, 255, 220, 260);
+        
+        const photoInput = document.getElementById('clientPhoto');
+        if (photoInput.files && photoInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const clientImg = new Image();
+                clientImg.onload = function() {
+                    ctx.drawImage(clientImg, 55, 260, 210, 250);
+                    drawQRCode(ctx, appLink, canvas);
+                }
+                clientImg.src = event.target.result;
+            }
+            reader.readAsDataURL(photoInput.files[0]);
+        } else {
+            ctx.fillStyle = "#0c2340";
+            ctx.font = "bold 14px Arial, sans-serif";
+            ctx.fillText("CUSTOMER PIC PLACEHOLDER", 62, 380);
+            drawQRCode(ctx, appLink, canvas);
+        }
+    }
+    
+    function drawQRCode(ctx, text, canvas) {
+        if(text) {
+            const qrObj = new QRious({
+                value: text,
+                size: 110,
+                level: 'H'
+            });
+            const qrImg = new Image();
+            qrImg.onload = function() {
+                ctx.drawImage(qrImg, 70, 545, 110, 110);
+                finalizeOutput(canvas);
+            };
+            qrImg.src = qrObj.toDataURL();
+        } else {
+            finalizeOutput(canvas);
+        }
+    }
+    
+    function finalizeOutput(canvas) {
+        canvas.style.display = "block";
+        document.getElementById('dlBtn').style.display = "block";
+        canvas.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function downloadCertificate() {
+        const canvas = document.getElementById('certificateCanvas');
+        const image = canvas.toDataURL("image/png");
+        const link = document.createElement('a');
+        const nameInput = document.getElementById('winnerName').value || "Winner";
+        link.download = `KBC_Official_Certificate_${nameInput.replace(/\s+/g, '_')}.png`;
+        link.href = image;
+        link.click();
+    }
+</script>
+
+</body>
+</html>
 
