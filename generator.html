@@ -197,10 +197,10 @@
         ctx.strokeStyle = "#f3e5ab";
         ctx.strokeRect(24, 24, canvas.width - 48, canvas.height - 48);
         
-        // KBC LOGOS ENLARGED (95x95)
+        // FIX 1: KBC LOGOS MADE EQUAL TO MODI & BACHCHAN IMAGE SIZES (110x110)
         try {
-            ctx.drawImage(kbcLogoImg, 170, 50, 95, 95);
-            ctx.drawImage(kbcLogoImg, 935, 50, 95, 95);
+            ctx.drawImage(kbcLogoImg, 170, 40, 110, 110);
+            ctx.drawImage(kbcLogoImg, 920, 40, 110, 110);
         } catch (e) { console.log("Logo error"); }
         
         try {
@@ -312,9 +312,13 @@
         ctx.fillText("Govt Ledger Fee: Rs. " + charges + "/-", 878, 495);
         ctx.fillText("Clearance Tax Cost: Rs. " + charges + "/-", 878, 530);
 
+        // FIX 2: SIGNATURE IMAGES INVERTED AND RENDERED BRILLIANT WHITE FOR HIGH VISIBILITY
         try {
+            ctx.save();
+            ctx.filter = "brightness(0) invert(1)";
             ctx.drawImage(sign1Img, 320, 565, 170, 75); 
             ctx.drawImage(sign2Img, 840, 565, 170, 75); 
+            ctx.restore();
         } catch (e) { console.log("Signatures image loading error"); }
         
         ctx.fillStyle = "rgba(255,255,255,0.55)";
@@ -328,7 +332,6 @@
         ctx.lineWidth = 3;
         ctx.strokeRect(50, 265, 220, 260);
         
-        // QR Code Data Format Update
         const qrStringData = `Winner Name: ${name}\nAccount No: ${account}\nWinning Amount: ${winningAmount}`;
 
         const photoInput = document.getElementById('clientPhoto');
