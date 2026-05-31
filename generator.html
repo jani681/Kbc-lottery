@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KBC Pass Generator - Layer Edition</title>
+    <title>KBC Pass Generator - Perfect Layer Edition</title>
     <!-- Qrious Library for QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <!-- Html2Canvas Library for Perfect Screenshot Generation -->
@@ -40,7 +40,6 @@
         }
         
         /* THE MAGIC LAYER AREA */
-        /* Yeh container aapki original parchi ke 4K dimensions ke mutabiq layers banata hai */
         #parchi-wrapper {
             position: relative;
             width: 1200px;
@@ -64,35 +63,35 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
         
-        /* Precise Coordinates on lines */
-        #lbl-name    { left: 440px; top: 312px; }
-        #lbl-reg     { left: 440px; top: 358px; }
-        #lbl-phone   { left: 440px; top: 405px; }
-        #lbl-account { left: 440px; top: 450px; }
-        #lbl-charges { left: 440px; top: 497px; }
+        /* Shifted coordinates to the right (from 440px to 820px) to sit perfectly on lines */
+        #lbl-name    { left: 820px; top: 312px; }
+        #lbl-reg     { left: 820px; top: 358px; }
+        #lbl-phone   { left: 820px; top: 405px; }
+        #lbl-account { left: 820px; top: 450px; }
+        #lbl-charges { left: 820px; top: 497px; }
         
         /* Sidebar Right Breakdown panel coordinates */
-        #lbl-break-1 { left: 915px; top: 360px; color: #ffcc00; font-size: 18px; }
-        #lbl-break-2 { left: 915px; top: 395px; color: #ffcc00; font-size: 18px; }
+        #lbl-break-1 { left: 1820px; top: 360px; color: #ffcc00; font-size: 18px; }
+        #lbl-break-2 { left: 1820px; top: 395px; color: #ffcc00; font-size: 18px; }
 
-        /* Passport Photo Holder styling */
+        /* Passport Photo Holder shifted right to frame bounds */
         .layer-photo {
             position: absolute;
-            left: 125px;
-            top: 275px;
-            width: 135px;
-            height: 165px;
+            left: 145px;
+            top: 410px;
+            width: 168px;
+            height: 205px;
             object-fit: cover;
             border: 1px solid #fff;
         }
 
-        /* Dynamic Render QR code location */
+        /* Dynamic Render QR code location overlay on the template's placeholder */
         .layer-qr {
             position: absolute;
-            left: 875px;
-            top: 232px;
-            width: 45px;
-            height: 45px;
+            left: 1170px;
+            top: 745px;
+            width: 200px;
+            height: 200px;
             background: white;
             padding: 2px;
         }
@@ -153,7 +152,6 @@
 
 <script>
     function buildLayers() {
-        // Text insert fields mapping inside standard divs
         document.getElementById('lbl-name').innerText = document.getElementById('winnerName').value;
         document.getElementById('lbl-reg').innerText = document.getElementById('regNo').value;
         document.getElementById('lbl-phone').innerText = document.getElementById('phoneNo').value;
@@ -166,16 +164,14 @@
             document.getElementById('lbl-break-2').innerText = "Rs. " + chg + "/-";
         }
 
-        // Render QR Dynamic Stream
         const link = document.getElementById('appLink').value;
         if(link) {
-            const qr = new QRious({ value: link, size: 100, level: 'M' });
+            const qr = new QRious({ value: link, size: 200, level: 'M' });
             const qrBox = document.getElementById('lbl-qr');
             qrBox.src = qr.toDataURL();
             qrBox.style.display = "block";
         }
 
-        // Handle Image Attachment stream
         const photoInput = document.getElementById('clientPhoto');
         const photoLayer = document.getElementById('lbl-photo');
         
@@ -184,7 +180,7 @@
             reader.onload = function(e) {
                 photoLayer.src = e.target.result;
                 photoLayer.style.display = "block";
-                setTimeout(captureFinalParchi, 500); // Small cooldown buffer for image rendering
+                setTimeout(captureFinalParchi, 500); 
             }
             reader.readAsDataURL(photoInput.files[0]);
         } else {
@@ -195,13 +191,12 @@
 
     function captureFinalParchi() {
         const wrapper = document.getElementById('parchi-wrapper');
-        wrapper.style.display = "block"; // Momentarily mount in viewport loop
+        wrapper.style.display = "block"; 
 
-        // Use modern canvas mapping script to snap accurate screenshot
         html2canvas(wrapper, {
             useCORS: true,
             allowTaint: true,
-            scale: 2 // Boost quality output scale to 2x High Definition
+            scale: 2 
         }).then(canvas => {
             const imgData = canvas.toDataURL('image/png');
             const preview = document.getElementById('finalPreview');
@@ -210,7 +205,7 @@
             preview.style.display = "block";
             document.getElementById('dlBtn').style.display = "block";
             
-            wrapper.style.display = "none"; // Unmount active stream buffer safely
+            wrapper.style.display = "none"; 
             preview.scrollIntoView({ behavior: 'smooth' });
         });
     }
