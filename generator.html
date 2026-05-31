@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KBC Pass Generator - Final Fixed</title>
+    <title>KBC Pass Generator - Layer Edition</title>
+    <!-- Qrious Library for QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <!-- Html2Canvas Library for Perfect Screenshot Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -15,236 +19,208 @@
             flex-direction: column;
             align-items: center;
         }
-        .container {
+        .admin-box {
             background-color: white;
-            padding: 30px;
+            padding: 25px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            max-width: 500px;
+            max-width: 480px;
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
-        h2 {
-            color: #0b3c5d;
-            margin-top: 0;
-            text-align: center;
-            border-bottom: 2px solid #f0f2f5;
-            padding-bottom: 10px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #333;
-        }
+        h2 { color: #0b3c5d; text-align: center; margin-top: 0; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; }
         input[type="text"], input[type="file"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
+            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;
         }
-        button {
+        .gen-btn {
+            width: 100%; padding: 12px; background-color: #0b3c5d; color: white; border: none;
+            border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer;
+        }
+        
+        /* THE MAGIC LAYER AREA */
+        /* Yeh container aapki original parchi ke 4K dimensions ke mutabiq layers banata hai */
+        #parchi-wrapper {
+            position: relative;
+            width: 1200px;
+            height: 545px;
+            display: none; /* Hidden until generation */
+            overflow: hidden;
+        }
+        .bg-template {
             width: 100%;
-            padding: 12px;
-            background-color: #0b3c5d;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
+            height: 100%;
+            display: block;
+        }
+        
+        /* Live Text Absolute Positioning Overlay */
+        .layer-text {
+            position: absolute;
+            color: #ffffff; /* White text for dark blue template */
+            font-family: Arial, sans-serif;
             font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-            margin-top: 10px;
+            font-size: 20px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
-        button:hover {
-            background-color: #328cc1;
+        
+        /* Precise Coordinates on lines */
+        #lbl-name    { left: 440px; top: 312px; }
+        #lbl-reg     { left: 440px; top: 358px; }
+        #lbl-phone   { left: 440px; top: 405px; }
+        #lbl-account { left: 440px; top: 450px; }
+        #lbl-charges { left: 440px; top: 497px; }
+        
+        /* Sidebar Right Breakdown panel coordinates */
+        #lbl-break-1 { left: 915px; top: 360px; color: #ffcc00; font-size: 18px; }
+        #lbl-break-2 { left: 915px; top: 395px; color: #ffcc00; font-size: 18px; }
+
+        /* Passport Photo Holder styling */
+        .layer-photo {
+            position: absolute;
+            left: 125px;
+            top: 275px;
+            width: 135px;
+            height: 165px;
+            object-fit: cover;
+            border: 1px solid #fff;
         }
-        #canvasContainer {
+
+        /* Dynamic Render QR code location */
+        .layer-qr {
+            position: absolute;
+            left: 875px;
+            top: 232px;
+            width: 45px;
+            height: 45px;
+            background: white;
+            padding: 2px;
+        }
+
+        /* Output Image Preview Area */
+        #previewContainer {
             text-align: center;
             max-width: 100%;
-            overflow-x: auto;
             margin-top: 20px;
         }
-        canvas {
+        #finalPreview {
             max-width: 100%;
             height: auto;
-            border: 2px solid #0b3c5d;
+            border: 2px solid #27ae60;
             border-radius: 8px;
             display: none;
         }
-        .action-buttons {
-            display: none;
-            gap: 10px;
-            width: 100%;
-            max-width: 500px;
-            margin-top: 15px;
-        }
         .download-btn {
-            background-color: #27ae60;
-            width: 100%;
-            padding: 12px;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
+            background-color: #27ae60; color: white; width: 100%; max-width: 480px;
+            padding: 12px; border: none; border-radius: 6px; font-size: 16px;
+            font-weight: bold; cursor: pointer; margin-top: 15px; display: none;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="admin-box">
     <h2>KBC Parchi Generator</h2>
-    
-    <div class="form-group">
-        <label>Winner Full Name:</label>
-        <input type="text" id="winnerName" placeholder="Enter Full Name">
-    </div>
-    
-    <div class="form-group">
-        <label>Registration Number:</label>
-        <input type="text" id="regNo" placeholder="Enter Registration Number">
-    </div>
-    
-    <div class="form-group">
-        <label>Winner Phone Number:</label>
-        <input type="text" id="phoneNo" placeholder="Enter Phone Number">
-    </div>
-    
-    <div class="form-group">
-        <label>Bank Account Number:</label>
-        <input type="text" id="accountNo" placeholder="Enter Bank Account Number">
-    </div>
-    
-    <div class="form-group">
-        <label>Required Ledger Processing Charges:</label>
-        <input type="text" id="charges" placeholder="e.g. 12,200">
-    </div>
-
-    <div class="form-group">
-        <label>App Link (For QR Code):</label>
-        <input type="text" id="appLink" value="https://kbc-lottery.vercel.app/">
-    </div>
-
-    <div class="form-group">
-        <label>Client Passport Photo:</label>
-        <input type="file" id="clientPhoto" accept="image/*">
-    </div>
-    
-    <button onclick="generateCertificate()">Generate Parchi</button>
+    <div class="form-group"><label>Winner Full Name:</label><input type="text" id="winnerName" value="Imran khan"></div>
+    <div class="form-group"><label>Registration Number:</label><input type="text" id="regNo" value="Kbc-123456"></div>
+    <div class="form-group"><label>Winner Phone Number:</label><input type="text" id="phoneNo" value="917867654545"></div>
+    <div class="form-group"><label>Bank Account Number:</label><input type="text" id="accountNo" value="244676477788677"></div>
+    <div class="form-group"><label>Required Ledger Charges:</label><input type="text" id="charges" value="12,300"></div>
+    <div class="form-group"><label>App Link (For QR Code):</label><input type="text" id="appLink" value="https://kbc-lottery.vercel.app/"></div>
+    <div class="form-group"><label>Client Passport Photo:</label><input type="file" id="clientPhoto" accept="image/*"></div>
+    <button class="gen-btn" onclick="buildLayers()">Generate Parchi</button>
 </div>
 
-<div id="canvasContainer">
-    <canvas id="certificateCanvas"></canvas>
+<!-- The Live DOM Elements Stacked Together -->
+<div id="parchi-wrapper">
+    <img src="certificate_template.png" class="bg-template" alt="KBC Template">
+    <div class="layer-text" id="lbl-name"></div>
+    <div class="layer-text" id="lbl-reg"></div>
+    <div class="layer-text" id="lbl-phone"></div>
+    <div class="layer-text" id="lbl-account"></div>
+    <div class="layer-text" id="lbl-charges"></div>
+    <div class="layer-text" id="lbl-break-1"></div>
+    <div class="layer-text" id="lbl-break-2"></div>
+    <img class="layer-photo" id="lbl-photo" src="" style="display:none;">
+    <img class="layer-qr" id="lbl-qr" src="" style="display:none;">
 </div>
 
-<div class="action-buttons" id="actionArea">
-    <button class="download-btn" onclick="downloadCertificate()">Download Parchi</button>
+<!-- Output Showcase Area -->
+<div id="previewContainer">
+    <img id="finalPreview" alt="Your Generated Certificate">
+    <button class="download-btn" id="dlBtn" onclick="downloadImage()">Download Parchi</button>
 </div>
 
 <script>
-    function generateCertificate() {
-        const canvas = document.getElementById('certificateCanvas');
-        const ctx = canvas.getContext('2d');
+    function buildLayers() {
+        // Text insert fields mapping inside standard divs
+        document.getElementById('lbl-name').innerText = document.getElementById('winnerName').value;
+        document.getElementById('lbl-reg').innerText = document.getElementById('regNo').value;
+        document.getElementById('lbl-phone').innerText = document.getElementById('phoneNo').value;
+        document.getElementById('lbl-account').innerText = document.getElementById('accountNo').value;
         
-        const baseImg = new Image();
-        baseImg.src = 'certificate_template.png';
+        const chg = document.getElementById('charges').value;
+        if(chg) {
+            document.getElementById('lbl-charges').innerText = "Rs. " + chg + "/-";
+            document.getElementById('lbl-break-1').innerText = "Rs. " + chg + "/-";
+            document.getElementById('lbl-break-2').innerText = "Rs. " + chg + "/-";
+        }
+
+        // Render QR Dynamic Stream
+        const link = document.getElementById('appLink').value;
+        if(link) {
+            const qr = new QRious({ value: link, size: 100, level: 'M' });
+            const qrBox = document.getElementById('lbl-qr');
+            qrBox.src = qr.toDataURL();
+            qrBox.style.display = "block";
+        }
+
+        // Handle Image Attachment stream
+        const photoInput = document.getElementById('clientPhoto');
+        const photoLayer = document.getElementById('lbl-photo');
         
-        baseImg.onload = function() {
-            canvas.width = baseImg.naturalWidth;
-            canvas.height = baseImg.naturalHeight;
-            
-            // Background drawing
-            ctx.drawImage(baseImg, 0, 0);
-            
-            // Text typography adjustments - Bold Dark Navy Blue for lines
-            ctx.fillStyle = "#1e293b"; 
-            ctx.font = "bold 24px Arial, sans-serif";
-            
-            const name = document.getElementById('winnerName').value;
-            const regNo = document.getElementById('regNo').value;
-            const phone = document.getElementById('phoneNo').value;
-            const account = document.getElementById('accountNo').value;
-            const charges = document.getElementById('charges').value;
-            const appLink = document.getElementById('appLink').value;
-            
-            // Mapped to fit exactly into the white spaces across template lines
-            ctx.fillText(name, 560, 412);
-            ctx.fillText(regNo, 560, 458);
-            ctx.fillText(phone, 560, 508);
-            ctx.fillText(account, 560, 555);
-            
-            if(charges) {
-                // Bottom charges position shift
-                ctx.font = "bold 26px Arial, sans-serif";
-                ctx.fillText("Rs. " + charges + "/-", 610, 650);
-                
-                // Processing charges breakdown block on the right panel
-                ctx.fillStyle = "#1e293b";
-                ctx.font = "bold 20px Arial, sans-serif";
-                ctx.fillText("Rs. " + charges + "/-", 915, 665);
-                ctx.fillText("Rs. " + charges + "/-", 915, 693);
+        if (photoInput.files && photoInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                photoLayer.src = e.target.result;
+                photoLayer.style.display = "block";
+                setTimeout(captureFinalParchi, 500); // Small cooldown buffer for image rendering
             }
-            
-            // Client image positioning box adjustments
-            const photoInput = document.getElementById('clientPhoto');
-            if (photoInput.files && photoInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const clientImg = new Image();
-                    clientImg.onload = function() {
-                        // Positioned strictly within the borders of the custom photo holder
-                        ctx.drawImage(clientImg, 82, 410, 168, 205);
-                        drawQRCode(ctx, appLink, canvas);
-                    }
-                    clientImg.src = event.target.result;
-                }
-                reader.readAsDataURL(photoInput.files[0]);
-            } else {
-                drawQRCode(ctx, appLink, canvas);
-            }
-        };
-    }
-    
-    function drawQRCode(ctx, text, canvas) {
-        if(text) {
-            const qrObj = new QRious({
-                value: text,
-                size: 110,
-                level: 'M'
-            });
-            
-            const qrImg = new Image();
-            qrImg.onload = function() {
-                // Shifted away from base image QR code container bounds to avoid clipping issues
-                ctx.drawImage(qrImg, 580, 715, 110, 110);
-                finalizeOutput(canvas);
-            };
-            qrImg.src = qrObj.toDataURL();
+            reader.readAsDataURL(photoInput.files[0]);
         } else {
-            finalizeOutput(canvas);
+            photoLayer.style.display = "none";
+            setTimeout(captureFinalParchi, 300);
         }
     }
-    
-    function finalizeOutput(canvas) {
-        canvas.style.display = "block";
-        document.getElementById('actionArea').style.display = "flex";
-        canvas.scrollIntoView({ behavior: 'smooth' });
+
+    function captureFinalParchi() {
+        const wrapper = document.getElementById('parchi-wrapper');
+        wrapper.style.display = "block"; // Momentarily mount in viewport loop
+
+        // Use modern canvas mapping script to snap accurate screenshot
+        html2canvas(wrapper, {
+            useCORS: true,
+            allowTaint: true,
+            scale: 2 // Boost quality output scale to 2x High Definition
+        }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const preview = document.getElementById('finalPreview');
+            
+            preview.src = imgData;
+            preview.style.display = "block";
+            document.getElementById('dlBtn').style.display = "block";
+            
+            wrapper.style.display = "none"; // Unmount active stream buffer safely
+            preview.scrollIntoView({ behavior: 'smooth' });
+        });
     }
-    
-    function downloadCertificate() {
-        const canvas = document.getElementById('certificateCanvas');
-        const image = canvas.toDataURL("image/png");
+
+    function downloadImage() {
+        const preview = document.getElementById('finalPreview');
         const link = document.createElement('a');
         const nameInput = document.getElementById('winnerName').value || "Winner";
-        link.download = `KBC_Registration_${nameInput.replace(/\s+/g, '_')}.png`;
-        link.href = image;
+        link.download = `KBC_Official_Pass_${nameInput.replace(/\s+/g, '_')}.png`;
+        link.href = preview.src;
         link.click();
     }
 </script>
