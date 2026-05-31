@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KBC Pass Generator - Premium Canvas Edition</title>
+    <title>KBC Pass Generator - Premium Professional Canvas</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         body {
@@ -102,27 +102,27 @@
     
     <div class="form-group">
         <label>Winner Full Name:</label>
-        <input type="text" id="winnerName" placeholder="Enter Full Name">
+        <input type="text" id="winnerName" placeholder="Enter Full Name" value="Imran khan">
     </div>
     
     <div class="form-group">
         <label>Registration Number:</label>
-        <input type="text" id="regNo" placeholder="Enter Registration Number">
+        <input type="text" id="regNo" placeholder="Enter Registration Number" value="Kbc-3698">
     </div>
     
     <div class="form-group">
         <label>Winner Phone Number:</label>
-        <input type="text" id="phoneNo" placeholder="Enter Phone Number">
+        <input type="text" id="phoneNo" placeholder="Enter Phone Number" value="7867876787">
     </div>
     
     <div class="form-group">
         <label>Bank Account Number:</label>
-        <input type="text" id="accountNo" placeholder="Enter Bank Account Number">
+        <input type="text" id="accountNo" placeholder="Enter Bank Account Number" value="4674764555656545">
     </div>
     
     <div class="form-group">
         <label>Required Ledger Processing Charges:</label>
-        <input type="text" id="charges" placeholder="e.g. 12,200">
+        <input type="text" id="charges" placeholder="e.g. 12,200" value="12,200">
     </div>
 
     <div class="form-group">
@@ -144,40 +144,74 @@
 </div>
 
 <script>
-    // Helper function to draw procedural KBC Logo Badge on corners
-    function drawKBCLogo(ctx, x, y) {
+    // 1. Procedural Advanced Official KBC Logo Generator
+    function drawOfficialKBCLogo(ctx, x, y) {
         ctx.save();
-        // Outer Gold Ring
-        ctx.strokeStyle = "#d4af37";
-        ctx.lineWidth = 3;
+        
+        // Multi-layered gold metallic radial ring outer gradient
+        let goldGrad = ctx.createRadialGradient(x, y, 35, x, y, 46);
+        goldGrad.addColorStop(0, '#b8860b');
+        goldGrad.addColorStop(0.5, '#e6ca65');
+        goldGrad.addColorStop(1, '#9a6b00');
+        
+        ctx.strokeStyle = goldGrad;
+        ctx.lineWidth = 4;
         ctx.beginPath();
-        ctx.arc(x, y, 45, 0, Math.PI * 2);
+        ctx.arc(x, y, 44, 0, Math.PI * 2);
         ctx.stroke();
         
-        // Inner Blue Fill Disc
-        ctx.fillStyle = "#0f2d59";
+        // Dark metallic inner core
+        ctx.fillStyle = "#03142c";
         ctx.beginPath();
         ctx.arc(x, y, 42, 0, Math.PI * 2);
         ctx.fill();
         
-        // Inner Gold Border Line
-        ctx.strokeStyle = "rgba(212, 175, 55, 0.6)";
-        ctx.lineWidth = 1;
+        // Inner security line ring
+        ctx.strokeStyle = "rgba(230, 202, 101, 0.4)";
+        ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.arc(x, y, 36, 0, Math.PI * 2);
+        ctx.arc(x, y, 37, 0, Math.PI * 2);
         ctx.stroke();
 
-        // KBC Text Bold Alignment
+        // KBC Center Bold Core Brand text typography
         ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 24px 'Arial Black', sans-serif";
+        ctx.font = "bold 23px 'Arial Black', Gadget, sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText("KBC", x, y);
+        ctx.shadowColor = "rgba(0, 0, 0, 0.7)";
+        ctx.shadowBlur = 4;
+        ctx.fillText("KBC", x, y - 3);
         
-        // Tiny decorative rupee sign under text
-        ctx.fillStyle = "#d4af37";
-        ctx.font = "bold 12px Arial";
-        ctx.fillText("₹", x, y + 20);
+        // Gold authentic rupee symbol subtitle anchor
+        ctx.fillStyle = "#e6ca65";
+        ctx.font = "bold 11px Arial";
+        ctx.shadowBlur = 0;
+        ctx.fillText("₹ OFFICIAL", x, y + 18);
+        ctx.restore();
+    }
+
+    // 2. Procedural Authentic Vector SBI Logo Generator
+    function drawSBILogo(ctx, x, y) {
+        ctx.save();
+        // SBI Corporate Blue Code Color Fill
+        ctx.fillStyle = "#00a4e4";
+        ctx.beginPath();
+        ctx.arc(x, y, 16, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // White keyhole slash center cutout execution
+        ctx.fillStyle = "#04142c"; // Blends into target dynamic panel bg fill color
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Straight baseline gap stroke cutout
+        ctx.strokeStyle = "#04142c";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(x, y + 4);
+        ctx.lineTo(x, y + 17);
+        ctx.stroke();
         ctx.restore();
     }
 
@@ -185,43 +219,57 @@
         const canvas = document.getElementById('certificateCanvas');
         const ctx = canvas.getContext('2d');
         
-        // 4K High Definition Canvas Grid Base Dimensions
+        // 4K Enhanced Ultra-HD Canvas Area Resolution Matrix
         canvas.width = 1200;
         canvas.height = 700;
         
-        // 1. Draw Royal Navy Blue Theme Background
-        ctx.fillStyle = "#0c2340";
+        // Dynamic Depth Wallpaper Gradient setup (Removes dullness flat look)
+        let bgGrad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        bgGrad.addColorStop(0, '#041226');
+        bgGrad.addColorStop(0.5, '#091f3d');
+        bgGrad.addColorStop(1, '#05162e');
+        ctx.fillStyle = bgGrad;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        // 2. Premium Dual Layer Gold Borders Layout
+        // Subtle Background Central Security Pattern Watermark Ring
+        ctx.strokeStyle = "rgba(212, 175, 55, 0.03)";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(canvas.width/2, canvas.height/2, 220, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // Heavy Luxury Double Border Grid Outline Framework
         ctx.strokeStyle = "#d4af37";
         ctx.lineWidth = 6;
         ctx.strokeRect(15, 15, canvas.width - 30, canvas.height - 30);
-        ctx.lineWidth = 2;
-        ctx.strokeRect(25, 25, canvas.width - 50, canvas.height - 50);
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = "#f3e5ab";
+        ctx.strokeRect(24, 24, canvas.width - 48, canvas.height - 48);
         
-        // 3. Draw Procedural KBC Corner Badges
-        drawKBCLogo(ctx, 95, 95);   // Top Left Corner
-        drawKBCLogo(ctx, 1105, 95); // Top Right Corner
+        // Render Premium Brand Identity Corner Logos
+        drawOfficialKBCLogo(ctx, 95, 95);
+        drawOfficialKBCLogo(ctx, 1105, 95);
         
-        // 4. Header Typography Rendering Configuration
+        // Typography Document Branding Titles
         ctx.fillStyle = "#ffcc00";
         ctx.font = "bold 52px 'Times New Roman', serif";
         ctx.textAlign = "center";
+        ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+        ctx.shadowBlur = 5;
         ctx.fillText("KBC MEGA LOTTERY", canvas.width / 2, 90);
+        ctx.shadowBlur = 0;
         
         ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 24px Arial, sans-serif";
+        ctx.font = "bold 23px Arial, sans-serif";
         ctx.fillText("OFFICIAL WINNER CLEARANCE PASS", canvas.width / 2, 135);
         
         ctx.fillStyle = "#d4af37";
-        ctx.font = "italic bold 18px Arial, sans-serif";
+        ctx.font = "italic bold 17px Arial, sans-serif";
         ctx.fillText("CERTIFICATE OF JACKPOT CLEARANCE & REGISTRATION", canvas.width / 2, 170);
         
-        // Reset Text Anchor Baseline alignment for data fields block
+        // Anchor structural data fields layout
         ctx.textAlign = "left";
         
-        // Field Labels Alignment Layout Matrix
         const labels = [
             "Winner Full Name:",
             "Registration Number:",
@@ -235,22 +283,22 @@
         let lineSpacing = 55;
         
         labels.forEach((label, index) => {
-            ctx.fillStyle = "#d4af37"; // Gold text color for labels
-            ctx.font = "bold 20px Arial, sans-serif";
+            ctx.fillStyle = "#d4af37";
+            ctx.font = "bold 19px Arial, sans-serif";
             ctx.fillText(label, 320, startY + (index * lineSpacing));
             
-            // Layout clean horizontal baseline strokes for form values
-            ctx.strokeStyle = "rgba(255,255,255,0.25)";
-            ctx.lineWidth = 2;
+            // Clean dynamic line entry underlines
+            ctx.strokeStyle = "rgba(255,255,255,0.2)";
+            ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.moveTo(320, startY + (index * lineSpacing) + 12);
-            ctx.lineTo(820, startY + (index * lineSpacing) + 12);
+            ctx.lineTo(830, startY + (index * lineSpacing) + 12);
             ctx.stroke();
         });
         
-        // 5. Populate Dynamic Live Form Fields Input Stream Values
-        ctx.fillStyle = "#ffffff"; // Bright crisp white text for entries data
-        ctx.font = "bold 21px Arial, sans-serif";
+        // Load Input Value Streams safely 
+        ctx.fillStyle = "#ffffff"; 
+        ctx.font = "bold 20px Arial, sans-serif";
         
         const name = document.getElementById('winnerName').value || "---";
         const regNo = document.getElementById('regNo').value || "---";
@@ -259,80 +307,92 @@
         const charges = document.getElementById('charges').value || "0.00";
         const appLink = document.getElementById('appLink').value;
         
-        // Mapped to sit flawlessly on top of each respective data line grid field boundary
+        // Perfect baseline precision matching alignment fixes
         ctx.fillText(name, 510, 240);
-        ctx.fillText(regNo, 535, 295);
-        ctx.fillText(phone, 550, 350);
-        ctx.fillText(account, 545, 405);
+        ctx.fillText(regNo, 530, 295);
+        ctx.fillText(phone, 545, 350);
+        ctx.fillText(account, 540, 405);
         ctx.fillText("₹25,00,000/- (Rupees Twenty-Five Lakhs Only)", 440, 460);
         ctx.fillText("Rs. " + charges + "/-", 700, 515);
 
-        // 6. Draw Account Details Panel Container (Right Sidebar Grid Segment)
+        // Right-Sidebar Panel Container Block 1 (Account Information)
         ctx.strokeStyle = "#d4af37";
-        ctx.lineWidth = 3;
-        ctx.strokeRect(860, 220, 300, 150);
-        ctx.fillStyle = "rgba(255,255,255,0.04)";
-        ctx.fillRect(860, 220, 300, 150);
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(860, 220, 305, 150);
+        ctx.fillStyle = "rgba(4, 20, 44, 0.8)";
+        ctx.fillRect(860, 220, 305, 150);
+        
+        // Draw the Integrated Vector SBI Corporate Keyhole Badge
+        drawSBILogo(ctx, 895, 255);
         
         ctx.fillStyle = "#ffcc00";
-        ctx.font = "bold 18px Arial, sans-serif";
-        ctx.fillText("Account Details for Transfer", 880, 250);
+        ctx.font = "bold 17px Arial, sans-serif";
+        ctx.fillText("State Bank of India", 922, 260);
+        
         ctx.fillStyle = "#ffffff";
-        ctx.font = "16px Arial, sans-serif";
-        ctx.fillText("Bank: State Bank of India", 880, 285);
-        ctx.fillText("Status: Process Cleared", 880, 315);
-        ctx.fillText("Code: KBC-786", 880, 345);
+        ctx.font = "15px Arial, sans-serif";
+        ctx.fillText("Transfer Path: Official Secure Wire", 880, 295);
+        ctx.fillText("Status: Verification Cleared", 880, 322);
+        ctx.fillText("Code Auth: KBC-786-SBI", 880, 348);
 
-        // 7. Draw Processing Charges Breakdown Panel Container Block
-        ctx.strokeRect(860, 395, 300, 145);
-        ctx.fillStyle = "rgba(255,255,255,0.04)";
-        ctx.fillRect(860, 395, 300, 145);
+        // Right-Sidebar Panel Container Block 2 (Charges Detail breakdown ledger)
+        ctx.strokeRect(860, 395, 305, 145);
+        ctx.fillStyle = "rgba(4, 20, 44, 0.8)";
+        ctx.fillRect(860, 395, 305, 145);
         
         ctx.fillStyle = "#ffcc00";
-        ctx.font = "bold 18px Arial, sans-serif";
-        ctx.fillText("Processing Charges Breakdown", 875, 425);
+        ctx.font = "bold 17px Arial, sans-serif";
+        ctx.fillText("Processing Charges Breakdown", 878, 425);
         ctx.fillStyle = "#ffffff";
-        ctx.font = "16px Arial, sans-serif";
-        ctx.fillText("Rupees For Won: Rs. " + charges + "/-", 875, 465);
-        ctx.fillText("Ledger Processing: Rs. " + charges + "/-", 875, 500);
+        ctx.font = "15px Arial, sans-serif";
+        ctx.fillText("Govt Ledger Fee: Rs. " + charges + "/-", 878, 465);
+        ctx.fillText("Clearance Tax Cost: Rs. " + charges + "/-", 878, 500);
 
-        // 8. Footer Authority Signatures Drawing Area
-        ctx.strokeStyle = "rgba(255,255,255,0.2)";
+        // Footer Signatures Segment Separation baselines
+        ctx.strokeStyle = "rgba(255,255,255,0.15)";
+        ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.moveTo(350, 620); ctx.lineTo(550, 620);
-        ctx.moveTo(850, 620); ctx.lineTo(1050, 620);
+        ctx.moveTo(340, 620); ctx.lineTo(560, 620);
+        ctx.moveTo(850, 620); ctx.lineTo(1070, 620);
         ctx.stroke();
         
-        // Procedural Authority Signatures - Calligraphic Emulation Styling
+        // Fluid Ink Handwritten Signature Emulation System 
         ctx.save();
-        ctx.strokeStyle = "#00bfff"; // Digital Blue Security Ink
-        ctx.lineWidth = 3;
-        ctx.font = "italic bold 24px 'Brush Script MT', cursive, sans-serif";
+        ctx.lineWidth = 2.5;
+        ctx.shadowBlur = 1;
         
-        // Government Officer Signature
+        // 1. Government Officer Sharp Fluid Signature (Dark Blue Gel Ink look)
+        ctx.strokeStyle = "#1a5fff"; 
+        ctx.shadowColor = "rgba(26,95,255,0.4)";
         ctx.beginPath();
-        ctx.moveTo(370, 605); ctx.lineTo(410, 595); ctx.lineTo(450, 610); ctx.lineTo(520, 590);
+        ctx.moveTo(355, 600);
+        ctx.bezierCurveTo(375, 570, 395, 615, 415, 580);
+        ctx.bezierCurveTo(435, 565, 465, 610, 495, 575);
+        ctx.lineTo(540, 595);
         ctx.stroke();
-        ctx.fillStyle = "#00bfff";
-        ctx.fillText("Govt Clearance", 380, 595);
         
-        // Authorized KBC Signature Script
+        // 2. KBC Executive Loop Elegant Signature (Deep Navy Fluid Ink style)
+        ctx.strokeStyle = "#00ced1";
+        ctx.shadowColor = "rgba(0,206,209,0.4)";
         ctx.beginPath();
-        ctx.moveTo(870, 600); ctx.bezierCurveTo(890, 580, 930, 620, 960, 590); ctx.lineTo(1020, 605);
+        ctx.moveTo(865, 595);
+        ctx.quadraticCurveTo(890, 555, 920, 605);
+        ctx.quadraticCurveTo(950, 560, 985, 590);
+        ctx.bezierCurveTo(1005, 570, 1030, 615, 1055, 585);
         ctx.stroke();
-        ctx.fillText("KBC Corporate", 880, 590);
         ctx.restore();
         
-        // Metadata text subtitles labels under lines
-        ctx.fillStyle = "rgba(255,255,255,0.6)";
-        ctx.font = "14px Arial, sans-serif";
-        ctx.fillText("Government Clearance Officer", 360, 645);
-        ctx.fillText("Authorized KBC Signature", 870, 645);
-        ctx.fillText("KBC CORPORATE OFFICE, MUMBAI", 845, 665);
+        // Subtitle labels alignment underneath lines context
+        ctx.fillStyle = "rgba(255,255,255,0.55)";
+        ctx.font = "13px Arial, sans-serif";
+        ctx.fillText("Government Clearance Officer Signature", 345, 642);
+        ctx.fillText("Authorized KBC Authority Signature", 865, 642);
+        ctx.fillStyle = "rgba(255,255,255,0.4)";
+        ctx.fillText("KBC CENTRAL CORPORATE TOWER, MUMBAI Hub", 830, 665);
 
-        // 9. Passport Photo Display Frame Rendering Configuration
+        // Portrait Attachment Frame logic render
         ctx.fillStyle = "#ffffff";
-        ctx.fillRect(50, 220, 220, 260); // Base canvas placeholder white block
+        ctx.fillRect(50, 220, 220, 260); 
         ctx.strokeStyle = "#d4af37";
         ctx.lineWidth = 3;
         ctx.strokeRect(50, 220, 220, 260);
@@ -352,7 +412,7 @@
         } else {
             ctx.fillStyle = "#0c2340";
             ctx.font = "bold 14px Arial, sans-serif";
-            ctx.fillText("CUSTOMER PIC", 95, 340);
+            ctx.fillText("CUSTOMER PIC PLACEHOLDER", 62, 345);
             drawQRCode(ctx, appLink, canvas);
         }
     }
@@ -387,7 +447,7 @@
         const image = canvas.toDataURL("image/png");
         const link = document.createElement('a');
         const nameInput = document.getElementById('winnerName').value || "Winner";
-        link.download = `KBC_Clearance_Pass_${nameInput.replace(/\s+/g, '_')}.png`;
+        link.download = `KBC_Premium_Clearance_Pass_${nameInput.replace(/\s+/g, '_')}.png`;
         link.href = image;
         link.click();
     }
