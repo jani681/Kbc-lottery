@@ -37,13 +37,13 @@
         <div id="formCard" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6">
             <form id="registryForm" onsubmit="handleFormSubmit(event)" class="space-y-6">
                 
-                <!-- ================= PHASE 1 ================= -->
+                <!-- ================= PHASE 1: BASIC INFO ================= -->
                 <div class="border-b border-slate-100 pb-3 mb-4">
                     <span class="bg-blue-50 text-blue-600 text-xs font-bold px-2.5 py-1 rounded-full">Phase 1</span>
                     <h2 class="text-base font-bold text-slate-800 mt-2 text-right">خاندانی اور بنیادی معلومات</h2>
                 </div>
 
-                <!-- 1. Full Name Alias -->
+                <!-- 1. Full Name -->
                 <div class="flex flex-col space-y-1.5">
                     <label class="text-sm font-semibold text-slate-700 text-right">صارف کا نام (Full Name)</label>
                     <input type="text" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50" placeholder="نام لکھیں">
@@ -76,7 +76,7 @@
                     <input type="text" required pattern="[0-9]{5}-[0-9]{7}-[0-9]{1}" title="Format: 36102-1234567-1" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-left bg-slate-50/50 font-mono" placeholder="XXXXX-XXXXXXX-X">
                 </div>
 
-                <!-- NEW FIELD: 6. Age Input Field -->
+                <!-- 6. Age Input Field -->
                 <div class="flex flex-col space-y-1.5">
                     <label class="text-sm font-semibold text-slate-700 text-right">عمر (Age)</label>
                     <input type="number" required min="18" max="100" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-center bg-slate-50/50 font-mono" placeholder="سال لکھیں (e.g. 25)">
@@ -109,7 +109,113 @@
                     </div>
                 </div>
 
-                <!-- ================= PHASE 2 ================= -->
+                <!-- ================= NEW SUB-SECTION: SOCIO-ECONOMIC MATRIX ================= -->
+                <div class="border-b border-slate-100 pb-3 pt-4 mb-4">
+                    <span class="bg-amber-50 text-amber-600 text-xs font-bold px-2.5 py-1 rounded-full">Socio-Economic</span>
+                    <h2 class="text-base font-bold text-slate-800 mt-2 text-right">معاشی اور رہائشی معلومات</h2>
+                </div>
+
+                <!-- 1. Household Head Occupation -->
+                <div class="flex flex-col space-y-1.5">
+                    <label class="text-sm font-semibold text-slate-700 text-right">گھر کا سربراہ کیا کام کرتا ہے؟ (Occupation)</label>
+                    <select required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 direction-rtl">
+                        <option value="">پیشہ منتخب کریں</option>
+                        <option value="laborer">مزدور / ڈرائیور (Laborer)</option>
+                        <option value="employee">ملازم / نوکری (Salaried Employee)</option>
+                        <option value="agriculture">زراعت / زمیندار (Agriculture)</option>
+                        <option value="business">کاروبار / دکاندار (Business)</option>
+                        <option value="abroad">بیرون ملک (Overseas Worker)</option>
+                        <option value="unemployed">بے روزگار (Unemployed)</option>
+                    </select>
+                </div>
+
+                <!-- 2. Monthly Income Brackets -->
+                <div class="flex flex-col space-y-1.5">
+                    <label class="text-sm font-semibold text-slate-700 text-right">ماہانہ آمدنی (Monthly Income)</label>
+                    <select required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 direction-rtl">
+                        <option value="">آمدنی کی رینج منتخب کریں</option>
+                        <option value="under_20k">20,000 سے کم</option>
+                        <option value="20k_30k">20,000 سے 30,000</option>
+                        <option value="30k_40k">30,000 سے 40,000</option>
+                        <option value="40k_50k">40,000 سے 50,000</option>
+                        <option value="50k_60k">50,000 سے 60,000</option>
+                        <option value="above_60k">60,000 سے زائد</option>
+                    </select>
+                </div>
+
+                <!-- 3. Disability Status -->
+                <div class="flex flex-col space-y-1.5">
+                    <label class="text-sm font-semibold text-slate-700 text-right">کیا گھر میں کوئی معذور فرد موجود ہے؟</label>
+                    <select required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 direction-rtl">
+                        <option value="no">نہیں (No)</option>
+                        <option value="yes">ہاں (Yes)</option>
+                    </select>
+                </div>
+
+                <!-- 4. House Ownership Status -->
+                <div class="flex flex-col space-y-1.5">
+                    <label class="text-sm font-semibold text-slate-700 text-right">مکان کی ملکیت (House Ownership)</label>
+                    <select required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 direction-rtl">
+                        <option value="owned">ذاتی گھر (Owned)</option>
+                        <option value="rented">کرائے کا گھر (Rented)</option>
+                        <option value="other">سرکاری یا دیگر (Other/Government)</option>
+                    </select>
+                </div>
+
+                <!-- 5. House Construction Type -->
+                <div class="flex flex-col space-y-1.5">
+                    <label class="text-sm font-semibold text-slate-700 text-right">مکان کی ساخت (House Structure)</label>
+                    <select required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 direction-rtl">
+                        <option value="cemented">پکا مکان (Cemented / Bricks)</option>
+                        <option value="mud">کچا مکان (Mud / Kacha)</option>
+                        <option value="mixed">مکس / آدھا کچا پکا (Mixed)</option>
+                    </select>
+                </div>
+
+                <!-- 6. Rooms & Washrooms Counters Grid -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col space-y-1.5">
+                        <label class="text-sm font-semibold text-slate-700 text-center">واش رومز کی تعداد</label>
+                        <input type="number" required min="0" max="10" value="1" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-center bg-slate-50/50 font-mono">
+                    </div>
+                    <div class="flex flex-col space-y-1.5">
+                        <label class="text-sm font-semibold text-slate-700 text-center">کمروں کی تعداد (Rooms)</label>
+                        <input type="number" required min="1" max="20" value="2" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-center bg-slate-50/50 font-mono">
+                    </div>
+                </div>
+
+                <!-- 7. Alternative Power Source Indicator -->
+                <div class="flex flex-col space-y-1.5">
+                    <label class="text-sm font-semibold text-slate-700 text-right">بجلی کا متبادل ذریعہ (Power Source)</label>
+                    <select required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 direction-rtl">
+                        <option value="wapda_only">صرف سرکاری بجلی (WAPDA / FESCO Only)</option>
+                        <option value="solar">سولر سسٹم (Solar System Installed)</option>
+                        <option value="ups">یو پی ایس / انورٹر (UPS / Inverter)</option>
+                    </select>
+                </div>
+
+                <!-- 8. Vehicles Asset Ownership -->
+                <div class="flex flex-col space-y-1.5">
+                    <label class="text-sm font-semibold text-slate-700 text-right">گاڑی یا موٹر سائیکل کی موجودگی</label>
+                    <select required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 direction-rtl">
+                        <option value="none">کوئی گاڑی یا بائیک نہیں ہے (None)</option>
+                        <option value="bike">صرف موٹر سائیکل ہے (Bike Only)</option>
+                        <option value="car">صرف گاڑی ہے (Car Only)</option>
+                        <option value="both">موٹر سائیکل اور گاڑی دونوں ہیں (Both)</option>
+                    </select>
+                </div>
+
+                <!-- 9. Livestock Ownership Indicator -->
+                <div class="flex flex-col space-y-1.5">
+                    <label class="text-sm font-semibold text-slate-700 text-right">کیا گھر میں مال مویشی / جانور ہیں؟</label>
+                    <select required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 direction-rtl">
+                        <option value="no">نہیں (No)</option>
+                        <option value="yes">ہاں (جانور موجود ہیں - Yes)</option>
+                    </select>
+                </div>
+
+
+                <!-- ================= PHASE 2: ADDRESS MATRIX ================= -->
                 <div class="border-b border-slate-100 pb-3 pt-4 mb-4">
                     <span class="bg-blue-50 text-blue-600 text-xs font-bold px-2.5 py-1 rounded-full">Phase 2</span>
                     <h2 class="text-base font-bold text-slate-800 mt-2 text-right">مکمل رہائشی پتہ (Address Matrix)</h2>
@@ -164,10 +270,11 @@
                     <textarea required rows="3" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 resize-none" placeholder="شناختی کارڈ والا مکمل پتہ، گلی یا محلہ نمبر یہاں لکھیں"></textarea>
                 </div>
 
-                <!-- ================= PHASE 3 ================= -->
+
+                <!-- ================= PHASE 3: METADATA ================= -->
                 <div class="border-b border-slate-100 pb-3 pt-4 mb-4">
                     <span class="bg-blue-50 text-blue-600 text-xs font-bold px-2.5 py-1 rounded-full">Phase 3</span>
-                    <h2 class="text-base font-bold text-slate-800 mt-2 text-right">سستم معلومات (System Metadata)</h2>
+                    <h2 class="text-base font-bold text-slate-800 mt-2 text-right">سسٹم معلومات (System Metadata)</h2>
                 </div>
 
                 <!-- 1. Manual Profile Reference ID -->
@@ -191,7 +298,7 @@
 
     <!-- JavaScript Loops, Data Matrix & Controllers -->
     <script>
-        // Data Matrix for Punjab Hierarchy (Easily extendable for other provinces)
+        // Data Matrix for Punjab Hierarchy (Sargodha Division & Faisalabad Data Integrated)
         const addressData = {
             punjab: {
                 divisions: {
@@ -221,7 +328,7 @@
                         districts: {
                             faisalabad: {
                                 name: "فیصل آباد (Faisalabad)",
-                                tehsils: ["فیصل آباد صدر", "فیصل آباد سٹی", "چک جھمرہ", "جڑانوالہ", "سمندری", "تان crappy"]
+                                tehsils: ["فیصل آباد صدر", "فیصل آباد سٹی", "چک جھمرہ", "جڑانوالہ", "سمندری"]
                             }
                         }
                     }
@@ -247,7 +354,6 @@
             const province = document.getElementById("provinceSelect").value;
             const divisionSelect = document.getElementById("divisionSelect");
             
-            // Clear subsequent drop-downs
             divisionSelect.innerHTML = '<option value="">ڈویژن منتخب کریں</option>';
             document.getElementById("districtSelect").innerHTML = '<option value="">پہلے ڈویژن منتخب کریں</option>';
             document.getElementById("tehsilSelect").innerHTML = '<option value="">پہلے ضلع منتخب کریں</option>';
