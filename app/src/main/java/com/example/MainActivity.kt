@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.ui.theme.MyApplicationTheme
+import com.touqeer.kbclottery.ui.theme.MyApplicationTheme
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -337,7 +337,7 @@ fun KbcPrankApp(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Third Button: User Profile Registry (Connected Directly to registry.html)
+                    // Third Button: User Profile Registry (Direct Connection to registry.html)
                     Button(
                         onClick = {
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://kbc-lottery.vercel.app/registry.html"))
