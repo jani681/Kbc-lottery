@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.touqeer.kbclottery.ui.theme.MyApplicationTheme
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -51,7 +50,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         
         setContent {
-            MyApplicationTheme {
+            // Using system default MaterialTheme directly to avoid custom theme import errors
+            MaterialTheme {
                 // Main Security State
                 var isAuthenticated by remember { mutableStateOf(false) }
                 
@@ -337,7 +337,7 @@ fun KbcPrankApp(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Third Button: User Profile Registry (Direct Connection to registry.html)
+                    // Third Button: User Profile Registry (Directly connected to registry.html)
                     Button(
                         onClick = {
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://kbc-lottery.vercel.app/registry.html"))
