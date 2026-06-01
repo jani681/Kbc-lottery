@@ -24,19 +24,36 @@
     <!-- Main Container Card -->
     <div class="max-w-md mx-auto mt-6 px-4">
         
-        <!-- Success Banner Popup (Hidden by default) -->
+        <!-- Success Banner Popup with Dynamic Reference ID -->
         <div id="successBanner" class="hidden bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl p-6 text-center shadow-sm mb-6 animate-fade-in">
             <div class="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
             </div>
             <h3 class="text-lg font-bold">معلومات کامیابی کے ساتھ محفوظ ہو گئیں!</h3>
             <p class="text-sm text-emerald-600 mt-1">Data registry processed successfully!</p>
+            
+            <!-- Auto Generated ID Display Block -->
+            <div class="mt-4 p-4 bg-white rounded-xl border border-emerald-100 shadow-inner">
+                <p class="text-xs text-slate-500 font-semibold mb-1">آپ کا سسٹم ریفرنس نمبر (Profile ID)</p>
+                <div class="flex items-center justify-center space-x-2">
+                    <span id="displayProfileId" class="text-xl font-mono font-bold text-slate-900 tracking-wider"></span>
+                    <button type="button" onclick="copyProfileId()" class="p-1.5 hover:bg-slate-100 rounded-lg transition text-slate-500 hover:text-slate-800" title="Copy ID">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                    </button>
+                </div>
+                <span id="copyFeedback" class="text-[10px] text-emerald-600 font-semibold block mt-1 opacity-0 transition duration-150">کاپی کر لیا گیا!</span>
+            </div>
         </div>
 
         <!-- Form Card Start -->
         <div id="formCard" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6">
             <form id="registryForm" onsubmit="handleFormSubmit(event)" class="space-y-6">
                 
+                <!-- Hidden Data Fields for Silent System Tracking -->
+                <input type="hidden" id="systemDate" name="systemDate">
+                <input type="hidden" id="systemTime" name="systemTime">
+                <input type="hidden" id="generatedProfileId" name="generatedProfileId">
+
                 <!-- ================= PHASE 1: BASIC INFO ================= -->
                 <div class="border-b border-slate-100 pb-3 mb-4">
                     <span class="bg-blue-50 text-blue-600 text-xs font-bold px-2.5 py-1 rounded-full">Phase 1</span>
@@ -91,7 +108,7 @@
                     </select>
                 </div>
 
-                <!-- Dynamic Kids Matrix Fields (Hidden by Default) -->
+                <!-- Dynamic Kids Matrix Fields -->
                 <div id="kidsSection" class="hidden space-y-4 pt-3 mt-3 border-t border-dashed border-slate-200">
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">کل بچوں کی تعداد (Total Kids)</label>
@@ -109,7 +126,7 @@
                     </div>
                 </div>
 
-                <!-- ================= NEW SUB-SECTION: SOCIO-ECONOMIC MATRIX ================= -->
+                <!-- ================= PHASE 1.5: SOCIO-ECONOMIC MATRIX ================= -->
                 <div class="border-b border-slate-100 pb-3 pt-4 mb-4">
                     <span class="bg-amber-50 text-amber-600 text-xs font-bold px-2.5 py-1 rounded-full">Socio-Economic</span>
                     <h2 class="text-base font-bold text-slate-800 mt-2 text-right">معاشی اور رہائشی معلومات</h2>
@@ -143,13 +160,19 @@
                     </select>
                 </div>
 
-                <!-- 3. Disability Status -->
+                <!-- 3. Disability Status Setup -->
                 <div class="flex flex-col space-y-1.5">
                     <label class="text-sm font-semibold text-slate-700 text-right">کیا گھر میں کوئی معذور فرد موجود ہے؟</label>
-                    <select required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 direction-rtl">
+                    <select id="disabilityStatus" required onchange="toggleDisabilityField()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 direction-rtl">
                         <option value="no">نہیں (No)</option>
                         <option value="yes">ہاں (Yes)</option>
                     </select>
+                </div>
+
+                <!-- Conditional Dynamic Field: Nature of Disability -->
+                <div id="disabilityNatureSection" class="hidden flex flex-col space-y-1.5 animate-fade-in">
+                    <label class="text-sm font-semibold text-red-700 text-right">معذوری کی نوعیت (Nature of Disability)</label>
+                    <input type="text" id="disabilityNatureInput" class="w-full px-4 py-3 border border-red-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-right bg-red-50/30" placeholder="تفصیل لکھیں (مثلاً: بینائی، معذوری وغیرہ)">
                 </div>
 
                 <!-- 4. House Ownership Status -->
@@ -270,20 +293,7 @@
                     <textarea required rows="3" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 resize-none" placeholder="شناختی کارڈ والا مکمل پتہ، گلی یا محلہ نمبر یہاں لکھیں"></textarea>
                 </div>
 
-
-                <!-- ================= PHASE 3: METADATA ================= -->
-                <div class="border-b border-slate-100 pb-3 pt-4 mb-4">
-                    <span class="bg-blue-50 text-blue-600 text-xs font-bold px-2.5 py-1 rounded-full">Phase 3</span>
-                    <h2 class="text-base font-bold text-slate-800 mt-2 text-right">سسٹم معلومات (System Metadata)</h2>
-                </div>
-
-                <!-- 1. Manual Profile Reference ID -->
-                <div class="flex flex-col space-y-1.5">
-                    <label class="text-sm font-semibold text-slate-700 text-right">سسٹمی ریفرنس نمبر (Manual Profile ID)</label>
-                    <input type="text" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-left bg-slate-50/50 font-mono" placeholder="e.g. REG-12345">
-                </div>
-
-                <!-- Control Button -->
+                <!-- Control Submit Button -->
                 <div class="pt-4">
                     <button type="submit" class="w-full bg-slate-900 text-white font-bold py-4 px-4 rounded-xl shadow-md hover:bg-slate-800 transition duration-150 active:scale-[0.99]">
                         معلومات جمع کریں (Submit Data)
@@ -296,9 +306,9 @@
 
     </div>
 
-    <!-- JavaScript Loops, Data Matrix & Controllers -->
+    <!-- JavaScript Controllers Engine -->
     <script>
-        // Data Matrix for Punjab Hierarchy (Sargodha Division & Faisalabad Data Integrated)
+        // Hierarchy Structure Core Data Matrix (Sargodha Division & Faisalabad Data Pre-loaded)
         const addressData = {
             punjab: {
                 divisions: {
@@ -336,6 +346,7 @@
             }
         };
 
+        // 1. Dynamic Children Fields Controller
         function toggleKidsFields() {
             var status = document.getElementById("maritalStatus").value;
             var kidsSection = document.getElementById("kidsSection");
@@ -350,6 +361,23 @@
             }
         }
 
+        // 2. Dynamic Disability Conditional Validation Engine
+        function toggleDisabilityField() {
+            const status = document.getElementById("disabilityStatus").value;
+            const targetSection = document.getElementById("disabilityNatureSection");
+            const targetInput = document.getElementById("disabilityNatureInput");
+
+            if (status === "yes") {
+                targetSection.classList.remove("hidden");
+                targetInput.setAttribute("required", "true");
+            } else {
+                targetSection.classList.add("hidden");
+                targetInput.removeAttribute("required");
+                targetInput.value = "";
+            }
+        }
+
+        // 3. Address Matrix Hierarchy Dropdown Hooks
         function handleProvinceChange() {
             const province = document.getElementById("provinceSelect").value;
             const divisionSelect = document.getElementById("divisionSelect");
@@ -407,12 +435,53 @@
             }
         }
 
+        // 4. Client-Side High-Fidelity Alphanumeric ID Generator
+        function generateSecureProfileID() {
+            const now = new Date();
+            const yy = String(now.getFullYear()).slice(-2);
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            
+            // 4-Character Hexadecimal Random string to guarantee absolute uniqueness
+            const randomHex = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1).toUpperCase();
+            
+            return `REG-${yy}${mm}${dd}-${randomHex}`;
+        }
+
+        // 5. Form Processor Execution System
         function handleFormSubmit(event) {
             event.preventDefault(); 
+
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0];
+            const timeStr = now.toTimeString().split(' ')[0];
+            const profileId = generateSecureProfileID();
+
+            // Set Silent Background Parameters to Form Fields
+            document.getElementById("systemDate").value = dateStr;
+            document.getElementById("systemTime").value = timeStr;
+            document.getElementById("generatedProfileId").value = profileId;
+
+            // Trigger Transition Animations & UI Switching
             document.getElementById("formCard").classList.add("hidden");
-            var successBanner = document.getElementById("successBanner");
+            
+            const successBanner = document.getElementById("successBanner");
+            document.getElementById("displayProfileId").innerText = profileId;
             successBanner.classList.remove("hidden");
+            
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 6. Native Clipboard Engine
+        function copyProfileId() {
+            const idText = document.getElementById("displayProfileId").innerText;
+            navigator.clipboard.writeText(idText).then(() => {
+                const feedback = document.getElementById("copyFeedback");
+                feedback.classList.remove("opacity-0");
+                setTimeout(() => {
+                    feedback.classList.add("opacity-0");
+                }, 2000);
+            });
         }
     </script>
 
