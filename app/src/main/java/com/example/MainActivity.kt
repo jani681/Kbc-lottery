@@ -334,6 +334,25 @@ fun KbcPrankApp(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Create Registration Certificate", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                     }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Third Button: User Profile Registry (New Luxury Addition)
+                    Button(
+                        onClick = {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://user-profile-registry-test.vercel.app"))
+                            context.startActivity(intent)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F172A)) // Stylish Dark Slate Blue
+                    ) {
+                        Icon(Icons.Default.List, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("صارف پروفائل رجسٹری (Registry)", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                    }
                 }
             }
 
