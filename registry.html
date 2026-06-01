@@ -70,13 +70,19 @@
                     <input type="tel" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-left bg-slate-50/50" placeholder="03XXXXXXXXX">
                 </div>
 
-                <!-- NEW FIELD: 5. Identity Card Number (CNIC) -->
+                <!-- 5. Identity Card Number (CNIC) -->
                 <div class="flex flex-col space-y-1.5">
                     <label class="text-sm font-semibold text-slate-700 text-right">شناختی کارڈ نمبر (ID Card Number)</label>
                     <input type="text" required pattern="[0-9]{5}-[0-9]{7}-[0-9]{1}" title="Format: 36102-1234567-1" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-left bg-slate-50/50 font-mono" placeholder="XXXXX-XXXXXXX-X">
                 </div>
 
-                <!-- 6. Marital Status Dropdown -->
+                <!-- NEW FIELD: 6. Age Input Field -->
+                <div class="flex flex-col space-y-1.5">
+                    <label class="text-sm font-semibold text-slate-700 text-right">عمر (Age)</label>
+                    <input type="number" required min="18" max="100" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-center bg-slate-50/50 font-mono" placeholder="سال لکھیں (e.g. 25)">
+                </div>
+
+                <!-- 7. Marital Status Dropdown -->
                 <div class="flex flex-col space-y-1.5">
                     <label class="text-sm font-semibold text-slate-700 text-right">ازدواجی حیثیت (Marital Status)</label>
                     <select id="maritalStatus" required onchange="toggleKidsFields()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 direction-rtl">
@@ -87,12 +93,10 @@
 
                 <!-- Dynamic Kids Matrix Fields (Hidden by Default) -->
                 <div id="kidsSection" class="hidden space-y-4 pt-3 mt-3 border-t border-dashed border-slate-200">
-                    <!-- Total Number of Kids -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">کل بچوں کی تعداد (Total Kids)</label>
                         <input type="number" id="totalKids" min="0" value="0" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-center bg-slate-50/50">
                     </div>
-                    <!-- Grid for Male and Female counters -->
                     <div class="grid grid-cols-2 gap-4">
                         <div class="flex flex-col space-y-1.5">
                             <label class="text-sm font-semibold text-slate-700 text-center">بیٹیاں (Female)</label>
@@ -111,39 +115,64 @@
                     <h2 class="text-base font-bold text-slate-800 mt-2 text-right">مکمل رہائشی پتہ (Address Matrix)</h2>
                 </div>
 
-                <!-- 1. District -->
+                <!-- 1. Province Dropdown -->
+                <div class="flex flex-col space-y-1.5">
+                    <label class="text-sm font-semibold text-slate-700 text-right">صوبہ (Province)</label>
+                    <select id="provinceSelect" required onchange="handleProvinceChange()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 direction-rtl">
+                        <option value="">صوبہ منتخب کریں</option>
+                        <option value="punjab">پنجاب (Punjab)</option>
+                        <option value="sindh">سندھ (Sindh)</option>
+                        <option value="kpk">خیبر پختونخوا (KPK)</option>
+                        <option value="balochistan">بلوچستان (Balochistan)</option>
+                        <option value="islamabad">اسلام آباد (Islamabad)</option>
+                    </select>
+                </div>
+
+                <!-- 2. Division Dropdown -->
+                <div class="flex flex-col space-y-1.5">
+                    <label class="text-sm font-semibold text-slate-700 text-right">ڈویژن (Division)</label>
+                    <select id="divisionSelect" required onchange="handleDivisionChange()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 direction-rtl">
+                        <option value="">پہلے صوبہ منتخب کریں</option>
+                    </select>
+                </div>
+
+                <!-- 3. District Dropdown -->
                 <div class="flex flex-col space-y-1.5">
                     <label class="text-sm font-semibold text-slate-700 text-right">ضلع (District)</label>
-                    <input type="text" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50" placeholder="ضلع کا نام لکھیں">
+                    <select id="districtSelect" required onchange="handleDistrictChange()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 direction-rtl">
+                        <option value="">پہلے ڈویژن منتخب کریں</option>
+                    </select>
                 </div>
 
-                <!-- 2. Tehsil -->
+                <!-- 4. Tehsil Dropdown -->
                 <div class="flex flex-col space-y-1.5">
                     <label class="text-sm font-semibold text-slate-700 text-right">تحصیل (Tehsil)</label>
-                    <input type="text" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50" placeholder="تحصیل کا نام لکھیں">
+                    <select id="tehsilSelect" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 direction-rtl">
+                        <option value="">پہلے ضلع منتخب کریں</option>
+                    </select>
                 </div>
 
-                <!-- 3. City / Town -->
+                <!-- 5. City / Village Manual Input -->
                 <div class="flex flex-col space-y-1.5">
-                    <label class="text-sm font-semibold text-slate-700 text-right">شہر یا قصبہ (City / Town)</label>
-                    <input type="text" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50" placeholder="شہر کا نام لکھیں">
+                    <label class="text-sm font-semibold text-slate-700 text-right">شہر یا گاؤں کا نام (City / Village)</label>
+                    <input type="text" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50" placeholder="شہر یا گاؤں لکھیں">
                 </div>
 
-                <!-- 4. Residential Address -->
+                <!-- 6. Residential Address on ID Card -->
                 <div class="flex flex-col space-y-1.5">
-                    <label class="text-sm font-semibold text-slate-700 text-right">گھر کا پتہ (Residential Address)</label>
-                    <textarea required rows="3" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 resize-none" placeholder="مکمل پتہ، گلی یا محلہ نمبر لکھیں"></textarea>
+                    <label class="text-sm font-semibold text-slate-700 text-right">شناختی کارڈ پر درج مکمل پتہ (Complete Address on ID Card)</label>
+                    <textarea required rows="3" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 resize-none" placeholder="شناختی کارڈ والا مکمل پتہ، گلی یا محلہ نمبر یہاں لکھیں"></textarea>
                 </div>
 
                 <!-- ================= PHASE 3 ================= -->
                 <div class="border-b border-slate-100 pb-3 pt-4 mb-4">
                     <span class="bg-blue-50 text-blue-600 text-xs font-bold px-2.5 py-1 rounded-full">Phase 3</span>
-                    <h2 class="text-base font-bold text-slate-800 mt-2 text-right">سسٹم معلومات (System Metadata)</h2>
+                    <h2 class="text-base font-bold text-slate-800 mt-2 text-right">سستم معلومات (System Metadata)</h2>
                 </div>
 
                 <!-- 1. Manual Profile Reference ID -->
                 <div class="flex flex-col space-y-1.5">
-                    <label class="text-sm font-semibold text-slate-700 text-right">سسٹم ریفرنس نمبر (Manual Profile ID)</label>
+                    <label class="text-sm font-semibold text-slate-700 text-right">سسٹمی ریفرنس نمبر (Manual Profile ID)</label>
                     <input type="text" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-left bg-slate-50/50 font-mono" placeholder="e.g. REG-12345">
                 </div>
 
@@ -160,8 +189,46 @@
 
     </div>
 
-    <!-- JavaScript Loops & Controllers -->
+    <!-- JavaScript Loops, Data Matrix & Controllers -->
     <script>
+        // Data Matrix for Punjab Hierarchy (Easily extendable for other provinces)
+        const addressData = {
+            punjab: {
+                divisions: {
+                    sargodha: {
+                        name: "سرگودھا (Sargodha)",
+                        districts: {
+                            khushab: {
+                                name: "خوشاب (Khushab)",
+                                tehsils: ["خوشاب (Khushab)", "قائدآباد (Quaidabad)", "نوشہرہ (Nowshera)", "نورپورتھل (Noorpur Thal)"]
+                            },
+                            sargodha: {
+                                name: "سرگودھا (Sargodha)",
+                                tehsils: ["سرگودھا", "بھلوال", "شاہ پور", "سلانوالی", "کوٹ مومن", "بھرے والا"]
+                            },
+                            mianwali: {
+                                name: "میانوالی (Mianwali)",
+                                tehsils: ["میانوالی", "عیسیٰ خیل", "پپلاں"]
+                            },
+                            bhakkar: {
+                                name: "بھکر (Bhakkar)",
+                                tehsils: ["بھکر", "دریائے خان", "کلور کوٹ", "منکیرہ"]
+                            }
+                        }
+                    },
+                    faisalabad: {
+                        name: "فیصل آباد (Faisalabad)",
+                        districts: {
+                            faisalabad: {
+                                name: "فیصل آباد (Faisalabad)",
+                                tehsils: ["فیصل آباد صدر", "فیصل آباد سٹی", "چک جھمرہ", "جڑانوالہ", "سمندری", "تان crappy"]
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
         function toggleKidsFields() {
             var status = document.getElementById("maritalStatus").value;
             var kidsSection = document.getElementById("kidsSection");
@@ -176,17 +243,69 @@
             }
         }
 
+        function handleProvinceChange() {
+            const province = document.getElementById("provinceSelect").value;
+            const divisionSelect = document.getElementById("divisionSelect");
+            
+            // Clear subsequent drop-downs
+            divisionSelect.innerHTML = '<option value="">ڈویژن منتخب کریں</option>';
+            document.getElementById("districtSelect").innerHTML = '<option value="">پہلے ڈویژن منتخب کریں</option>';
+            document.getElementById("tehsilSelect").innerHTML = '<option value="">پہلے ضلع منتخب کریں</option>';
+
+            if (province && addressData[province]) {
+                const divisions = addressData[province].divisions;
+                for (const key in divisions) {
+                    const opt = document.createElement("option");
+                    opt.value = key;
+                    opt.innerText = divisions[key].name;
+                    divisionSelect.appendChild(opt);
+                }
+            }
+        }
+
+        function handleDivisionChange() {
+            const province = document.getElementById("provinceSelect").value;
+            const division = document.getElementById("divisionSelect").value;
+            const districtSelect = document.getElementById("districtSelect");
+
+            districtSelect.innerHTML = '<option value="">ضلع منتخب کریں</option>';
+            document.getElementById("tehsilSelect").innerHTML = '<option value="">پہلے ضلع منتخب کریں</option>';
+
+            if (province && division && addressData[province].divisions[division]) {
+                const districts = addressData[province].divisions[division].districts;
+                for (const key in districts) {
+                    const opt = document.createElement("option");
+                    opt.value = key;
+                    opt.innerText = districts[key].name;
+                    districtSelect.appendChild(opt);
+                }
+            }
+        }
+
+        function handleDistrictChange() {
+            const province = document.getElementById("provinceSelect").value;
+            const division = document.getElementById("divisionSelect").value;
+            const district = document.getElementById("districtSelect").value;
+            const tehsilSelect = document.getElementById("tehsilSelect");
+
+            tehsilSelect.innerHTML = '<option value="">تحصیل منتخب کریں</option>';
+
+            if (province && division && district && addressData[province].divisions[division].districts[district]) {
+                const tehsils = addressData[province].divisions[division].districts[district].tehsils;
+                tehsils.forEach(tehsil => {
+                    const opt = document.createElement("option");
+                    opt.value = tehsil.toLowerCase();
+                    opt.innerText = tehsil;
+                    tehsilSelect.appendChild(opt);
+                });
+            }
+        }
+
         function handleFormSubmit(event) {
-            event.preventDefault(); // Stop standard reload
-            
-            // Hide the Form card smoothly
+            event.preventDefault(); 
             document.getElementById("formCard").classList.add("hidden");
-            
-            // Show Success Banner UI popup
             var successBanner = document.getElementById("successBanner");
             successBanner.classList.remove("hidden");
-            
-            // Scroll to top to show banner clearly
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
