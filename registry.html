@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صارف پروفائل رجسٹری</title>
+    <!-- Tailwind CSS for Beautiful Modern UI -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen pb-12">
+
+    <!-- Premium Header Area -->
+    <div class="bg-slate-900 text-white py-8 px-4 text-center shadow-lg border-b border-slate-800">
+        <h1 class="text-2xl font-bold tracking-wide">صارف پروفائل رجسٹری</h1>
+        <p class="text-slate-400 text-xs mt-2 font-mono">User Profile Registry System</p>
+    </div>
+
+    <!-- Main Container Card -->
+    <div class="max-w-md mx-auto mt-6 px-4">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6">
+            
+            <!-- Phase 1 Header -->
+            <div class="border-b border-slate-100 pb-3 mb-5">
+                <span class="bg-blue-50 text-blue-600 text-xs font-bold px-2.5 py-1 rounded-full">Phase 1</span>
+                <h2 class="text-lg font-bold text-slate-800 mt-2 text-right">خاندانی اور بنیادی معلومات</h2>
+            </div>
+
+            <form id="registryForm" class="space-y-5">
+                
+                <!-- 1. Full Name Alias -->
+                <div class="flex flex-col space-y-1.5">
+                    <label class="text-sm font-semibold text-slate-700 text-right">صارف کا نام (Full Name)</label>
+                    <input type="text" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50" placeholder="نام لکھیں">
+                </div>
+
+                <!-- 2. Relationship Selector -->
+                <div class="flex flex-col space-y-1.5">
+                    <label class="text-sm font-semibold text-slate-700 text-right">رشتہ منتخب کریں</label>
+                    <select required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 direction-rtl">
+                        <option value="father">والد (Father)</option>
+                        <option value="husband">شوہر (Husband)</option>
+                    </select>
+                </div>
+
+                <!-- 3. Guardian / Relative Name -->
+                <div class="flex flex-col space-y-1.5">
+                    <label class="text-sm font-semibold text-slate-700 text-right">سرپرست کا نام (Guardian Name)</label>
+                    <input type="text" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50" placeholder="والد یا شوہر کا نام لکھیں">
+                </div>
+
+                <!-- 4. Mobile Contact Token -->
+                <div class="flex flex-col space-y-1.5">
+                    <label class="text-sm font-semibold text-slate-700 text-right">موبائل نمبر (Mobile Number)</label>
+                    <input type="tel" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-left bg-slate-50/50" placeholder="03XXXXXXXXX">
+                </div>
+
+                <!-- 5. Marital Status Dropdown -->
+                <div class="flex flex-col space-y-1.5">
+                    <label class="text-sm font-semibold text-slate-700 text-right">ازدواجی حیثیت (Marital Status)</label>
+                    <select id="maritalStatus" required onchange="toggleKidsFields()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-right bg-slate-50/50 direction-rtl">
+                        <option value="single">غیر شادی شدہ (Single)</option>
+                        <option value="married">شادی شدہ (Married)</option>
+                    </select>
+                </div>
+
+                <!-- Dynamic Kids Matrix Fields (Hidden by Default) -->
+                <div id="kidsSection" class="hidden space-y-4 pt-3 mt-3 border-t border-dashed border-slate-200">
+                    
+                    <!-- 6. Total Number of Kids -->
+                    <div class="flex flex-col space-y-1.5">
+                        <label class="text-sm font-semibold text-slate-700 text-right">کل بچوں کی تعداد (Total Kids)</label>
+                        <input type="number" id="totalKids" min="0" value="0" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-center bg-slate-50/50">
+                    </div>
+
+                    <!-- Grid for Male and Female counters -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- 7. Female Kids -->
+                        <div class="flex flex-col space-y-1.5">
+                            <label class="text-sm font-semibold text-slate-700 text-center">بیٹیاں (Female)</label>
+                            <input type="number" id="femaleKids" min="0" value="0" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-center bg-slate-50/50">
+                        </div>
+                        
+                        <!-- 8. Male Kids -->
+                        <div class="flex flex-col space-y-1.5">
+                            <label class="text-sm font-semibold text-slate-700 text-center">بیٹے (Male)</label>
+                            <input type="number" id="maleKids" min="0" value="0" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 text-center bg-slate-50/50">
+                        </div>
+                    </div>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript for Conditional Logic Loop -->
+    <script>
+        function toggleKidsFields() {
+            var status = document.getElementById("maritalStatus").value;
+            var kidsSection = document.getElementById("kidsSection");
+            
+            if (status === "married") {
+                // If married, remove 'hidden' class immediately to show kids fields
+                kidsSection.classList.remove("hidden");
+            } else {
+                // If single, hide fields and reset inputs to 0 safely
+                kidsSection.classList.add("hidden");
+                document.getElementById("totalKids").value = 0;
+                document.getElementById("maleKids").value = 0;
+                document.getElementById("femaleKids").value = 0;
+            }
+        }
+    </script>
+
+</body>
+</html>
