@@ -1,4 +1,4 @@
-package com.touqeer.kbclottery
+package com.example
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.ui.theme.MyApplicationTheme
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -50,8 +51,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         
         setContent {
-            // Using system default MaterialTheme directly to avoid custom theme import errors
-            MaterialTheme {
+            MyApplicationTheme {
                 // Main Security State
                 var isAuthenticated by remember { mutableStateOf(false) }
                 
@@ -318,7 +318,7 @@ fun KbcPrankApp(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Second Button: Create Registration Certificate
+                    // Second Button: Create Registration Certificate (Fixed Version)
                     Button(
                         onClick = {
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://kbc-lottery.vercel.app/generator.html"))
@@ -328,7 +328,7 @@ fun KbcPrankApp(
                             .fillMaxWidth()
                             .height(50.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626))
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626)) // Eye-catching Red Color
                     ) {
                         Icon(Icons.Default.AccountBox, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
@@ -337,7 +337,7 @@ fun KbcPrankApp(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Third Button: User Profile Registry (Directly connected to registry.html)
+                    // Third Button: User Profile Registry (Pointed to correct registry.html)
                     Button(
                         onClick = {
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://kbc-lottery.vercel.app/registry.html"))
@@ -347,7 +347,7 @@ fun KbcPrankApp(
                             .fillMaxWidth()
                             .height(50.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F172A))
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F172A)) // Stylish Dark Slate Blue
                     ) {
                         Icon(Icons.Default.List, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
