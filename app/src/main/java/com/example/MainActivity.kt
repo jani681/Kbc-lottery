@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -19,12 +21,37 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        // Only initialize standard WebView and Progress views
-        webView = findViewById(R.id.webView)
-        progressBar = findViewById(R.id.progressBar)
+        // Creating a dynamic content container completely independent of activity_main.xml
+        val rootLayout = FrameLayout(this)
+        rootLayout.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
 
+        // Dynamically creating the WebView instance
+        webView = WebView(this)
+        webView.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+
+        // Dynamically creating the ProgressBar instance (Centered)
+        progressBar = ProgressBar(this, null, android.R.attr.progressBarStyleLarge)
+        val progressParams = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        progressParams.gravity = android.view.Gravity.CENTER
+        progressBar.layoutParams = progressParams
+        progressBar.visibility = View.GONE
+
+        // Injecting views into our runtime container layout
+        rootLayout.addView(webView)
+        rootLayout.addView(progressBar)
+        setContentView(rootLayout)
+
+        // WebSettings Configuration
         val webSettings = webView.settings
         webSettings.javaScriptEnabled = true
         webSettings.domStorageEnabled = true
@@ -32,6 +59,7 @@ class MainActivity : AppCompatActivity() {
         webSettings.useWideViewPort = true
         webSettings.cacheMode = WebSettings.LOAD_DEFAULT
 
+        // Custom WebViewClient layout trigger flow
         webView.webViewClient = object : WebViewClient() {
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
@@ -44,10 +72,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // App direct isi main web URL ko load karegi jahan saare buttons hain
+        // Directly point to the main Vercel endpoint where web buttons exist
         webView.loadUrl("https://kbc-lottery.vercel.app/")
 
-        // Simple Back Press Navigation
+        // Web Navigation Interceptor Stack
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (webView.canGoBack()) {
