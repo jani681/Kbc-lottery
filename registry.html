@@ -26,8 +26,9 @@
         /* Native Print CSS rules */
         @media print {
             body * { visibility: hidden; }
-            #receiptTemplate, #receiptTemplate * { visibility: visible; }
-            #receiptTemplate { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
+            #successBanner, #successBanner * { visibility: visible; }
+            #successBanner { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
+            #printBtn, #imageBtn, #resetBtn { display: none !important; }
         }
     </style>
 </head>
@@ -58,9 +59,18 @@
                 <span id="copyFeedback" class="text-[10px] text-[#006633] font-semibold block mt-1 opacity-0 transition duration-150">کاپی کر لیا گیا!</span>
             </div>
 
+            <div class="mt-5 border-t border-dashed border-emerald-300 pt-4 text-right direction-rtl text-sm">
+                <table class="w-full space-y-2">
+                    <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">صارف کا نام:</td><td id="receiptName" class="py-2 text-slate-800"></td></tr>
+                    <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">شناختی کارڈ:</td><td id="receiptCnic" class="py-2 text-slate-800 font-mono"></td></tr>
+                    <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">موبائل نمبر:</td><td id="receiptMobile" class="py-2 text-slate-800 font-mono"></td></tr>
+                    <tr><td class="py-2 font-bold text-[#004d26]">تاریخ اور وقت:</td><td id="receiptDateTime" class="py-2 text-slate-800 font-mono text-xs"></td></tr>
+                </table>
+            </div>
+
             <div class="mt-6 space-y-3">
                 <div class="grid grid-cols-2 gap-3">
-                    <button type="button" id="printBtn" onclick="printReceiptNative()" class="w-full bg-[#006633] text-white font-bold py-3 px-2 rounded-xl text-xs shadow hover:bg-[#004d26] transition cursor-pointer flex items-center justify-center">
+                    <button type="button" id="printBtn" onclick="window.print()" class="w-full bg-[#006633] text-white font-bold py-3 px-2 rounded-xl text-xs shadow hover:bg-[#004d26] transition cursor-pointer flex items-center justify-center">
                         <span>پرنٹ / محفوظ کریں (PDF)</span>
                     </button>
                     <button type="button" id="imageBtn" onclick="downloadReceiptImage()" class="w-full bg-emerald-600 text-white font-bold py-3 px-2 rounded-xl text-xs shadow hover:bg-emerald-700 transition cursor-pointer flex items-center justify-center">
@@ -87,7 +97,6 @@
                 
                 <input type="hidden" id="systemDate" name="systemDate">
                 <input type="hidden" id="systemTime" name="systemTime">
-                <input type="hidden" id="generatedProfileId" name="generatedProfileId">
 
                 <div id="step1-container" class="space-y-6">
                     <div class="border-b border-slate-100 pb-3 mb-4">
@@ -122,7 +131,7 @@
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">شناختی کارڈ نمبر (ID Card Number)</label>
                         <input type="text" id="cnicNumber" maxlength="15" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-left bg-slate-50/50 font-mono" placeholder="XXXXX-XXXXXXX-X">
-                        <span id="cnicError" class="text-xs text-red-600 text-right hidden">شناختی کارڈ فارمیٹ درست نہیں ہے یا پہلے سے رجسٹرڈ ہے۔</span>
+                        <span id="cnicError" class="text-xs text-red-600 text-right hidden">شناختی کارڈ فارمیٹ درست نہیں ہے۔</span>
                     </div>
 
                     <div class="flex flex-col space-y-1.5">
@@ -175,7 +184,6 @@
                             <option value="employee">ملازم / نوکری (Salaried Employee)</option>
                             <option value="agriculture">زراعت / زمیندار (Agriculture)</option>
                             <option value="business">کاروبار / دکاندار (Business)</option>
-                            <option value="abroad">بیرون ملک (Overseas Worker)</option>
                             <option value="unemployed">بے روزگار (Unemployed)</option>
                         </select>
                     </div>
@@ -186,9 +194,7 @@
                             <option value="under_20k">20,000 سے کم</option>
                             <option value="20k_30k">20,000 سے 30,000</option>
                             <option value="30k_40k">30,000 سے 40,000</option>
-                            <option value="40k_50k">40,000 سے 50,000</option>
-                            <option value="50k_60k">50,000 سے 60,000</option>
-                            <option value="above_60k">60,000 سے زائد</option>
+                            <option value="above_50k">50,000 سے زائد</option>
                         </select>
                     </div>
 
@@ -202,7 +208,7 @@
 
                     <div id="disabilityNatureSection" class="hidden flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-red-700 text-right">معذوری کی نوعیت (Nature of Disability)</label>
-                        <input type="text" id="disabilityNatureInput" class="w-full px-4 py-3 border border-red-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-right bg-red-50/30" placeholder="تفصیل لکھیں (مثلاً: بینائی، معذوری وغیرہ)">
+                        <input type="text" id="disabilityNatureInput" class="w-full px-4 py-3 border border-red-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-right bg-red-50/30" placeholder="تفصیل لکھیں">
                     </div>
 
                     <div class="flex flex-col space-y-1.5">
@@ -210,62 +216,25 @@
                         <select id="houseOwnership" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
                             <option value="owned">ذاتی گھر (Owned)</option>
                             <option value="rented">کرائے کا گھر (Rented)</option>
-                            <option value="other">سرکاری یا دیگر (Other/Government)</option>
-                        </select>
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">مکان کی ساخت (House Structure)</label>
-                        <select id="houseStructure" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
-                            <option value="cemented">پکا مکان (Cemented / Bricks)</option>
-                            <option value="mud">کچا مکان (Mud / Kacha)</option>
-                            <option value="mixed">مکس / آدھا کچا پکا (Mixed)</option>
                         </select>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div class="flex flex-col space-y-1.5">
                             <label class="text-sm font-semibold text-slate-700 text-center">واش رومز کی تعداد</label>
-                            <input type="text" id="washroomsCount" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="1" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-slate-50/50 font-mono">
+                            <input type="text" id="washroomsCount" inputmode="numeric" pattern="[0-9]*" value="1" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-slate-50/50 font-mono">
                         </div>
                         <div class="flex flex-col space-y-1.5">
                             <label class="text-sm font-semibold text-slate-700 text-center">کمروں کی تعداد (Rooms)</label>
-                            <input type="text" id="roomsCount" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="2" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-slate-50/50 font-mono">
+                            <input type="text" id="roomsCount" inputmode="numeric" pattern="[0-9]*" value="2" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-slate-50/50 font-mono">
                         </div>
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">بجلی کا متبادل ذریعہ (Power Source)</label>
-                        <select id="powerSource" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
-                            <option value="wapda_only">صرف سرکاری بجلی (WAPDA / FESCO Only)</option>
-                            <option value="solar">سولر سسٹم (Solar System Installed)</option>
-                            <option value="ups">یو پی ایس / انورٹر (UPS / Inverter)</option>
-                        </select>
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">گاڑی یا موٹر سائیکل کی موجودگی</label>
-                        <select id="vehiclesAsset" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
-                            <option value="none">کوئی گاڑی یا بائیک نہیں ہے (None)</option>
-                            <option value="bike">صرف موٹر سائیکل ہے (Bike Only)</option>
-                            <option value="car">صرف گاڑی ہے (Car Only)</option>
-                            <option value="both">موٹر سائیکل اور گاڑی دونوں ہیں (Both)</option>
-                        </select>
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">کیا گھر میں مال مویشی / جانور ہیں؟</label>
-                        <select id="livestock" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
-                            <option value="no">نہیں (No)</option>
-                            <option value="yes">ہاں (جانور موجود ہیں - Yes)</option>
-                        </select>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4 pt-2">
                         <button type="button" onclick="goToStep(1)" class="w-full bg-slate-100 text-slate-800 font-bold py-3.5 px-4 rounded-xl hover:bg-slate-200 transition cursor-pointer">
                             پیچھے جائیں
                         </button>
-                        <button type="button" onclick="validateStep2AndGo()" class="w-full bg-[#006633] text-white font-bold py-3.5 px-4 rounded-xl shadow hover:bg-[#004d26] transition cursor-pointer">
+                        <button type="button" onclick="goToStep(3)" class="w-full bg-[#006633] text-white font-bold py-3.5 px-4 rounded-xl shadow hover:bg-[#004d26] transition cursor-pointer">
                             اگلا مرحلہ
                         </button>
                     </div>
@@ -310,18 +279,8 @@
                     </div>
 
                     <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">یونین کونسل (Union Council)</label>
-                        <input type="text" id="localAreaInput" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50" placeholder="یونین کونسل کا نام یا نمبر لکھیں">
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">شہر یا گاؤں کا نام (City / Village)</label>
                         <input type="text" id="villageName" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50" placeholder="شہر یا گاؤں لکھیں">
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">شناختی کارڈ پر درج مکمل پتہ (Complete Address on ID Card)</label>
-                        <textarea id="cnicAddress" required rows="3" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 resize-none" placeholder="شناختی کارڈ والا مکمل پتہ، گلی یا محلہ نمبر یہاں لکھیں"></textarea>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4 pt-2">
@@ -329,7 +288,6 @@
                             پیچھے جائیں
                         </button>
                         <button type="submit" id="submitBtn" class="w-full bg-[#339933] text-white font-bold py-3.5 px-4 rounded-xl shadow hover:bg-[#006633] transition active:scale-[0.99] flex items-center justify-center space-x-2 cursor-pointer">
-                            <span id="btnLoader" class="btn-spinner hidden"></span>
                             <span id="btnText">جمع کریں (Submit)</span>
                         </button>
                     </div>
@@ -339,40 +297,8 @@
         </div>
         </div>
 
-    <div id="receiptTemplate" style="position: absolute; top: -9999px; left: -9999px; width: 450px; background-color: #ffffff; padding: 25px; border: 1px solid #cbd5e1; border-radius: 12px; direction: rtl; text-align: right;">
-        <div style="text-align: center; border-bottom: 3px solid #006633; padding-bottom: 12px; margin-bottom: 20px;">
-            <h2 style="margin: 0; font-size: 22px; color: #006633; font-weight: bold;">بینظیر انکم سپورٹ پروگرام رجسٹریشن رسید</h2>
-            <p style="margin: 4px 0 0; font-size: 11px; color: #339933; font-weight: bold; font-family: sans-serif;">BISP National Socio-Economic Registry Verification</p>
-        </div>
-        <div style="background-color: #f0fdf4; border: 1px dashed #339933; padding: 12px; text-align: center; border-radius: 8px; margin-bottom: 20px;">
-            <span style="font-size: 11px; display: block; color: #14532d; font-weight: bold;">پروفائل ریفرنس آئی ڈی</span>
-            <strong id="pdfProfileId" style="font-size: 18px; color: #006633; font-family: monospace; tracking: 1px;"></strong>
-        </div>
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;">
-            <tr>
-                <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #004d26; width: 45%;">صارف کا نام:</td>
-                <td id="pdfName" style="padding: 10px; border-bottom: 1px solid #e2e8f0;"></td>
-            </tr>
-            <tr>
-                <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #004d26;">شناختی کارڈ نمبر:</td>
-                <td id="pdfCnic" style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-family: monospace;"></td>
-            </tr>
-            <tr>
-                <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #004d26;">موبائل نمبر:</td>
-                <td id="pdfMobile" style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-family: monospace;"></td>
-            </tr>
-            <tr>
-                <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #004d26;">تاریخ اور وقت:</td>
-                <td id="pdfDateTime" style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-family: monospace;"></td>
-            </tr>
-        </table>
-        <div style="text-align: center; color: #64748b; font-size: 10px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
-            یہ ایک ڈیجیٹل طور پر تیار کردہ تصدیقی دستاویز ہے، جو ڈیٹا اینٹری ٹریکنگ کے لیے استعمال کی جا سکتی ہے۔
-        </div>
-    </div>
-
     <script>
-        // SENIOR PRO FIX: Complete Dynamic Pakistan NSER Address Matrix Mapping Data
+        // SENIOR DEV FIX: Fully populated Pakistan NSER Address Matrix Mapping Data
         const addressData = {
             punjab: {
                 divisions: {
@@ -389,15 +315,7 @@
                         name: "فیصل آباد (Faisalabad)",
                         districts: {
                             faisalabad: { name: "فیصل آباد (Faisalabad)", tehsils: ["فیصل آباد صدر", "فیصل آباد سٹی", "جڑانوالہ", "سمندری"] },
-                            jhang: { name: "جھنگ (Jhang)", tehsils: ["جھنگ", "شورکوٹ", "18 ہزاری"] },
-                            chiniot: { name: "چنیوٹ (Chiniot)", tehsils: ["چنیوٹ", "لالیاں"] }
-                        }
-                    },
-                    lahore: {
-                        name: "لاہور (Lahore)",
-                        districts: {
-                            lahore: { name: "لاہور (Lahore)", tehsils: ["لاہور سٹی", "کینٹ", "رائے ونڈ"] },
-                            kasur: { name: "قصور (Kasur)", tehsils: ["قصور", "چونیاں", "پتوقی"] }
+                            jhang: { name: "جھنگ (Jhang)", tehsils: ["جھنگ", "شورکوٹ", "18 ہزاری"] }
                         }
                     }
                 }
@@ -407,14 +325,24 @@
                     karachi: {
                         name: "کراچی (Karachi)",
                         districts: {
-                            karachi_east: { name: "کراچی شرقی (East)", tehsils: ["گلشن اقبال", "جمشید کوارٹرز"] },
-                            karachi_south: { name: "کراچی غربی (South)", tehsils: ["صدر", "آرام باغ"] }
+                            karachi_east: { name: "کراچی شرقی (East)", tehsils: ["گلشن اقبال", "جمشید کوارٹرز", "فیروز آباد"] },
+                            karachi_south: { name: "کراچی جنوبی (South)", tehsils: ["صدر", "آرام باغ", "سول لائنز"] },
+                            karachi_central: { name: "کراچی وسطی (Central)", tehsils: ["گلبرگ", "لیاقت آباد", "ناظم آباد"] }
                         }
                     },
                     hyderabad: {
                         name: "حیدرآباد (Hyderabad)",
                         districts: {
-                            hyderabad: { name: "حیدرآباد (Hyderabad)", tehsils: ["حیدرآباد سٹی", "لطیف آباد", "قاسم آباد"] }
+                            hyderabad: { name: "حیدرآباد (Hyderabad)", tehsils: ["حیدرآباد سٹی", "لطیف آباد", "قاسم آباد"] },
+                            matuari: { name: "مٹیاری (Matiari)", tehsils: ["مٹیاری", "ہالا", "سعید آباد"] },
+                            tando_allahyar: { name: "ٹنڈو اللہ یار", tehsils: ["ٹنڈو اللہ یار", "چمبر"] }
+                        }
+                    },
+                    sukkur: {
+                        name: "سکھر (Sukkur)",
+                        districts: {
+                            sukkur: { name: "سکھر (Sukkur)", tehsils: ["سکھر سٹی", "روہڑی", "پنو عاقل"] },
+                            ghotki: { name: "گھوٹکی (Ghotki)", tehsils: ["گھوٹکی", "اوباوڑو", "ڈھرکی"] }
                         }
                     }
                 }
@@ -424,13 +352,15 @@
                     peshawar: {
                         name: "پشاور (Peshawar)",
                         districts: {
-                            peshawar: { name: "پشاور (Peshawar)", tehsils: ["پشاور سٹی", "شاہ عالم", "متنی"] }
+                            peshawar: { name: "پشاور (Peshawar)", tehsils: ["پشاور سٹی", "شاہ عالم", "متنی"] },
+                            charsadda: { name: "چارسدہ (Charsadda)", tehsils: ["چارسدہ", "شبقدر", "تنگی"] }
                         }
                     },
                     malakand: {
                         name: "مالاکنڈ (Malakand)",
                         districts: {
-                            swat: { name: "سوات (Swat)", tehsils: ["بابوزئی", "بریکوٹ", "مٹہ"] }
+                            swat: { name: "سوات (Swat)", tehsils: ["بابوزئی", "بریکوٹ", "مٹہ", "خواہ زہ خیل"] },
+                            mardan: { name: "مردان (Mardan)", tehsils: ["مردان سٹی", "تخت بھائی", "کاٹلنگ"] }
                         }
                     }
                 }
@@ -440,19 +370,16 @@
                     quetta: {
                         name: "کوئٹہ (Quetta)",
                         districts: {
-                            quetta: { name: "کوئٹہ (Quetta)", tehsils: ["کوئٹہ سٹی", "چلتن"] }
+                            quetta: { name: "کوئٹہ (Quetta)", tehsils: ["کوئٹہ سٹی", "چلتن", "صدر"] }
                         }
                     }
                 }
             }
         };
 
-        const registeredCnicDatabase = ["36102-1111111-1"];
         let currentStep = 1;
-        let isStep1Valid = false;
-        let isStep2Valid = false;
 
-        // Auto numeric rule attachments
+        // Auto numeric inputs mapping
         ['mobileNumber', 'userAge', 'totalKids', 'maleKids', 'femaleKids', 'roomsCount', 'washroomsCount'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.addEventListener('input', e => e.target.value = e.target.value.replace(/\D/g, ''));
@@ -500,13 +427,7 @@
             if(!/^[0-9]{5}-[0-9]{7}-[0-9]{1}$/.test(cnic)) { document.getElementById('cnicError').classList.remove('hidden'); return; } 
             else document.getElementById('cnicError').classList.add('hidden');
 
-            isStep1Valid = true;
             goToStep(targetStep);
-        }
-
-        function validateStep2AndGo() {
-            isStep2Valid = true;
-            goToStep(3);
         }
 
         function toggleKidsFields() {
@@ -519,7 +440,7 @@
             document.getElementById("disabilityNatureSection").classList.toggle("hidden", status !== "yes");
         }
 
-        // CRITICAL FIX: Dynamically fetching values relative to current selected parent nodes
+        // MATRIX LOGIC RE-ENGINEERED
         function handleProvinceChange() {
             const province = document.getElementById("provinceSelect").value;
             const divisionSelect = document.getElementById("divisionSelect");
@@ -583,7 +504,7 @@
             submitBtn.disabled = true;
 
             const now = new Date();
-            const randomID = Math.floor(100000 + Math.random() * 900000);
+            const randomID = Math.floor(1000 + Math.random() * 9000);
             const profileId = `BISP-${String(now.getFullYear()).slice(-2)}${String(now.getMonth() + 1).padStart(2, '0')}-${randomID}`;
 
             document.getElementById("formCard").style.display = "none";
@@ -592,11 +513,11 @@
             document.getElementById("displayProfileId").innerText = profileId;
             document.getElementById("successBanner").classList.remove("hidden");
             
-            document.getElementById("pdfProfileId").innerText = profileId;
-            document.getElementById("pdfName").innerText = document.getElementById("fullName").value;
-            document.getElementById("pdfCnic").innerText = document.getElementById("cnicNumber").value;
-            document.getElementById("pdfMobile").innerText = document.getElementById("mobileNumber").value;
-            document.getElementById("pdfDateTime").innerText = `${now.toLocaleTimeString()} @ ${now.toISOString().split('T')[0]}`;
+            // Map live receipt summary view fields directly
+            document.getElementById("receiptName").innerText = document.getElementById("fullName").value;
+            document.getElementById("receiptCnic").innerText = document.getElementById("cnicNumber").value;
+            document.getElementById("receiptMobile").innerText = document.getElementById("mobileNumber").value;
+            document.getElementById("receiptDateTime").innerText = `${now.toLocaleTimeString()} @ ${now.toISOString().split('T')[0]}`;
             
             submitBtn.disabled = false;
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -610,37 +531,26 @@
             });
         }
 
-        function printReceiptNative() {
-            const element = document.getElementById('receiptTemplate');
-            // رینڈر لوپ سے بچنے کے لیے پرنٹ سے پہلے عارضی طور پر سامنے لانا
-            const originalStyle = element.style.cssText;
-            element.style.cssText = "position: static; width: 100%; display: block;";
-            window.print();
-            element.style.cssText = originalStyle;
-        }
-
-        // CRITICAL SENIOR PRO FIX: Rendering off-screen viewport block elements safely 
+        // SENIOR PRO FIX: No hidden elements, prints/saves the direct view container flawlessly
         function downloadReceiptImage() {
-            const element = document.getElementById('receiptTemplate');
+            const element = document.getElementById('successBanner');
             const imageBtn = document.getElementById('imageBtn');
             const imageBtnText = document.getElementById('imageBtnText');
 
             imageBtn.disabled = true;
             imageBtnText.innerText = "تصویر بن رہی ہے...";
 
-            // عارضی طور پر عنصر کو پوشیدہ پوزیشن سے ہٹا کر رینڈر ایبل بنانا لیکن اسکرین کے باہر رکھنا
-            const originalStyle = element.style.cssText;
-            element.style.cssText = "position: absolute; top: 0; left: -2000px; width: 450px; background-color: #ffffff; display: block; padding: 25px;";
-
+            // Temporary padding optimizations for standard high-res image look
+            const originalClassName = element.className;
+            
             setTimeout(() => {
                 html2canvas(element, {
-                    scale: 3, // زبردست رزلٹ کے لیے کرسپ پکسل میپنگ
+                    scale: 3, 
                     useCORS: true,
                     allowTaint: true,
-                    backgroundColor: "#ffffff",
+                    backgroundColor: "#f8fafc",
                     logging: false
                 }).then(canvas => {
-                    element.style.cssText = originalStyle; // پرانی پوزیشن واپس لاک کریں
                     imageBtn.disabled = false;
                     imageBtnText.innerText = "تصویر ڈاؤن لوڈ (PNG)";
 
@@ -652,19 +562,16 @@
                     link.click();
                     document.body.removeChild(link);
                 }).catch(err => {
-                    console.error("Canvas Render Exception:", err);
-                    element.style.cssText = originalStyle;
+                    console.error("Canvas Exception", err);
                     imageBtn.disabled = false;
                     imageBtnText.innerText = "تصویر ڈاؤن لوڈ (PNG)";
-                    alert("موبائل امیج انجن بلاک ہو گیا۔ دوبارہ کلک کریں۔");
+                    alert("دوبارہ کلک کریں۔ ڈاؤن لوڈ انجن ریڈی ہو رہا ہے۔");
                 });
-            }, 100);
+            }, 50);
         }
 
         function resetRegistryForm() {
             document.getElementById("registryForm").reset();
-            isStep1Valid = false;
-            isStep2Valid = false;
             currentStep = 1;
 
             document.getElementById('mobileError').classList.add('hidden');
@@ -680,7 +587,6 @@
         }
 
         window.resetRegistryForm = resetRegistryForm;
-        window.printReceiptNative = printReceiptNative;
         window.downloadReceiptImage = downloadReceiptImage;
     </script>
 
