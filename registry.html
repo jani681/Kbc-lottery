@@ -393,14 +393,14 @@
             firebase.initializeApp(firebaseConfig);
         }
 
-        // FULL FIXED MASTER ADDRESS DATABASE (Sargodha & Faisalabad Complete Structure)
+        // FULL COMPREHENSIVE ADDRESS DATABASE (PUNJAB ALL 10 OFFICIAL DIVISIONS)
         const provincesData = {
             punjab: [
                 {
                     divId: "sargodha", divName: "سرگودھا (Sargodha)",
                     districts: [
                         { distId: "khushab", distName: "خوشاب (Khushab)", tehsils: ["قائدآباد (Quaidabad)", "خوشاب (Khushab)", "نوشہرہ (Nowshera)", "نورپورتھل (Noorpur Thal)"] },
-                        { distId: "sargodha", distName: "سرگودھا (Sargodha)", tehsils: ["سرگودھا (Sargodha)", "بھلوال (Bhalwal)", "شاہ پور (Shahpur)", "سلانوالی (Sillanwali)", "کوٹ مومن (Kot Momin)", "مڈ رانجھا (Midh Ranjha)"] },
+                        { distId: "sargodha", distName: "سرگودھا (Sargodha)", tehsils: ["سرگودھا (Sargodha)", "بھلوال (Bhalwal)", "شاه پور (Shahpur)", "سلانوالی (Sillanwali)", "کوٹ مومن (Kot Momin)", "مڈ رانجھا (Midh Ranjha)"] },
                         { distId: "mianwali", distName: "میانوالی (Mianwali)", tehsils: ["میانوالی (Mianwali)", "عیسیٰ خیل (Isakhel)", "پپلاں (Piplan)"] },
                         { distId: "bhakkar", distName: "بھکر (Bhakkar)", tehsils: ["بھکر (Bhakkar)", "دریا خان (Darya Khan)", "کلور کوٹ (Kallurkot)", "منکیرہ (Mankera)"] }
                     ]
@@ -413,11 +413,85 @@
                         { distId: "toba_tek_singh", distName: "ٹوبہ ٹیک سنگھ (Toba Tek Singh)", tehsils: ["ٹوبہ ٹیک سنگھ", "کمالیہ", "گوجرہ", "پیر محل"] },
                         { distId: "chiniot", distName: "چنیوٹ (Chiniot)", tehsils: ["چنیوٹ (Chiniot)", "بھوانہ (Bhowana)", "لالیاں (Lalian)"] }
                     ]
+                },
+                {
+                    divId: "lahore", divName: "لاہور (Lahore)",
+                    districts: [
+                        { distId: "lahore", distName: "لاہور (Lahore)", tehsils: ["لاہور سٹی", "لاہور کینٹ", "شالیمار", "ماڈل ٹاؤن", "رائے ونڈ"] },
+                        { distId: "kasur", distName: "قصور (Kasur)", tehsils: ["قصور", "چونیاں", "پتوکی", "کوٹ رادھا کشن"] },
+                        { distId: "sheikhupura", distName: "شیخوپورہ (Sheikhupura)", tehsils: ["شیخوپورہ", "مریدکے", "فیروز والا", "صفدر آباد", "شرقپور"] },
+                        { distId: "nankana_sahib", distName: "ننکانہ صاحب (Nankana Sahib)", tehsils: ["ننکانہ صاحب", "سانگلہ ہل", "شاہ کوٹ"] }
+                    ]
+                },
+                {
+                    divId: "rawalpindi", divName: "راولپنڈی (Rawalpindi)",
+                    districts: [
+                        { distId: "rawalpindi", distName: "راولپنڈی (Rawalpindi)", tehsils: ["راولپنڈی", "گوجر خان", "ٹیکسلا", "کہوٹہ", "مری", "کوٹلی ستیاں", "کلر سیداں"] },
+                        { distId: "attock", distName: "اٹک (Attock)", tehsils: ["اٹک", "حسن ابدال", "فتح جنگ", "پنڈی گھیب", "جنڈ", "حضرو"] },
+                        { distId: "jhelum", distName: "جہلم (Jhelum)", tehsils: ["جہلم", "پنڈ دادن خان", "دینا", "سوہاوہ"] },
+                        { distId: "chakwal", distName: "چکوال (Chakwal)", tehsils: ["چکوال", "تلا گنگ", "چوا سیدن شاہ"] }
+                    ]
+                },
+                {
+                    divId: "multan", divName: "ملتان (Multan)",
+                    districts: [
+                        { distId: "multan", distName: "ملتان (Multan)", tehsils: ["ملتان سٹی", "ملتان صدر", "شجاع آباد", "جلال پور پیروالہ"] },
+                        { distId: "khanewal", distName: "خانیوال (Khanewal)", tehsils: ["خانیوال", "کبیروالہ", "میاں چنوں", "جہانیاں"] },
+                        { distId: "lodhran", distName: "لودھراں (Lodhran)", tehsils: ["لودھراں", "دنیا پور", "کہروڑ پکا"] },
+                        { distId: "vehari", distName: "وہاڑی (Vehari)", tehsils: ["وہاڑی", "بورے والا", "میلسی"] }
+                    ]
+                },
+                {
+                    divId: "gujranwala", divName: "گوجرانوالہ (Gujranwala)",
+                    districts: [
+                        { distId: "gujranwala", distName: "گوجرانوالہ (Gujranwala)", tehsils: ["گوجرانوالہ سٹی", "گوجرانوالہ صدر", "کامونکی", "نوشہرہ ورکاں"] },
+                        { distId: "sialkot", distName: "سیالکوٹ (Sialkot)", tehsils: ["سیالکوٹ", "ڈسکہ", "پسرور", "سمبڑیال"] },
+                        { distId: "narowal", distName: "نارووال (Narowal)", tehsils: ["نارووال", "شکر گڑھ", "ظفر وال"] }
+                    ]
+                },
+                {
+                    divId: "gujrat", divName: "گجرات (Gujrat)",
+                    districts: [
+                        { distId: "gujrat", distName: "گجرات (Gujrat)", tehsils: ["گجرات", "کھاریاں", "سرائے عالمگیر"] },
+                        { distId: "mandi_bahauddin", distName: "منڈی بہاؤالدین", tehsils: ["منڈی بہاؤالدین", "پھالیہ", "ملکوال"] },
+                        { distId: "hafizabad", distName: "حافظ آباد (Hafizabad)", tehsils: ["حافظ آباد", "پنڈی بھٹیاں"] }
+                    ]
+                },
+                {
+                    divId: "bahawalpur", divName: "بہاولپور (Bahawalpur)",
+                    districts: [
+                        { distId: "bahawalpur", distName: "بہاولپور (Bahawalpur)", tehsils: ["بہاولپور سٹی", "بہاولپور صدر", "احمد پور شرقیہ", "حاصل پور", "خیر پور ٹامیوالی", "یزمان"] },
+                        { distId: "bahawalnagar", distName: "بہاولنگر (Bahawalnagar)", tehsils: ["بہاولنگر", "چشتیاں", "ہارون آباد", "فورٹ عباس", "منچن آباد"] },
+                        { distId: "rahim_yar_khan", distName: "رحیم یار خان", tehsils: ["رحیم یار خان", "خانپور", "صادق آباد", "لیاقت پور"] }
+                    ]
+                },
+                {
+                    divId: "sahiwal", divName: "ساہیوال (Sahiwal)",
+                    districts: [
+                        { distId: "sahiwal", distName: "ساہیوال (Sahiwal)", tehsils: ["ساہیwal", "چیچہ وطنی"] },
+                        { distId: "okara", distName: "اوکاڑہ (Okara)", tehsils: ["اوکاڑہ", "دیپالپور", "رنالہ خورد"] },
+                        { distId: "pakpattan", distName: "پاکپتن (Pakpattan)", tehsils: ["پاکپتن", "عارف والا"] }
+                    ]
+                },
+                {
+                    divId: "dg_khan", divName: "ڈی جی خان (D.G. Khan)",
+                    districts: [
+                        { distId: "dg_khan", distName: "ڈیرہ غازی خان", tehsils: ["ڈی جی خان", "کوٹ چھٹہ"] },
+                        { distId: "muzaffargarh", distName: "مظفر گڑھ (Muzaffargarh)", tehsils: ["مظفر گڑھ", "علی پور", "جتوئی", "کوٹ ادو"] },
+                        { distId: "layyah", distName: "لیہ (Layyah)", tehsils: ["لیہ", "چوبارہ", "کروڑ لعل عیسن"] },
+                        { distId: "rajanpur", distName: "راجن پور (Rajanpur)", tehsils: ["راجن پور", "جام پور", "رcommand"] }
+                    ]
                 }
             ],
-            sindh: [],
-            kpk: [],
-            balochistan: []
+            sindh: [
+                { divId: "karachi", divName: "کراچی (Karachi)", districts: [{ distId: "karachi_central", distName: "کراچی سینٹرل", tehsils: ["نارتھ ناظم آباد", "گلبرگ"] }] }
+            ],
+            kpk: [
+                { divId: "peshawar", divName: "پشاور (Peshawar)", districts: [{ distId: "peshawar", distName: "پشاور", tehsils: ["پشاور سٹی"] }] }
+            ],
+            balochistan: [
+                { divId: "quetta", divName: "کوئٹہ (Quetta)", districts: [{ distId: "quetta", distName: "کوئٹہ", tehsils: ["کوئٹہ سٹی"] }] }
+            ]
         };
 
         let currentStep = 1;
