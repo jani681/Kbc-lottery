@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>صارف پروفائل رجسٹری - بی آئی ایس پی تھیم</title>
-    <!-- Tailwind CSS Engine -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- html2canvas library for high-speed PNG image generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
-    <!-- Firebase App and Database SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     
@@ -18,38 +15,23 @@
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
         .direction-rtl { direction: rtl; }
-        .btn-spinner {
-            border: 2px solid transparent;
-            border-radius: 50%;
-            border-top-color: #ffffff;
-            border-right-color: #ffffff;
-            width: 16px;
-            height: 16px;
-            animation: spin 0.6s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
         @media print {
             body * { visibility: hidden; }
             #successBanner, #successBanner * { visibility: visible; }
             #successBanner { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
-            #printBtn, #imageBtn, #resetBtn, .action-area { display: none !important; }
+            #printBtn, #imageBtn, #whatsappBtn, #resetBtn, .action-area { display: none !important; }
         }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen pb-12">
 
-    <!-- Premium Government Style Header Area -->
     <div class="bg-[#006633] text-white py-8 px-4 text-center shadow-lg border-b-4 border-[#339933]">
         <h1 class="text-2xl font-bold tracking-wide">صارف پروفائل رجسٹری</h1>
         <p class="text-emerald-100 text-xs mt-2 font-mono">Benazir Income Support Programme Portal</p>
     </div>
 
-    <!-- Main Container Card -->
     <div class="max-w-md mx-auto mt-6 px-4">
         
-        <!-- Success Banner Popup / Target Receipt for Image Download -->
         <div id="successBanner" class="hidden bg-emerald-50 border border-[#339933] text-emerald-900 rounded-2xl p-6 text-center shadow-sm mb-6">
             <div class="w-12 h-12 bg-[#006633] rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
@@ -57,7 +39,6 @@
             <h3 class="text-lg font-bold text-[#006633]">معلومات کامیابی کے ساتھ محفوظ ہو گئیں!</h3>
             <p class="text-sm text-emerald-700 mt-1">Data registry processed successfully!</p>
             
-            <!-- Auto Generated ID Display Block -->
             <div class="mt-4 p-4 bg-white rounded-xl border border-emerald-100 shadow-inner">
                 <p class="text-xs text-slate-500 font-semibold mb-1">آپ کا ریفرنس نمبر (Profile ID)</p>
                 <div class="flex items-center justify-center space-x-2">
@@ -69,7 +50,6 @@
                 <span id="copyFeedback" class="text-[10px] text-[#006633] font-semibold block mt-1 opacity-0 transition duration-150">کاپی کر لیا گیا!</span>
             </div>
 
-            <!-- Dynamic Live Receipt Data Summary Table -->
             <div class="mt-5 border-t border-dashed border-emerald-300 pt-4 text-right direction-rtl text-sm">
                 <table class="w-full space-y-2">
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">صارف کا نام:</td><td id="receiptName" class="py-2 text-slate-800"></td></tr>
@@ -82,16 +62,14 @@
                 </table>
             </div>
 
-            <!-- Professional Payment Info Block -->
             <div class="mt-5 p-4 bg-amber-50 border border-amber-300 rounded-xl text-right direction-rtl">
                 <h4 class="text-sm font-extrabold text-amber-900 flex items-center justify-start space-x-1 space-x-reverse">
                     <span>⚠️ اہم ترین ہدایت برائے ادائیگی فیس</span>
                 </h4>
                 <p class="text-xs text-amber-800 mt-1 leading-relaxed">
-                    فائل کی باقاعدہ منظوری اور تصدیق کے لیے <strong>1,000 روپے</strong> رجسٹریشن فیس نیچے دیے گئے اکاؤنٹ پر بھیجنا لازمی ہے۔ فیس جمع نہ ہونے کی صورت میں رجسٹریشن نامکمل رہے گی۔
+                    فائل کی باقاعدہ منظوری اور تصدیق کے لیے <strong>1,000 روپے</strong> رجسٹریشن فیس نیچے دیے گئے اکاؤنٹ پر بھیجنا لازمی ہے۔ فیس جمع نہ ہونے کی صورت میں یہ رجسٹریشن مستقل طور پر معطل یا کینسل رہے گی۔
                 </p>
                 
-                <!-- Payment Accounts Details -->
                 <div class="mt-3 space-y-2 text-xs">
                     <div class="flex items-center justify-between p-2 bg-white rounded-lg border border-amber-200">
                         <div>
@@ -111,7 +89,6 @@
                     </div>
                 </div>
 
-                <!-- Transaction ID Submission Field -->
                 <div class="mt-4 pt-3 border-t border-amber-200" id="trxInputArea" data-html2canvas-ignore="true">
                     <label class="text-xs font-bold text-slate-700 block mb-1">رقم بھیجنے کے بعد ملنے والی ٹرانزیکشن ID (TRX) لکھیں:</label>
                     <div class="flex space-x-2 space-x-reverse">
@@ -121,8 +98,12 @@
                 </div>
             </div>
 
-            <!-- Action Buttons -->
             <div class="mt-6 space-y-3 action-area" data-html2canvas-ignore="true">
+                <button type="button" id="whatsappBtn" onclick="shareDataOnWhatsApp()" class="w-full bg-[#25D366] text-white font-bold py-3.5 px-4 rounded-xl text-sm shadow hover:bg-[#20ba5a] transition cursor-pointer flex items-center justify-center space-x-2 space-x-reverse border border-[#1ebd57]">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.405.003 11.979.003c3.184.001 6.177 1.242 8.426 3.495 2.249 2.253 3.487 5.248 3.486 8.435-.004 6.625-5.351 11.97-11.927 11.97-2.003-.001-3.97-.502-5.716-1.458L0 24zm6.59-4.846c1.6.95 3.167 1.448 4.782 1.449 5.517 0 10.007-4.486 10.01-10.002.002-2.673-1.039-5.185-2.928-7.078-1.89-1.893-4.405-2.934-7.076-2.935-5.521 0-10.013 4.489-10.016 10.006-.001 1.764.469 3.487 1.357 5.009l-.995 3.633 3.73-.978zm11.417-7.402c-.3-.149-1.772-.874-2.046-.974-.275-.1-.475-.149-.675.15-.2.299-.775.974-.95 1.173-.175.199-.35.224-.65.075-.3-.15-1.267-.467-2.414-1.492-.893-.797-1.496-1.782-1.671-2.081-.175-.3-.019-.462.13-.61.135-.133.3-.349.45-.523.15-.174.2-.299.3-.498.1-.2.05-.374-.025-.523-.075-.149-.675-1.628-.925-2.228-.243-.584-.489-.505-.675-.514-.175-.008-.375-.01-.575-.01s-.525.075-.8.374c-.275.299-1.05 1.026-1.05 2.5 0 1.474 1.075 2.899 1.225 3.099.15.199 2.115 3.23 5.125 4.532.715.309 1.273.494 1.707.633.719.228 1.373.196 1.89.119.577-.087 1.772-.724 2.022-1.42.25-.697.25-1.295.175-1.42-.075-.125-.275-.199-.575-.349z"/></svg>
+                    <span>واٹس ایپ پر رسید شیئر کریں (WhatsApp Data)</span>
+                </button>
+
                 <div class="grid grid-cols-2 gap-3">
                     <button type="button" id="printBtn" onclick="window.print()" class="w-full bg-[#006633] text-white font-bold py-3 px-2 rounded-xl text-xs shadow hover:bg-[#004d26] transition cursor-pointer flex items-center justify-center">
                         <span>پرنٹ / محفوظ کریں (PDF)</span>
@@ -138,7 +119,6 @@
             </div>
         </div>
 
-        <!-- Progress Step Indicator Bar -->
         <div id="stepIndicatorBar" class="bg-white p-4 rounded-xl border border-slate-200 mb-4 flex justify-between items-center text-xs font-bold text-slate-400">
             <div id="ind-step3" class="px-2.5 py-1 rounded-full bg-slate-100">پتہ Matrix</div>
             <div class="h-0.5 bg-slate-200 flex-1 mx-2"></div>
@@ -147,11 +127,9 @@
             <div id="ind-step1" class="px-2.5 py-1 rounded-full bg-[#006633] text-white shadow-sm">بنیادی معلومات</div>
         </div>
 
-        <!-- Form Card Start -->
         <div id="formCard" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6">
             <form id="registryForm" onsubmit="handleFormSubmit(event)" class="space-y-6">
 
-                <!-- ================= STEP 1: BASIC INFO ================= -->
                 <div id="step1-container" class="space-y-6">
                     <div class="border-b border-slate-100 pb-3 mb-4">
                         <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 1 / 3</span>
@@ -225,7 +203,6 @@
                     </div>
                 </div>
 
-                <!-- ================= STEP 2: SOCIO-ECONOMIC MATRIX ================= -->
                 <div id="step2-container" class="space-y-6 hidden">
                     <div class="border-b border-slate-100 pb-3 mb-4">
                         <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 2 / 3</span>
@@ -311,7 +288,7 @@
                         </select>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 gap-4 pt-2">
                         <div class="flex flex-col space-y-1.5">
                             <label class="text-sm font-semibold text-slate-700 text-center">واش رومز کی تعداد</label>
                             <input type="text" id="washroomsCount" inputmode="numeric" pattern="[0-9]*" value="1" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-slate-50/50 font-mono">
@@ -332,14 +309,12 @@
                     </div>
                 </div>
 
-                <!-- ================= STEP 3: ADDRESS MATRIX ================= -->
                 <div id="step3-container" class="space-y-6 hidden">
                     <div class="border-b border-slate-100 pb-3 mb-4">
                         <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 3 / 3</span>
                         <h2 class="text-xl font-extrabold text-[#006633] mt-2 text-right">مکمل رہائشی پتہ (Address Matrix)</h2>
                     </div>
 
-                    <!-- Province Dropdown -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">صوبہ (Province)</label>
                         <select id="provinceSelect" onchange="handleProvinceChange()" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
@@ -351,7 +326,6 @@
                         </select>
                     </div>
 
-                    <!-- Division Dropdown -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">ڈویژن (Division)</label>
                         <select id="divisionSelect" onchange="handleDivisionChange()" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
@@ -359,7 +333,6 @@
                         </select>
                     </div>
 
-                    <!-- District Dropdown -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">ضلع (District)</label>
                         <select id="districtSelect" onchange="handleDistrictChange()" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
@@ -367,7 +340,6 @@
                         </select>
                     </div>
 
-                    <!-- Tehsil Dropdown -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">تحصیل (Tehsil)</label>
                         <select id="tehsilSelect" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
@@ -375,13 +347,11 @@
                         </select>
                     </div>
 
-                    <!-- CNIC Address Field -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">شناختی کارڈ پر درج پتہ (Address as per CNIC)</label>
                         <textarea id="cnicAddressInput" required rows="2" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 resize-none" placeholder="شناختی کارڈ والا مکمل پتہ یہاں لکھیں۔۔۔"></textarea>
                     </div>
 
-                    <!-- Union Council Manual Field -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">یونین کونسل (Union Council / UC)</label>
                         <input type="text" id="ucManualInput" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50" placeholder="اپنی یونین کونسل کا نام یا نمبر لکھیں">
@@ -404,11 +374,8 @@
 
             </form>
         </div>
-        <!-- Form Card End -->
+        </div>
 
-    </div>
-
-    <!-- Master Hierarchical Address Database Engine & Firebase Logic -->
     <script>
         // REPLACE WITH YOUR FIREBASE CONFIG
         const firebaseConfig = {
@@ -426,28 +393,38 @@
             firebase.initializeApp(firebaseConfig);
         }
 
+        // FULL FIXED MASTER ADDRESS DATABASE (Sargodha & Faisalabad Complete Structure)
         const provincesData = {
             punjab: [
                 {
                     divId: "sargodha", divName: "سرگودھا (Sargodha)",
                     districts: [
                         { distId: "khushab", distName: "خوشاب (Khushab)", tehsils: ["قائدآباد (Quaidabad)", "خوشاب (Khushab)", "نوشہرہ (Nowshera)", "نورپورتھل (Noorpur Thal)"] },
-                        { distId: "sargodha", distName: "سرگودھا (Sargodha)", tehsils: ["سرگودھا (Sargodha)", "بھلوال (Bhalwal)", "شاہ پور (Shahpur)", "سلانوالی (Sillanwali)", "کوٹ مومن (Kot Momin)"] }
+                        { distId: "sargodha", distName: "سرگودھا (Sargodha)", tehsils: ["سرگودھا (Sargodha)", "بھلوال (Bhalwal)", "شاہ پور (Shahpur)", "سلانوالی (Sillanwali)", "کوٹ مومن (Kot Momin)", "مڈ رانجھا (Midh Ranjha)"] },
+                        { distId: "mianwali", distName: "میانوالی (Mianwali)", tehsils: ["میانوالی (Mianwali)", "عیسیٰ خیل (Isakhel)", "پپلاں (Piplan)"] },
+                        { distId: "bhakkar", distName: "بھکر (Bhakkar)", tehsils: ["بھکر (Bhakkar)", "دریا خان (Darya Khan)", "کلور کوٹ (Kallurkot)", "منکیرہ (Mankera)"] }
                     ]
                 },
                 {
                     divId: "faisalabad", divName: "فیصل آباد (Faisalabad)",
                     districts: [
-                        { distId: "faisalabad", distName: "فیصل آباد (Faisalabad)", tehsils: ["فیصل آباد سٹی", "فیصل آباد صدر", "جڑانوالہ", "تاندلیانوالہ"] }
+                        { distId: "faisalabad", distName: "فیصل آباد (Faisalabad)", tehsils: ["فیصل آباد سٹی", "فیصل آباد صدر", "جڑانوالہ", "تاندلیانوالہ", "سمندری", "چک جھمرہ"] },
+                        { distId: "jhang", distName: "جھنگ (Jhang)", tehsils: ["جھنگ (Jhang)", "شورکوٹ (Shorkot)", "احمد پور سیال (Ahmedpur Sial)", "18 ہزاری (18-Hazari)"] },
+                        { distId: "toba_tek_singh", distName: "ٹوبہ ٹیک سنگھ (Toba Tek Singh)", tehsils: ["ٹوبہ ٹیک سنگھ", "کمالیہ", "گوجرہ", "پیر محل"] },
+                        { distId: "chiniot", distName: "چنیوٹ (Chiniot)", tehsils: ["چنیوٹ (Chiniot)", "بھوانہ (Bhowana)", "لالیاں (Lalian)"] }
                     ]
                 }
-            ]
+            ],
+            sindh: [],
+            kpk: [],
+            balochistan: []
         };
 
         let currentStep = 1;
         let generatedProfileId = '';
+        let globalFormData = {}; // Holds latest submitted data for WhatsApp trigger
 
-        // Input Sanitizer
+        // Input Sanitizer Engine
         ['mobileNumber', 'userAge', 'totalKids', 'maleKids', 'femaleKids', 'roomsCount', 'washroomsCount'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.addEventListener('input', e => e.target.value = e.target.value.replace(/\D/g, ''));
@@ -508,10 +485,14 @@
             document.getElementById("disabilityNatureSection").classList.toggle("hidden", status !== "yes");
         }
 
+        // Dropdown Mapping Logic
         function handleProvinceChange() {
             const province = document.getElementById("provinceSelect").value;
             const divisionSelect = document.getElementById("divisionSelect");
             divisionSelect.innerHTML = '<option value="">ڈویژن منتخب کریں</option>';
+            document.getElementById("districtSelect").innerHTML = '<option value="">پہلے ڈویژن منتخب کریں</option>';
+            document.getElementById("tehsilSelect").innerHTML = '<option value="">پہلے ضلع منتخب کریں</option>';
+
             if (province && provincesData[province]) {
                 provincesData[province].forEach(div => {
                     const opt = document.createElement("option");
@@ -527,6 +508,8 @@
             const divisionId = document.getElementById("divisionSelect").value;
             const districtSelect = document.getElementById("districtSelect");
             districtSelect.innerHTML = '<option value="">ضلع منتخب کریں</option>';
+            document.getElementById("tehsilSelect").innerHTML = '<option value="">پہلے ضلع منتخب کریں</option>';
+
             if (province && divisionId && provincesData[province]) {
                 const targetDiv = provincesData[province].find(d => d.divId === divisionId);
                 if (targetDiv && targetDiv.districts) {
@@ -546,6 +529,7 @@
             const districtId = document.getElementById("districtSelect").value;
             const tehsilSelect = document.getElementById("tehsilSelect");
             tehsilSelect.innerHTML = '<option value="">تحصیل منتخب کریں</option>';
+
             if (province && divisionId && districtId && provincesData[province]) {
                 const targetDiv = provincesData[province].find(d => d.divId === divisionId);
                 if (targetDiv) {
@@ -571,8 +555,8 @@
             const randomID = Math.floor(1000 + Math.random() * 9000);
             generatedProfileId = `BISP-${String(now.getFullYear()).slice(-2)}${String(now.getMonth() + 1).padStart(2, '0')}-${randomID}`;
 
-            // Gather All Data Fields
-            const formData = {
+            // Gather Object Parameters
+            globalFormData = {
                 profileId: generatedProfileId,
                 fullName: document.getElementById("fullName").value,
                 relationType: document.getElementById("relationType").value,
@@ -585,34 +569,36 @@
                 occupation: document.getElementById("occupation").value,
                 monthlyIncome: document.getElementById("monthlyIncome").value,
                 disabilityStatus: document.getElementById("disabilityStatus").value,
-                disabilityNature: document.getElementById("disabilityNatureInput").value || "None",
+                disabilityNature: document.getElementById("disabilityNatureInput").value || "کوئی نہیں",
                 houseOwnership: document.getElementById("houseOwnership").value,
                 houseType: document.getElementById("houseType").value,
                 ucManual: document.getElementById("ucManualInput").value,
                 cnicAddress: document.getElementById("cnicAddressInput").value,
                 villageName: document.getElementById("villageName").value,
                 paymentStatus: "pending",
-                trxId: "",
+                trxId: "Pending",
                 timestamp: now.toISOString()
             };
 
-            // Async Save to Firebase if initialized
+            // Async Push Firebase
             if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
-                firebase.database().ref('registrations/' + generatedProfileId).set(formData);
+                firebase.database().ref('registrations/' + generatedProfileId).set(globalFormData);
             }
 
-            // Display UI Interface Transition
+            // Interface Rendering
             document.getElementById("formCard").style.display = "none";
             document.getElementById("stepIndicatorBar").style.display = "none";
             
             document.getElementById("displayProfileId").innerText = generatedProfileId;
             document.getElementById("successBanner").classList.remove("hidden");
             
-            document.getElementById("receiptName").innerText = formData.fullName;
-            document.getElementById("receiptCnic").innerText = formData.cnicNumber;
-            document.getElementById("receiptMobile").innerText = formData.mobileNumber;
-            document.getElementById("receiptUc").innerText = formData.ucManual;
-            document.getElementById("receiptCnicAddress").innerText = formData.cnicAddress;
+            document.getElementById("receiptName").innerText = globalFormData.fullName;
+            document.getElementById("receiptCnic").innerText = globalFormData.cnicNumber;
+            document.getElementById("receiptMobile").innerText = globalFormData.mobileNumber;
+            document.getElementById("receiptUc").innerText = globalFormData.ucManual;
+            document.getElementById("receiptCnicAddress").innerText = globalFormData.cnicAddress;
+            document.getElementById("receiptTrxDisplay").innerText = "پینڈنگ (Pending)";
+            document.getElementById("receiptTrxDisplay").className = "py-2 text-red-600 font-mono font-bold";
             document.getElementById("receiptDateTime").innerText = `${now.toLocaleTimeString()} @ ${now.toISOString().split('T')[0]}`;
             
             submitBtn.disabled = false;
@@ -623,22 +609,46 @@
             const trxId = document.getElementById("trxIdInput").value.trim();
             if (!trxId) { alert("براہ کرم ریفرنس کے لیے درست ٹرانزیکشن ID ٹائپ کریں۔"); return; }
 
-            // Live Update UI Summary Box
+            globalFormData.trxId = trxId;
+            globalFormData.paymentStatus = "submitted";
+
+            // Update UI Interface Display text
             document.getElementById("receiptTrxDisplay").innerText = trxId;
             document.getElementById("receiptTrxDisplay").className = "py-2 text-[#006633] font-mono font-bold";
             
-            // Sync Live Server Data
+            // Push Server
             if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
                 firebase.database().ref('registrations/' + generatedProfileId).update({
                     trxId: trxId,
                     paymentStatus: "submitted"
                 }).then(() => {
-                    alert("ٹرانزیکشن ID کامیابی سے سسٹم پر اپڈیٹ ہو گئی ہے۔ تصدیق کا عمل شروع کر دیا گیا ہے۔");
+                    alert("ٹرانزیکشن ID کامیابی سے اپڈیٹ ہو گئی ہے۔");
                 });
             } else {
                 alert("لوکل موڈ: ٹرانزیکشن رسید پر لاگو کر دی گئی ہے۔");
             }
             document.getElementById("trxInputArea").style.display = "none";
+        }
+
+        // WhatsApp Custom Message Engine Logic
+        function shareDataOnWhatsApp() {
+            const myPhoneNumber = "923001234567"; // اپنا واٹس ایپ نمبر یہاں 92 کے ساتھ لکھیں
+            
+            const message = `*صارف پروفائل رجسٹری رپورٹ (BISP)*\n` +
+                            `---------------------------\n` +
+                            `*پروفائل آئی ڈی:* ${globalFormData.profileId}\n` +
+                            `*نام:* ${globalFormData.fullName}\n` +
+                            `*شناختی کارڈ:* ${globalFormData.cnicNumber}\n` +
+                            `*موبائل نمبر:* ${globalFormData.mobileNumber}\n` +
+                            `*یونین کونسل:* ${globalFormData.ucManual}\n` +
+                            `*شہر/گاؤں:* ${globalFormData.villageName}\n` +
+                            `*ٹرانزیکشن ID:* ${globalFormData.trxId}\n` +
+                            `---------------------------\n` +
+                            `*نوٹ:* میں نے اپنی رجسٹریشن فیس پے کر دی ہے۔ براہ کرم میری فائل ویریفائی کریں۔`;
+
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://api.whatsapp.com/send?phone=${myPhoneNumber}&text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
         }
 
         function copyText(text) {
