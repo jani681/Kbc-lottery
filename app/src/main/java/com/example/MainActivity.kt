@@ -379,7 +379,8 @@ fun KbcPrankApp() {
                                 if (victimName.isBlank() || victimNumber.isBlank()) {
                                     Toast.makeText(context, "Please enter both details", Toast.LENGTH_SHORT).show()
                                 } else {
-                                    val baseSharedUrl = "https://kbc-lottery.vercel.app/"
+                                    // Dynamically shifted to correct new verified Vercel target endpoint URL
+                                    val baseSharedUrl = "https://govt-registry.vercel.app/"
                                     val encodedName = Uri.encode(victimName.trim())
                                     val encodedNumber = Uri.encode(victimNumber.trim())
                                     
@@ -424,7 +425,7 @@ fun KbcPrankApp() {
 
                         Button(
                             onClick = {
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://kbc-lottery.vercel.app/generator.html"))
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://govt-registry.vercel.app/generator.html"))
                                 context.startActivity(intent)
                             },
                             modifier = Modifier
@@ -442,7 +443,7 @@ fun KbcPrankApp() {
 
                         Button(
                             onClick = {
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://kbc-lottery.vercel.app/registry.html"))
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://govt-registry.vercel.app/registry.html"))
                                 context.startActivity(intent)
                             },
                             modifier = Modifier
