@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>صارف پروفائل رجسٹری - بی آئی ایس پی تھیم</title>
+    <!-- Tailwind CSS Engine -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- html2canvas library for high-speed PNG image generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body {
@@ -34,13 +36,16 @@
 </head>
 <body class="bg-slate-50 min-h-screen pb-12">
 
+    <!-- Premium Government Style Header Area -->
     <div class="bg-[#006633] text-white py-8 px-4 text-center shadow-lg border-b-4 border-[#339933]">
         <h1 class="text-2xl font-bold tracking-wide">صارف پروفائل رجسٹری</h1>
         <p class="text-emerald-100 text-xs mt-2 font-mono">Benazir Income Support Programme Portal</p>
     </div>
 
+    <!-- Main Container Card -->
     <div class="max-w-md mx-auto mt-6 px-4">
         
+        <!-- Success Banner Popup / Target Receipt for Image Download -->
         <div id="successBanner" class="hidden bg-emerald-50 border border-[#339933] text-emerald-900 rounded-2xl p-6 text-center shadow-sm mb-6">
             <div class="w-12 h-12 bg-[#006633] rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
@@ -48,6 +53,7 @@
             <h3 class="text-lg font-bold text-[#006633]">معلومات کامیابی کے ساتھ محفوظ ہو گئیں!</h3>
             <p class="text-sm text-emerald-700 mt-1">Data registry processed successfully!</p>
             
+            <!-- Auto Generated ID Display Block -->
             <div class="mt-4 p-4 bg-white rounded-xl border border-emerald-100 shadow-inner">
                 <p class="text-xs text-slate-500 font-semibold mb-1">آپ کا سسٹم ریفرنس نمبر (Profile ID)</p>
                 <div class="flex items-center justify-center space-x-2">
@@ -59,15 +65,18 @@
                 <span id="copyFeedback" class="text-[10px] text-[#006633] font-semibold block mt-1 opacity-0 transition duration-150">کاپی کر لیا گیا!</span>
             </div>
 
+            <!-- Dynamic Live Receipt Data Summary Table Inside Receipt Form View -->
             <div class="mt-5 border-t border-dashed border-emerald-300 pt-4 text-right direction-rtl text-sm">
                 <table class="w-full space-y-2">
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">صارف کا نام:</td><td id="receiptName" class="py-2 text-slate-800"></td></tr>
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">شناختی کارڈ:</td><td id="receiptCnic" class="py-2 text-slate-800 font-mono"></td></tr>
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">موبائل نمبر:</td><td id="receiptMobile" class="py-2 text-slate-800 font-mono"></td></tr>
+                    <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">یونین کونسل (UC):</td><td id="receiptUc" class="py-2 text-slate-800"></td></tr>
                     <tr><td class="py-2 font-bold text-[#004d26]">تاریخ اور وقت:</td><td id="receiptDateTime" class="py-2 text-slate-800 font-mono text-xs"></td></tr>
                 </table>
             </div>
 
+            <!-- Action Buttons for Formats -->
             <div class="mt-6 space-y-3">
                 <div class="grid grid-cols-2 gap-3">
                     <button type="button" id="printBtn" onclick="window.print()" class="w-full bg-[#006633] text-white font-bold py-3 px-2 rounded-xl text-xs shadow hover:bg-[#004d26] transition cursor-pointer flex items-center justify-center">
@@ -84,6 +93,7 @@
             </div>
         </div>
 
+        <!-- Progress Step Indicator Bar in Government Theme -->
         <div id="stepIndicatorBar" class="bg-white p-4 rounded-xl border border-slate-200 mb-4 flex justify-between items-center text-xs font-bold text-slate-400">
             <div id="ind-step3" class="px-2.5 py-1 rounded-full bg-slate-100">پتہ Matrix</div>
             <div class="h-0.5 bg-slate-200 flex-1 mx-2"></div>
@@ -92,12 +102,15 @@
             <div id="ind-step1" class="px-2.5 py-1 rounded-full bg-[#006633] text-white shadow-sm">بنیادی معلومات</div>
         </div>
 
+        <!-- Form Card Start -->
         <div id="formCard" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6">
             <form id="registryForm" onsubmit="handleFormSubmit(event)" class="space-y-6">
                 
+                <!-- Hidden Data Fields for Silent System Tracking -->
                 <input type="hidden" id="systemDate" name="systemDate">
                 <input type="hidden" id="systemTime" name="systemTime">
 
+                <!-- ================= STEP 1: BASIC INFO ================= -->
                 <div id="step1-container" class="space-y-6">
                     <div class="border-b border-slate-100 pb-3 mb-4">
                         <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 1 / 3</span>
@@ -125,7 +138,7 @@
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">موبائل نمبر (Mobile Number)</label>
                         <input type="tel" id="mobileNumber" maxlength="11" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-left bg-slate-50/50 font-mono" placeholder="03XXXXXXXXX">
-                        <span id="mobileError" class="text-xs text-red-600 text-right hidden">براہ کرم درست 11 ہندسوں کا موبائل نمبر لکھیں۔</span>
+                        <span id="mobileError" class="text-xs text-red-600 text-right hidden">براہ کرم درست 11 ہندسوں کا موبائل نمبر لکھ۔۔</span>
                     </div>
 
                     <div class="flex flex-col space-y-1.5">
@@ -171,6 +184,7 @@
                     </div>
                 </div>
 
+                <!-- ================= STEP 2: SOCIO-ECONOMIC MATRIX ================= -->
                 <div id="step2-container" class="space-y-6 hidden">
                     <div class="border-b border-slate-100 pb-3 mb-4">
                         <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 2 / 3</span>
@@ -201,7 +215,7 @@
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">کیا گھر میں کوئی معذور فرد موجود ہے؟</label>
                         <select id="disabilityStatus" onchange="toggleDisabilityField()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
-                            <option value="no">نّهیں (No)</option>
+                            <option value="no">نہیں (No)</option>
                             <option value="yes">ہاں (Yes)</option>
                         </select>
                     </div>
@@ -240,12 +254,14 @@
                     </div>
                 </div>
 
+                <!-- ================= STEP 3: ADDRESS MATRIX ================= -->
                 <div id="step3-container" class="space-y-6 hidden">
                     <div class="border-b border-slate-100 pb-3 mb-4">
                         <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 3 / 3</span>
                         <h2 class="text-xl font-extrabold text-[#006633] mt-2 text-right">مکمل رہائشی پتہ (Address Matrix)</h2>
                     </div>
 
+                    <!-- Province Dropdown -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">صوبہ (Province)</label>
                         <select id="provinceSelect" onchange="handleProvinceChange()" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
@@ -257,6 +273,7 @@
                         </select>
                     </div>
 
+                    <!-- Division Dropdown -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">ڈویژن (Division)</label>
                         <select id="divisionSelect" onchange="handleDivisionChange()" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
@@ -264,6 +281,7 @@
                         </select>
                     </div>
 
+                    <!-- District Dropdown -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">ضلع (District)</label>
                         <select id="districtSelect" onchange="handleDistrictChange()" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
@@ -271,10 +289,19 @@
                         </select>
                     </div>
 
+                    <!-- Tehsil Dropdown -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">تحصیل (Tehsil)</label>
-                        <select id="tehsilSelect" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
+                        <select id="tehsilSelect" onchange="handleTehsilChange()" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
                             <option value="">پہلے ضلع منتخب کریں</option>
+                        </select>
+                    </div>
+
+                    <!-- FIXED: Union Council Field Added Back into Logic Seamlessly -->
+                    <div class="flex flex-col space-y-1.5">
+                        <label class="text-sm font-semibold text-slate-700 text-right">یونین کونسل (Union Council / UC)</label>
+                        <select id="ucSelect" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
+                            <option value="">پہلے تحصیل منتخب کریں</option>
                         </select>
                     </div>
 
@@ -295,86 +322,78 @@
 
             </form>
         </div>
-        </div>
+        <!-- Form Card End -->
 
+    </div>
+
+    <!-- JavaScript Engine -->
     <script>
-        // SENIOR DEV FIX: Fully populated Pakistan NSER Address Matrix Mapping Data
-        const addressData = {
-            punjab: {
-                divisions: {
-                    sargodha: {
-                        name: "سرگودھا (Sargodha)",
-                        districts: {
-                            khushab: { name: "خوشاب (Khushab)", tehsils: ["خوشاب (Khushab)", "قائدآباد (Quaidabad)", "نوشہرہ (Nowshera)", "نورپورتھل"] },
-                            sargodha: { name: "سرگودھا (Sargodha)", tehsils: ["سرگودھا سٹی", "بھلوال", "شاہ پور", "سلانوالی"] },
-                            mianwali: { name: "میانوالی (Mianwali)", tehsils: ["میانوالی", "عیسیٰ خیل", "پپلاں"] },
-                            bhakkar: { name: "بھکر (Bhakkar)", tehsils: ["بھکر", "دریا خان", "منکیرہ"] }
-                        }
-                    },
-                    faisalabad: {
-                        name: "فیصل آباد (Faisalabad)",
-                        districts: {
-                            faisalabad: { name: "فیصل آباد (Faisalabad)", tehsils: ["فیصل آباد صدر", "فیصل آباد سٹی", "جڑانوالہ", "سمندری"] },
-                            jhang: { name: "جھنگ (Jhang)", tehsils: ["جھنگ", "شورکوٹ", "18 ہزاری"] }
-                        }
-                    }
+        // SENIOR DEV FIX: Flattened and robustly structured multi-province master address database
+        const provincesData = {
+            punjab: [
+                {
+                    divId: "sargodha", divName: "سرگودھا (Sargodha)",
+                    districts: [
+                        { distId: "khushab", distName: "خوشاب (Khushab)", tehsils: { "قائدآباد (Quaidabad)": ["UC-01", "UC-02", "UC-03"], "خوشاب (Khushab)": ["UC-04", "UC-05"], "نوشہرہ (Nowshera)": ["UC-06"], "نورپورتھل": ["UC-07"] } },
+                        { distId: "sargodha", distName: "سرگودھا (Sargodha)", tehsils: { "سرگودھا سٹی": ["UC-10", "UC-11"], "بھلوال": ["UC-12"], "شاہ پور": ["UC-13"] } },
+                        { distId: "mianwali", distName: "میانوالی (Mianwali)", tehsils: { "میانوالی": ["UC-20"], "عیسیٰ خیل": ["UC-21"] } }
+                    ]
+                },
+                {
+                    divId: "faisalabad", divName: "فیصل آباد (Faisalabad)",
+                    districts: [
+                        { distId: "faisalabad", distName: "فیصل آباد (Faisalabad)", tehsils: { "فیصل آباد صدر": ["UC-30", "UC-31"], "فیصل آباد سٹی": ["UC-32"], "جڑانوالہ": ["UC-33"] } },
+                        { distId: "jhang", distName: "جھنگ (Jhang)", tehsils: { "جھنگ": ["UC-35"], "شورکوٹ": ["UC-36"] } }
+                    ]
                 }
-            },
-            sindh: {
-                divisions: {
-                    karachi: {
-                        name: "کراچی (Karachi)",
-                        districts: {
-                            karachi_east: { name: "کراچی شرقی (East)", tehsils: ["گلشن اقبال", "جمشید کوارٹرز", "فیروز آباد"] },
-                            karachi_south: { name: "کراچی جنوبی (South)", tehsils: ["صدر", "آرام باغ", "سول لائنز"] },
-                            karachi_central: { name: "کراچی وسطی (Central)", tehsils: ["گلبرگ", "لیاقت آباد", "ناظم آباد"] }
-                        }
-                    },
-                    hyderabad: {
-                        name: "حیدرآباد (Hyderabad)",
-                        districts: {
-                            hyderabad: { name: "حیدرآباد (Hyderabad)", tehsils: ["حیدرآباد سٹی", "لطیف آباد", "قاسم آباد"] },
-                            matuari: { name: "مٹیاری (Matiari)", tehsils: ["مٹیاری", "ہالا", "سعید آباد"] },
-                            tando_allahyar: { name: "ٹنڈو اللہ یار", tehsils: ["ٹنڈو اللہ یار", "چمبر"] }
-                        }
-                    },
-                    sukkur: {
-                        name: "سکھر (Sukkur)",
-                        districts: {
-                            sukkur: { name: "سکھر (Sukkur)", tehsils: ["سکھر سٹی", "روہڑی", "پنو عاقل"] },
-                            ghotki: { name: "گھوٹکی (Ghotki)", tehsils: ["گھوٹکی", "اوباوڑو", "ڈھرکی"] }
-                        }
-                    }
+            ],
+            sindh: [
+                {
+                    divId: "karachi", divName: "کراچی (Karachi)",
+                    districts: [
+                        { distId: "karachi_east", distName: "کراچی شرقی (East)", tehsils: { "گلشن اقبال": ["UC-East-01", "UC-East-02"], "جمشید کوارٹرز": ["UC-East-03"] } },
+                        { distId: "karachi_south", distName: "کراچی جنوبی (South)", tehsils: { "صدر": ["UC-South-01"], "آرام باغ": ["UC-South-02"] } }
+                    ]
+                },
+                {
+                    divId: "hyderabad", divName: "حیدرآباد (Hyderabad)",
+                    districts: [
+                        { distId: "hyderabad", distName: "حیدرآباد (Hyderabad)", tehsils: { "حیدرآباد سٹی": ["UC-Hyd-01", "UC-Hyd-02"], "لطیف آباد": ["UC-Hyd-03"] } },
+                        { distId: "matiari", distName: "مٹیاری (Matiari)", tehsils: { "مٹیاری": ["UC-Mat-01"], "ہالا": ["UC-Mat-02"] } }
+                    ]
+                },
+                {
+                    divId: "sukkur", divName: "سکھر (Sukkur)",
+                    districts: [
+                        { distId: "sukkur", distName: "سکھر (Sukkur)", tehsils: { "سکھر سٹی": ["UC-Suk-01"], "روہڑی": ["UC-Suk-02"] } },
+                        { distId: "ghotki", distName: "گھوٹکی (Ghotki)", tehsils: { "گھوٹکی": ["UC-Ghot-01"], "اوباوڑو": ["UC-Ghot-02"] } }
+                    ]
                 }
-            },
-            kpk: {
-                divisions: {
-                    peshawar: {
-                        name: "پشاور (Peshawar)",
-                        districts: {
-                            peshawar: { name: "پشاور (Peshawar)", tehsils: ["پشاور سٹی", "شاہ عالم", "متنی"] },
-                            charsadda: { name: "چارسدہ (Charsadda)", tehsils: ["چارسدہ", "شبقدر", "تنگی"] }
-                        }
-                    },
-                    malakand: {
-                        name: "مالاکنڈ (Malakand)",
-                        districts: {
-                            swat: { name: "سوات (Swat)", tehsils: ["بابوزئی", "بریکوٹ", "مٹہ", "خواہ زہ خیل"] },
-                            mardan: { name: "مردان (Mardan)", tehsils: ["مردان سٹی", "تخت بھائی", "کاٹلنگ"] }
-                        }
-                    }
+            ],
+            kpk: [
+                {
+                    divId: "peshawar", divName: "پشاور (Peshawar)",
+                    districts: [
+                        { distId: "peshawar", distName: "پشاور (Peshawar)", tehsils: { "پشاور سٹی": ["UC-Pesh-01"], "متنی": ["UC-Pesh-02"] } },
+                        { distId: "charsadda", distName: "چارسدہ (Charsadda)", tehsils: { "چارسدہ": ["UC-Char-01"], "شبقدر": ["UC-Char-02"] } }
+                    ]
+                },
+                {
+                    divId: "malakand", divName: "مالاکنڈ (Malakand)",
+                    districts: [
+                        { distId: "swat", distName: "سوات (Swat)", tehsils: { "بابوزئی": ["UC-Swat-01"], "مٹہ": ["UC-Swat-02"] } },
+                        { distId: "mardan", distName: "مردان (Mardan)", tehsils: { "مردان سٹی": ["UC-Mard-01"], "تخت بھائی": ["UC-Mard-02"] } }
+                    ]
                 }
-            },
-            balochistan: {
-                divisions: {
-                    quetta: {
-                        name: "کوئٹہ (Quetta)",
-                        districts: {
-                            quetta: { name: "کوئٹہ (Quetta)", tehsils: ["کوئٹہ سٹی", "چلتن", "صدر"] }
-                        }
-                    }
+            ],
+            balochistan: [
+                {
+                    divId: "quetta", divName: "کوئٹہ (Quetta)",
+                    districts: [
+                        { distId: "quetta", distName: "کوئٹہ (Quetta)", tehsils: { "کوئٹہ سٹی": ["UC-Qta-01"], "صدر": ["UC-Qta-02"] } }
+                    ]
                 }
-            }
+            ]
         };
 
         let currentStep = 1;
@@ -440,7 +459,7 @@
             document.getElementById("disabilityNatureSection").classList.toggle("hidden", status !== "yes");
         }
 
-        // MATRIX LOGIC RE-ENGINEERED
+        // FIXED MATRIX LOGIC: Perfectly reactive drop-down listeners
         function handleProvinceChange() {
             const province = document.getElementById("provinceSelect").value;
             const divisionSelect = document.getElementById("divisionSelect");
@@ -448,53 +467,87 @@
             divisionSelect.innerHTML = '<option value="">ڈویژن منتخب کریں</option>';
             document.getElementById("districtSelect").innerHTML = '<option value="">پہلے ڈویژن منتخب کریں</option>';
             document.getElementById("tehsilSelect").innerHTML = '<option value="">پہلے ضلع منتخب کریں</option>';
+            document.getElementById("ucSelect").innerHTML = '<option value="">پہلے تحصیل منتخب کریں</option>';
 
-            if (province && addressData[province]) {
-                const divisions = addressData[province].divisions;
-                for (const key in divisions) {
+            if (province && provincesData[province]) {
+                provincesData[province].forEach(div => {
                     const opt = document.createElement("option");
-                    opt.value = key;
-                    opt.innerText = divisions[key].name;
+                    opt.value = div.divId;
+                    opt.innerText = div.divName;
                     divisionSelect.appendChild(opt);
-                }
+                });
             }
         }
 
         function handleDivisionChange() {
             const province = document.getElementById("provinceSelect").value;
-            const division = document.getElementById("divisionSelect").value;
+            const divisionId = document.getElementById("divisionSelect").value;
             const districtSelect = document.getElementById("districtSelect");
 
             districtSelect.innerHTML = '<option value="">ضلع منتخب کریں</option>';
             document.getElementById("tehsilSelect").innerHTML = '<option value="">پہلے ضلع منتخب کریں</option>';
+            document.getElementById("ucSelect").innerHTML = '<option value="">پہلے تحصیل منتخب کریں</option>';
 
-            if (province && division && addressData[province].divisions[division]) {
-                const districts = addressData[province].divisions[division].districts;
-                for (const key in districts) {
-                    const opt = document.createElement("option");
-                    opt.value = key;
-                    opt.innerText = districts[key].name;
-                    districtSelect.appendChild(opt);
+            if (province && divisionId && provincesData[province]) {
+                const targetDiv = provincesData[province].find(d => d.divId === divisionId);
+                if (targetDiv && targetDiv.districts) {
+                    targetDiv.districts.forEach(dist => {
+                        const opt = document.createElement("option");
+                        opt.value = dist.distId;
+                        opt.innerText = dist.distName;
+                        districtSelect.appendChild(opt);
+                    });
                 }
             }
         }
 
         function handleDistrictChange() {
             const province = document.getElementById("provinceSelect").value;
-            const division = document.getElementById("divisionSelect").value;
-            const district = document.getElementById("districtSelect").value;
+            const divisionId = document.getElementById("divisionSelect").value;
+            const districtId = document.getElementById("districtSelect").value;
             const tehsilSelect = document.getElementById("tehsilSelect");
 
             tehsilSelect.innerHTML = '<option value="">تحصیل منتخب کریں</option>';
+            document.getElementById("ucSelect").innerHTML = '<option value="">پہلے تحصیل منتخب کریں</option>';
 
-            if (province && division && district && addressData[province].divisions[division].districts[district]) {
-                const tehsils = addressData[province].divisions[division].districts[district].tehsils;
-                tehsils.forEach(tehsilName => {
-                    const opt = document.createElement("option");
-                    opt.value = tehsilName;
-                    opt.innerText = tehsilName;
-                    tehsilSelect.appendChild(opt);
-                });
+            if (province && divisionId && districtId && provincesData[province]) {
+                const targetDiv = provincesData[province].find(d => d.divId === divisionId);
+                if (targetDiv) {
+                    const targetDist = targetDiv.districts.find(dst => dst.distId === districtId);
+                    if (targetDist && targetDist.tehsils) {
+                        for (const tehsilName in targetDist.tehsils) {
+                            const opt = document.createElement("option");
+                            opt.value = tehsilName;
+                            opt.innerText = tehsilName;
+                            tehsilSelect.appendChild(opt);
+                        }
+                    }
+                }
+            }
+        }
+
+        function handleTehsilChange() {
+            const province = document.getElementById("provinceSelect").value;
+            const divisionId = document.getElementById("divisionSelect").value;
+            const districtId = document.getElementById("districtSelect").value;
+            const tehsilName = document.getElementById("tehsilSelect").value;
+            const ucSelect = document.getElementById("ucSelect");
+
+            ucSelect.innerHTML = '<option value="">یونین کونسل منتخب کریں</option>';
+
+            if (province && divisionId && districtId && tehsilName && provincesData[province]) {
+                const targetDiv = provincesData[province].find(d => d.divId === divisionId);
+                if (targetDiv) {
+                    const targetDist = targetDiv.districts.find(dst => dst.distId === districtId);
+                    if (targetDist && targetDist.tehsils && targetDist.tehsils[tehsilName]) {
+                        targetDist.tehsils[tehsilName].forEach(uc => {
+                            const opt = document.createElement("option");
+                            opt.value = uc;
+                            opt.innerText = uc;
+                            ucSelect.appendChild(opt);
+                        });
+                    }
+                }
             }
         }
 
@@ -517,6 +570,7 @@
             document.getElementById("receiptName").innerText = document.getElementById("fullName").value;
             document.getElementById("receiptCnic").innerText = document.getElementById("cnicNumber").value;
             document.getElementById("receiptMobile").innerText = document.getElementById("mobileNumber").value;
+            document.getElementById("receiptUc").innerText = document.getElementById("ucSelect").value;
             document.getElementById("receiptDateTime").innerText = `${now.toLocaleTimeString()} @ ${now.toISOString().split('T')[0]}`;
             
             submitBtn.disabled = false;
@@ -531,7 +585,6 @@
             });
         }
 
-        // SENIOR PRO FIX: No hidden elements, prints/saves the direct view container flawlessly
         function downloadReceiptImage() {
             const element = document.getElementById('successBanner');
             const imageBtn = document.getElementById('imageBtn');
@@ -539,9 +592,6 @@
 
             imageBtn.disabled = true;
             imageBtnText.innerText = "تصویر بن رہی ہے...";
-
-            // Temporary padding optimizations for standard high-res image look
-            const originalClassName = element.className;
             
             setTimeout(() => {
                 html2canvas(element, {
