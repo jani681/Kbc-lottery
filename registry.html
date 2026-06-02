@@ -54,7 +54,7 @@
             
             <!-- Auto Generated ID Display Block -->
             <div class="mt-4 p-4 bg-white rounded-xl border border-emerald-100 shadow-inner">
-                <p class="text-xs text-slate-500 font-semibold mb-1">آپ کا سسٹم ریفرنس نمبر (Profile ID)</p>
+                <p class="text-xs text-slate-500 font-semibold mb-1">آپ کا systeem ریفرنس نمبر (Profile ID)</p>
                 <div class="flex items-center justify-center space-x-2">
                     <span id="displayProfileId" class="text-xl font-mono font-bold text-slate-900 tracking-wider"></span>
                     <button type="button" onclick="copyProfileId()" class="p-1.5 hover:bg-slate-100 rounded-lg transition text-slate-500 hover:text-[#006633]" title="Copy ID" data-html2canvas-ignore="true">
@@ -71,6 +71,7 @@
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">شناختی کارڈ:</td><td id="receiptCnic" class="py-2 text-slate-800 font-mono"></td></tr>
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">موبائل نمبر:</td><td id="receiptMobile" class="py-2 text-slate-800 font-mono"></td></tr>
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">یونین کونسل (UC):</td><td id="receiptUc" class="py-2 text-slate-800"></td></tr>
+                    <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">شناختی کارڈ پتہ:</td><td id="receiptCnicAddress" class="py-2 text-slate-800 text-xs"></td></tr>
                     <tr><td class="py-2 font-bold text-[#004d26]">تاریخ اور وقت:</td><td id="receiptDateTime" class="py-2 text-slate-800 font-mono text-xs"></td></tr>
                 </table>
             </div>
@@ -331,6 +332,12 @@
                         <select id="tehsilSelect" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
                             <option value="">پہلے ضلع منتخب کریں</option>
                         </select>
+                    </div>
+
+                    <!-- New Field: CNIC Address added elegantly -->
+                    <div class="flex flex-col space-y-1.5">
+                        <label class="text-sm font-semibold text-slate-700 text-right">شناختی کارڈ پر درج پتہ (Address as per CNIC)</label>
+                        <textarea id="cnicAddressInput" required rows="2" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 resize-none" placeholder="شناختی کارڈ والا مکمل پتہ یہاں لکھیں..."></textarea>
                     </div>
 
                     <!-- Union Council Manual Field Fixed -->
@@ -595,6 +602,7 @@
             document.getElementById("receiptCnic").innerText = document.getElementById("cnicNumber").value;
             document.getElementById("receiptMobile").innerText = document.getElementById("mobileNumber").value;
             document.getElementById("receiptUc").innerText = document.getElementById("ucManualInput").value;
+            document.getElementById("receiptCnicAddress").innerText = document.getElementById("cnicAddressInput").value;
             document.getElementById("receiptDateTime").innerText = `${now.toLocaleTimeString()} @ ${now.toISOString().split('T')[0]}`;
             
             submitBtn.disabled = false;
@@ -625,7 +633,6 @@
                     backgroundColor: "#f8fafc",
                     logging: false,
                     ignoreElements: function(el) {
-                        // Ignore buttons inside the banner while capturing image
                         return el.getAttribute('data-html2canvas-ignore') === 'true';
                     }
                 }).then(canvas => {
