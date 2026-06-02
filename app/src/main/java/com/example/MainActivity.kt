@@ -35,13 +35,13 @@ import androidx.compose.ui.window.DialogProperties
 import org.json.JSONArray
 import org.json.JSONObject
 
-// Firebase Realtime Database Components
+// Safe Firebase Core Realtime Data Binding Components
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
-// Data Models
+// Base Data Structures (Strictly Preserved)
 data class LocalPrankModel(
     val id: Long,
     val victimName: String,
@@ -178,7 +178,7 @@ fun KbcPrankApp() {
     val onlineRegistrations = remember { mutableStateListOf<OnlineRegistryModel>() }
     var pendingNotificationsCount by remember { mutableStateOf(0) }
 
-    // Load Local History safely
+    // Sync Local Persistent Store History Data
     LaunchedEffect(Unit) {
         val savedJson = sharedPreferences.getString("prank_list_json", "[]") ?: "[]"
         try {
@@ -199,7 +199,7 @@ fun KbcPrankApp() {
         }
     }
 
-    // Realtime Firebase Snapshots Synchronizer
+    // Live Realtime Synchronization Hook
     LaunchedEffect(Unit) {
         try {
             val databaseRef = FirebaseDatabase.getInstance().getReference("registrations")
@@ -230,7 +230,7 @@ fun KbcPrankApp() {
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Toast.makeText(context, "Database Sync Failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Database Connection Interrupted", Toast.LENGTH_SHORT).show()
                 }
             })
         } catch (e: Exception) {
@@ -251,7 +251,7 @@ fun KbcPrankApp() {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header Box
+            // Main Dashboard App Bar Configuration
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -304,7 +304,7 @@ fun KbcPrankApp() {
                 }
             }
 
-            // Tab Buttons
+            // Tab Navigation System
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -338,7 +338,7 @@ fun KbcPrankApp() {
                 }
             }
 
-            // Panel Switcher
+            // Interface Rendering Router Switch
             if (currentPanel == "generator") {
                 Card(
                     modifier = Modifier
@@ -519,7 +519,7 @@ fun KbcPrankApp() {
             }
         }
 
-        // Dialog Pop-up
+        // Overlay Feedback Component System
         if (showSuccessDialog) {
             Dialog(
                 onDismissRequest = { showSuccessDialog = false },
@@ -694,7 +694,6 @@ fun OnlineRegistryItemCard(registry: OnlineRegistryModel, context: Context) {
             }
             
             Spacer(modifier = Modifier.height(6.dp))
-            // Stable Custom Divider Line
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
