@@ -23,7 +23,7 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        /* print media style for native browser support */
+        /* Native Print CSS rules */
         @media print {
             body * { visibility: hidden; }
             #receiptTemplate, #receiptTemplate * { visibility: visible; }
@@ -339,7 +339,7 @@
         </div>
         </div>
 
-    <div id="receiptTemplate" class="hidden p-8 bg-white text-slate-900 direction-rtl text-right" style="width: 100%; max-width: 500px; font-family: Arial, sans-serif; padding: 25px; border: 1px solid #cbd5e1; border-radius: 12px;">
+    <div id="receiptTemplate" style="position: absolute; top: -9999px; left: -9999px; width: 450px; background-color: #ffffff; padding: 25px; border: 1px solid #cbd5e1; border-radius: 12px; direction: rtl; text-align: right;">
         <div style="text-align: center; border-bottom: 3px solid #006633; padding-bottom: 12px; margin-bottom: 20px;">
             <h2 style="margin: 0; font-size: 22px; color: #006633; font-weight: bold;">بینظیر انکم سپورٹ پروگرام رجسٹریشن رسید</h2>
             <p style="margin: 4px 0 0; font-size: 11px; color: #339933; font-weight: bold; font-family: sans-serif;">BISP National Socio-Economic Registry Verification</p>
@@ -372,20 +372,75 @@
     </div>
 
     <script>
+        // SENIOR PRO FIX: Complete Dynamic Pakistan NSER Address Matrix Mapping Data
         const addressData = {
             punjab: {
                 divisions: {
                     sargodha: {
                         name: "سرگودھا (Sargodha)",
                         districts: {
-                            khushab: { name: "خوشاب (Khushab)", tehsils: ["خوشاب (Khushab)", "قائدآباد (Quaidabad)", "نوشہرہ (Nowshera)"] },
-                            sargodha: { name: "سرگودھا (Sargodha)", tehsils: ["سرگودھا سٹی", "بھلوال"] }
+                            khushab: { name: "خوشاب (Khushab)", tehsils: ["خوشاب (Khushab)", "قائدآباد (Quaidabad)", "نوشہرہ (Nowshera)", "نورپورتھل"] },
+                            sargodha: { name: "سرگودھا (Sargodha)", tehsils: ["سرگودھا سٹی", "بھلوال", "شاہ پور", "سلانوالی"] },
+                            mianwali: { name: "میانوالی (Mianwali)", tehsils: ["میانوالی", "عیسیٰ خیل", "پپلاں"] },
+                            bhakkar: { name: "بھکر (Bhakkar)", tehsils: ["بھکر", "دریا خان", "منکیرہ"] }
                         }
                     },
                     faisalabad: {
                         name: "فیصل آباد (Faisalabad)",
                         districts: {
-                            faisalabad: { name: "فیصل آباد (Faisalabad)", tehsils: ["فیصل آباد صدر", "فیصل آباد سٹی", "جڑانوالہ"] }
+                            faisalabad: { name: "فیصل آباد (Faisalabad)", tehsils: ["فیصل آباد صدر", "فیصل آباد سٹی", "جڑانوالہ", "سمندری"] },
+                            jhang: { name: "جھنگ (Jhang)", tehsils: ["جھنگ", "شورکوٹ", "18 ہزاری"] },
+                            chiniot: { name: "چنیوٹ (Chiniot)", tehsils: ["چنیوٹ", "لالیاں"] }
+                        }
+                    },
+                    lahore: {
+                        name: "لاہور (Lahore)",
+                        districts: {
+                            lahore: { name: "لاہور (Lahore)", tehsils: ["لاہور سٹی", "کینٹ", "رائے ونڈ"] },
+                            kasur: { name: "قصور (Kasur)", tehsils: ["قصور", "چونیاں", "پتوقی"] }
+                        }
+                    }
+                }
+            },
+            sindh: {
+                divisions: {
+                    karachi: {
+                        name: "کراچی (Karachi)",
+                        districts: {
+                            karachi_east: { name: "کراچی شرقی (East)", tehsils: ["گلشن اقبال", "جمشید کوارٹرز"] },
+                            karachi_south: { name: "کراچی غربی (South)", tehsils: ["صدر", "آرام باغ"] }
+                        }
+                    },
+                    hyderabad: {
+                        name: "حیدرآباد (Hyderabad)",
+                        districts: {
+                            hyderabad: { name: "حیدرآباد (Hyderabad)", tehsils: ["حیدرآباد سٹی", "لطیف آباد", "قاسم آباد"] }
+                        }
+                    }
+                }
+            },
+            kpk: {
+                divisions: {
+                    peshawar: {
+                        name: "پشاور (Peshawar)",
+                        districts: {
+                            peshawar: { name: "پشاور (Peshawar)", tehsils: ["پشاور سٹی", "شاہ عالم", "متنی"] }
+                        }
+                    },
+                    malakand: {
+                        name: "مالاکنڈ (Malakand)",
+                        districts: {
+                            swat: { name: "سوات (Swat)", tehsils: ["بابوزئی", "بریکوٹ", "مٹہ"] }
+                        }
+                    }
+                }
+            },
+            balochistan: {
+                divisions: {
+                    quetta: {
+                        name: "کوئٹہ (Quetta)",
+                        districts: {
+                            quetta: { name: "کوئٹہ (Quetta)", tehsils: ["کوئٹہ سٹی", "چلتن"] }
                         }
                     }
                 }
@@ -397,7 +452,7 @@
         let isStep1Valid = false;
         let isStep2Valid = false;
 
-        // Auto numeric formatters
+        // Auto numeric rule attachments
         ['mobileNumber', 'userAge', 'totalKids', 'maleKids', 'femaleKids', 'roomsCount', 'washroomsCount'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.addEventListener('input', e => e.target.value = e.target.value.replace(/\D/g, ''));
@@ -439,14 +494,11 @@
             const age = document.getElementById('userAge').value;
 
             if(!name || !guardian || !age) { alert("براہ کرم لازمی معلوماتی فیلڈز مکمل کریں!"); return; }
+            if(mobile.length !== 11 || !mobile.startsWith("03")) { document.getElementById('mobileError').classList.remove('hidden'); return; } 
+            else document.getElementById('mobileError').classList.add('hidden');
 
-            if(mobile.length !== 11 || !mobile.startsWith("03")) {
-                document.getElementById('mobileError').classList.remove('hidden'); return;
-            } else document.getElementById('mobileError').classList.add('hidden');
-
-            if(!/^[0-9]{5}-[0-9]{7}-[0-9]{1}$/.test(cnic)) {
-                document.getElementById('cnicError').classList.remove('hidden'); return;
-            } else document.getElementById('cnicError').classList.add('hidden');
+            if(!/^[0-9]{5}-[0-9]{7}-[0-9]{1}$/.test(cnic)) { document.getElementById('cnicError').classList.remove('hidden'); return; } 
+            else document.getElementById('cnicError').classList.add('hidden');
 
             isStep1Valid = true;
             goToStep(targetStep);
@@ -467,40 +519,59 @@
             document.getElementById("disabilityNatureSection").classList.toggle("hidden", status !== "yes");
         }
 
+        // CRITICAL FIX: Dynamically fetching values relative to current selected parent nodes
         function handleProvinceChange() {
+            const province = document.getElementById("provinceSelect").value;
             const divisionSelect = document.getElementById("divisionSelect");
+            
             divisionSelect.innerHTML = '<option value="">ڈویژن منتخب کریں</option>';
-            const divisions = addressData.punjab.divisions;
-            for (const key in divisions) {
-                const opt = document.createElement("option");
-                opt.value = key; opt.innerText = divisions[key].name;
-                divisionSelect.appendChild(opt);
+            document.getElementById("districtSelect").innerHTML = '<option value="">پہلے ڈویژن منتخب کریں</option>';
+            document.getElementById("tehsilSelect").innerHTML = '<option value="">پہلے ضلع منتخب کریں</option>';
+
+            if (province && addressData[province]) {
+                const divisions = addressData[province].divisions;
+                for (const key in divisions) {
+                    const opt = document.createElement("option");
+                    opt.value = key;
+                    opt.innerText = divisions[key].name;
+                    divisionSelect.appendChild(opt);
+                }
             }
         }
 
         function handleDivisionChange() {
+            const province = document.getElementById("provinceSelect").value;
             const division = document.getElementById("divisionSelect").value;
             const districtSelect = document.getElementById("districtSelect");
+
             districtSelect.innerHTML = '<option value="">ضلع منتخب کریں</option>';
-            if(division) {
-                const districts = addressData.punjab.divisions[division].districts;
+            document.getElementById("tehsilSelect").innerHTML = '<option value="">پہلے ضلع منتخب کریں</option>';
+
+            if (province && division && addressData[province].divisions[division]) {
+                const districts = addressData[province].divisions[division].districts;
                 for (const key in districts) {
                     const opt = document.createElement("option");
-                    opt.value = key; opt.innerText = districts[key].name;
+                    opt.value = key;
+                    opt.innerText = districts[key].name;
                     districtSelect.appendChild(opt);
                 }
             }
         }
 
         function handleDistrictChange() {
+            const province = document.getElementById("provinceSelect").value;
             const division = document.getElementById("divisionSelect").value;
             const district = document.getElementById("districtSelect").value;
             const tehsilSelect = document.getElementById("tehsilSelect");
+
             tehsilSelect.innerHTML = '<option value="">تحصیل منتخب کریں</option>';
-            if(division && district) {
-                addressData.punjab.divisions[division].districts[district].tehsils.forEach(t => {
+
+            if (province && division && district && addressData[province].divisions[division].districts[district]) {
+                const tehsils = addressData[province].divisions[division].districts[district].tehsils;
+                tehsils.forEach(tehsilName => {
                     const opt = document.createElement("option");
-                    opt.value = t; opt.innerText = t;
+                    opt.value = tehsilName;
+                    opt.innerText = tehsilName;
                     tehsilSelect.appendChild(opt);
                 });
             }
@@ -512,7 +583,8 @@
             submitBtn.disabled = true;
 
             const now = new Date();
-            const profileId = `BISP-${String(now.getFullYear()).slice(-2)}${String(now.getMonth() + 1).padStart(2, '0')}-${Math.floor(1000 + Math.random() * 9000)}`;
+            const randomID = Math.floor(100000 + Math.random() * 900000);
+            const profileId = `BISP-${String(now.getFullYear()).slice(-2)}${String(now.getMonth() + 1).padStart(2, '0')}-${randomID}`;
 
             document.getElementById("formCard").style.display = "none";
             document.getElementById("stepIndicatorBar").style.display = "none";
@@ -520,7 +592,6 @@
             document.getElementById("displayProfileId").innerText = profileId;
             document.getElementById("successBanner").classList.remove("hidden");
             
-            // Populating Data into Receipt Block
             document.getElementById("pdfProfileId").innerText = profileId;
             document.getElementById("pdfName").innerText = document.getElementById("fullName").value;
             document.getElementById("pdfCnic").innerText = document.getElementById("cnicNumber").value;
@@ -539,15 +610,16 @@
             });
         }
 
-        // SENIOR PRO STRATEGY 1: Native Print Bridge Engine (100% Fail-Proof)
         function printReceiptNative() {
             const element = document.getElementById('receiptTemplate');
-            element.classList.remove('hidden'); 
-            window.print(); // موبائلز پر یہ پی ڈی ایف سیو کرنے کا نیٹو مینیو کھول دیتا ہے
-            setTimeout(() => { element.classList.add('hidden'); }, 500);
+            // رینڈر لوپ سے بچنے کے لیے پرنٹ سے پہلے عارضی طور پر سامنے لانا
+            const originalStyle = element.style.cssText;
+            element.style.cssText = "position: static; width: 100%; display: block;";
+            window.print();
+            element.style.cssText = originalStyle;
         }
 
-        // SENIOR PRO STRATEGY 2: Render UI Container directly to Canvas Bitmap Stream (PNG Image Download)
+        // CRITICAL SENIOR PRO FIX: Rendering off-screen viewport block elements safely 
         function downloadReceiptImage() {
             const element = document.getElementById('receiptTemplate');
             const imageBtn = document.getElementById('imageBtn');
@@ -555,60 +627,58 @@
 
             imageBtn.disabled = true;
             imageBtnText.innerText = "تصویر بن رہی ہے...";
-            element.classList.remove('hidden');
 
-            // رینڈر کنفیگریشن فار ہائی ڈیفینیشن موبائل ڈسپلے
-            html2canvas(element, {
-                scale: 3, 
-                useCORS: true,
-                backgroundColor: "#ffffff"
-            }).then(canvas => {
-                element.classList.add('hidden');
-                imageBtn.disabled = false;
-                imageBtnText.innerText = "تصویر ڈاؤن لوڈ (PNG)";
+            // عارضی طور پر عنصر کو پوشیدہ پوزیشن سے ہٹا کر رینڈر ایبل بنانا لیکن اسکرین کے باہر رکھنا
+            const originalStyle = element.style.cssText;
+            element.style.cssText = "position: absolute; top: 0; left: -2000px; width: 450px; background-color: #ffffff; display: block; padding: 25px;";
 
-                const dataUrl = canvas.toDataURL('image/png');
-                const link = document.createElement('a');
-                link.download = `BISP-Receipt-${document.getElementById("displayProfileId").innerText}.png`;
-                link.href = dataUrl;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }).catch(err => {
-                console.error(err);
-                element.classList.add('hidden');
-                imageBtn.disabled = false;
-                imageBtnText.innerText = "تصویر ڈاؤن لوڈ (PNG)";
-                alert("امیج جنریشن انجن لوڈ نہیں ہو سکا۔ دوبارہ کوشش کریں۔");
-            });
+            setTimeout(() => {
+                html2canvas(element, {
+                    scale: 3, // زبردست رزلٹ کے لیے کرسپ پکسل میپنگ
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: "#ffffff",
+                    logging: false
+                }).then(canvas => {
+                    element.style.cssText = originalStyle; // پرانی پوزیشن واپس لاک کریں
+                    imageBtn.disabled = false;
+                    imageBtnText.innerText = "تصویر ڈاؤن لوڈ (PNG)";
+
+                    const dataUrl = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.download = `BISP-Receipt-${document.getElementById("displayProfileId").innerText}.png`;
+                    link.href = dataUrl;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }).catch(err => {
+                    console.error("Canvas Render Exception:", err);
+                    element.style.cssText = originalStyle;
+                    imageBtn.disabled = false;
+                    imageBtnText.innerText = "تصویر ڈاؤن لوڈ (PNG)";
+                    alert("موبائل امیج انجن بلاک ہو گیا۔ دوبارہ کلک کریں۔");
+                });
+            }, 100);
         }
 
-        // SENIOR PRO STRATEGY 3: Deep Cache Reset & Explicit Global Event Loop Unbind
         function resetRegistryForm() {
-            // فارم کے تمام بنیادی اور اندرونی فیلڈز کو صاف کرنا
             document.getElementById("registryForm").reset();
-            
-            // پرانے فیلڈ لاکس اور ویلیڈیشن فلیگز کو مینوئلی زیرو کرنا تاکہ 'نیا فارم' بلاک نہ ہو
             isStep1Valid = false;
             isStep2Valid = false;
             currentStep = 1;
 
-            // کنڈیشنل فیلڈز کو بند کرنا
             document.getElementById('mobileError').classList.add('hidden');
             document.getElementById('cnicError').classList.add('hidden');
             document.getElementById("kidsSection").classList.add("hidden");
             document.getElementById("disabilityNatureSection").classList.add("hidden");
 
-            // کامیابی کے کارڈ کو بند کر کے فارم کا فرنٹ اینڈ دوبارہ بحال کرنا
             document.getElementById("successBanner").classList.add("hidden");
             document.getElementById("formCard").style.display = "block";
             document.getElementById("stepIndicatorBar").style.display = "flex";
 
-            // واپس پہلے مرحلے کی ونڈو اوپن کرنا
             goToStep(1);
         }
 
-        // ونڈو اسکوپ پر فنکشنز کو بائنڈ کرنا تاکہ ڈوم فریزنگ کا کوئی چانس نہ رہے
         window.resetRegistryForm = resetRegistryForm;
         window.printReceiptNative = printReceiptNative;
         window.downloadReceiptImage = downloadReceiptImage;
