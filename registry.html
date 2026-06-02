@@ -27,10 +27,8 @@ export default function BISPPortal() {
   const [showReceipt, setShowReceipt] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   
-  // ریسیٹ کارڈ کو ٹارگٹ کرنے کے لیے ریفرنس
   const receiptRef = useRef(null);
 
-  // صوبوں کے مطابق ڈویژنز کا ڈیٹا
   const locationData = {
     Punjab: ["Sargodha", "Faisalabad", "Lahore", "Rawalpindi", "Multan", "Gufranwala", "Bahawalpur", "Dera Ghazi Khan", "Sahiwal"],
     Sindh: ["Karachi", "Hyderabad", "Sukkur", "Larkana", "Mirpur Khas", "Shaheed Benazirabad"],
@@ -67,35 +65,28 @@ export default function BISPPortal() {
     setShowReceipt(true);
   };
 
-  // متبادل ڈاؤن لوڈ لاجک جو موبائل براؤزرز پر فیل نہیں ہوگا
   const downloadReceiptImage = async () => {
     if (!receiptRef.current || isGeneratingImage) return;
 
     setIsGeneratingImage(true);
 
     try {
-      // 1. عارضی طور پر اسکیلنگ اور رینڈرنگ کو بہتر بنانے کے لیے کنفیگریشنز
       const options = {
-        scale: 2, // موبائل ریم پر دباؤ کم کرنے کے لیے اسکیل 2 رکھا ہے جو کہ ایچ ڈی رزلٹ دیتا ہے
+        scale: 2,
         useCORS: true,
         allowTaint: true,
         backgroundColor: "#ffffff",
         logging: false,
         scrollX: 0,
-        scrollY: -window.scrollY, // اسکرول پوزیشن کا مسئلہ حل کرنے کے لیے
+        scrollY: -window.scrollY,
         windowWidth: receiptRef.current.scrollWidth,
         windowHeight: receiptRef.current.scrollHeight
       };
 
-      // موبائل پروسیسر کو رینڈرنگ کے لیے 100ms کا وقت دیں
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 150));
 
       const canvas = await html2canvas(receiptRef.current, options);
       
-      // ڈیٹا یو آر ایل بنانا
-      const dataUrl = canvas.toDataURL("image/png");
-
-      // 2. بلاب (Blob) میتھڈ کا استعمال تاکہ موبائل کروم یا سفاری ڈاؤن لوڈ بلاک نہ کرے
       canvas.toBlob((blob) => {
         if (!blob) {
           alert("ڈاؤن لوڈ فائل جنریٹ نہیں ہو سکی، دوبارہ کلک کریں۔");
@@ -111,22 +102,20 @@ export default function BISPPortal() {
         document.body.appendChild(link);
         link.click();
         
-        // میموری کلین اپ
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
         setIsGeneratingImage(false);
       }, "image/png");
 
     } catch (error) {
-      console.error("Image Generation Error:", error);
-      alert("ڈاؤن لوڈنگ میں تعطل آیا۔ براہ کرم ایک بار پھر بٹن دبائیں۔");
+      console.error(error);
+      alert("ڈاؤن لوڈنگ میں تعطل آیا۔ دوبارہ کلک کریں۔");
       setIsGeneratingImage(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-start pb-10" dir="rtl">
-      {/* ہیڈر پورٹل */}
       <div className="w-full bg-emerald-800 text-white py-6 px-4 text-center shadow-md mb-6">
         <h1 className="text-2xl font-bold font-sans">صارف پروفائل رجسٹری</h1>
         <p className="text-xs text-emerald-200 mt-1">Benazir Income Support Programme Portal</p>
@@ -135,7 +124,6 @@ export default function BISPPortal() {
       <div className="w-full max-w-md px-4">
         {!showReceipt ? (
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            {/* پروگریس بار */}
             <div className="flex items-center justify-between mb-6 text-xs text-gray-400 border-b border-gray-100 pb-4">
               <span className={`px-3 py-1 rounded-full ${step === 1 ? "bg-emerald-50 text-emerald-700 font-bold border border-emerald-200" : "bg-gray-50 text-gray-400"}`}>بنیادی معلومات</span>
               <span className="h-[1px] bg-gray-200 flex-1 mx-2"></span>
@@ -149,7 +137,6 @@ export default function BISPPortal() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              {/* اسٹیپ 1: بنیادی معلومات */}
               {step === 1 && (
                 <div className="space-y-4">
                   <h2 className="text-lg font-bold text-gray-800 mb-2">خاندانی اور بنیادی معلومات</h2>
@@ -223,7 +210,6 @@ export default function BISPPortal() {
                 </div>
               )}
 
-              {/* اسٹیپ 2: معاشی معلومات */}
               {step === 2 && (
                 <div className="space-y-4">
                   <h2 className="text-lg font-bold text-gray-800 mb-2">معاشی اور رہائشی معلومات</h2>
@@ -310,7 +296,6 @@ export default function BISPPortal() {
                 </div>
               )}
 
-              {/* اسٹیپ 3: پتہ معلومات */}
               {step === 3 && (
                 <div className="space-y-4">
                   <h2 className="text-lg font-bold text-gray-800 mb-2">(Address Matrix) مکمل رہائشی پتہ</h2>
@@ -403,7 +388,6 @@ export default function BISPPortal() {
                 </div>
               )}
 
-              {/* نیویگیشن بٹنز */}
               <div className="flex gap-3 pt-2">
                 {step > 1 && (
                   <button
@@ -435,12 +419,10 @@ export default function BISPPortal() {
             </form>
           </div>
         ) : (
-          /* سکسیس کارڈ اور ڈاؤن لوڈ ایبل ریسیٹ سیکشن */
           <div className="space-y-4">
-            {/* کامیابی کا سٹیٹس کارڈ */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-emerald-100 text-center space-y-4">
-              <div className="w-12 h-12 bg-emerald-700 text-white rounded-full flex items-center justify-start mx-auto shadow-md">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <div className="w-12 h-12 bg-emerald-700 text-white rounded-full flex items-center justify-center mx-auto shadow-md">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
@@ -458,12 +440,12 @@ export default function BISPPortal() {
                 <button
                   onClick={downloadReceiptImage}
                   disabled={isGeneratingImage}
-                  className={`flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 px-4 rounded-xl text-sm transition-colors flex items-center justify-start gap-2 shadow-md ${isGeneratingImage ? "opacity-70 cursor-wait" : ""}`}
+                  className={`flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 px-4 rounded-xl text-sm transition-colors flex items-center justify-center gap-2 shadow-md ${isGeneratingImage ? "opacity-70 cursor-wait" : ""}`}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  <span className="mx-auto">{isGeneratingImage ? "...تصویر بن رہی ہے" : "رسید ڈاؤن لوڈ کریں (PDF)"}</span>
+                  <span>{isGeneratingImage ? "...تصویر بن رہی ہے" : "رسید ڈاؤن لوڈ کریں"}</span>
                 </button>
                 <button
                   onClick={() => {
@@ -496,7 +478,6 @@ export default function BISPPortal() {
               </div>
             </div>
 
-            {/* آفیشل ریسیٹ ٹیمپلیٹ (یہ وہ کارڈ ہے جس کا اسکرین شاٹ ڈاؤن لوڈ ہوگا) */}
             <div 
               ref={receiptRef}
               className="bg-white rounded-2xl p-6 shadow-md border-t-8 border-emerald-800 space-y-6 text-gray-800 relative overflow-hidden"
@@ -528,7 +509,7 @@ export default function BISPPortal() {
                   <span className="font-mono font-bold text-gray-800">{formData.mobileNumber}</span>
                 </div>
                 <div className="flex justify-between items-center border-b border-gray-50 pb-2">
-                  <span className="text-gray-400 font-medium">پیشہ / ماہانہ آمدنی:</span>
+                  <span className="text-gray-400 font-medium">پیشہ / ماهیانہ آمدنی:</span>
                   <span className="font-bold text-gray-800">{formData.occupation} / {formData.monthlyIncome}</span>
                 </div>
                 <div className="flex justify-between items-start border-b border-gray-50 pb-2">
@@ -543,7 +524,6 @@ export default function BISPPortal() {
                 </div>
               </div>
 
-              {/* واٹر مارک آرٹ ورک */}
               <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-emerald-50 rounded-full opacity-50 -z-10"></div>
             </div>
           </div>
