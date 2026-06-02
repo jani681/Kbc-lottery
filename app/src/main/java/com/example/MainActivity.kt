@@ -1,17 +1,11 @@
 package com.example
 
-import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
-import android.webkit.WebChromeClient
-import android.webkit.WebSettings
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -39,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.compose.ui.viewinterop.AndroidView
 import com.example.ui.theme.MyApplicationTheme
 import org.json.JSONArray
 import org.json.JSONObject
@@ -53,12 +46,6 @@ data class LocalPrankModel(
 )
 
 class MainActivity : ComponentActivity() {
-    
-    // BACK BUTTON OVERRIDE FOR INTERNAL WEBVIEW HANDLING
-    private var webViewInstance: WebView? = null
-    private var isWebViewVisible = false
-    private var onHideWebView: (() -> Unit)? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -67,52 +54,20 @@ class MainActivity : ComponentActivity() {
             MyApplicationTheme {
                 // Main Security State
                 var isAuthenticated by remember { mutableStateOf(false) }
-                var activeWebViewUrl by remember { mutableStateOf<String?>(null) }
-
-                // Connect Compose State to Activity Scope for safe hardware back press
-                LaunchedEffect(activeWebViewUrl) {
-                    isWebViewVisible = activeWebViewUrl != null
-                    if (activeWebViewUrl == null) {
-                        webViewInstance = null
-                    }
-                }
-                onHideWebView = { activeWebViewUrl = null }
                 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        if (!isAuthenticated) {
-                            LoginScreen(
-                                modifier = Modifier.padding(innerPadding),
-                                onLoginSuccess = { isAuthenticated = true }
-                            )
-                        } else {
-                            KbcPrankApp(
-                                modifier = Modifier.padding(innerPadding),
-                                onOpenUrlInWebView = { url -> activeWebViewUrl = url }
-                            )
-                        }
-
-                        // Seamless Top-Over WebView Layer (Triggered on Button Action)
-                        activeWebViewUrl?.let { url ->
-                            AppWebViewOverlay(
-                                url = url,
-                                onWebViewCreated = { webViewInstance = it },
-                                onClose = { activeWebViewUrl = null }
-                            )
-                        }
+                    if (!isAuthenticated) {
+                        LoginScreen(
+                            modifier = Modifier.padding(innerPadding),
+                            onLoginSuccess = { isAuthenticated = true }
+                        )
+                    } else {
+                        KbcPrankApp(
+                            modifier = Modifier.padding(innerPadding)
+                        )
                     }
                 }
             }
-        }
-    }
-
-    override fun onBackPressed() {
-        if (isWebViewVisible && webViewInstance?.canGoBack() == true) {
-            webViewInstance?.goBack()
-        } else if (isWebViewVisible) {
-            onHideWebView?.invoke()
-        } else {
-            super.onBackPressed()
         }
     }
 }
@@ -200,8 +155,7 @@ fun LoginScreen(
 
 @Composable
 fun KbcPrankApp(
-    modifier: Modifier = Modifier,
-    onOpenUrlInWebView: (String) -> Unit
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val sharedPreferences = remember { context.getSharedPreferences("kbc_prank_prefs", Context.MODE_PRIVATE) }
@@ -364,16 +318,17 @@ fun KbcPrankApp(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Second Button: Create Registration Certificate (WebView Safe)
+                    // Second Button: Create Registration Certificate (Fixed Version)
                     Button(
                         onClick = {
-                            onOpenUrlInWebView("https://kbc-lottery.vercel.app/generator.html")
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://kbc-lottery.vercel.app/generator.html"))
+                            context.startActivity(intent)
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626))
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626)) // Eye-catching Red Color
                     ) {
                         Icon(Icons.Default.AccountBox, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
@@ -382,16 +337,17 @@ fun KbcPrankApp(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Third Button: User Profile Registry (WebView Safe)
+                    // Third Button: User Profile Registry (Pointed to correct registry.html)
                     Button(
                         onClick = {
-                            onOpenUrlInWebView("https://kbc-lottery.vercel.app/registry.html")
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://kbc-lottery.vercel.app/registry.html"))
+                            context.startActivity(intent)
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F172A))
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F172A)) // Stylish Dark Slate Blue
                     ) {
                         Icon(Icons.Default.List, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
@@ -584,71 +540,6 @@ fun HistoryItemRow(prank: LocalPrankModel, context: Context) {
                     Icon(Icons.Default.Send, contentDescription = "Share", tint = Color(0xFF10B981))
                 }
             }
-        }
-    }
-}
-
-// SAFE NATIVE INTEGRATED FULL-SCREEN WEBVIEW OVERLAY LAYER
-@SuppressLint("SetJavaScriptEnabled")
-@Composable
-fun AppWebViewOverlay(
-    url: String,
-    onWebViewCreated: (WebView) -> Unit,
-    onClose: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .statusBarsPadding()
-            .navigationBarsPadding()
-    ) {
-        AndroidView(
-            factory = { context ->
-                WebView(context).apply {
-                    layoutParams = android.view.ViewGroup.LayoutParams(
-                        android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-                        android.view.ViewGroup.LayoutParams.MATCH_PARENT
-                    )
-                    settings.apply {
-                        javaScriptEnabled = true
-                        domStorageEnabled = true
-                        databaseEnabled = true
-                        loadsImagesAutomatically = true
-                        mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-                    }
-                    webViewClient = object : WebViewClient() {
-                        override fun shouldOverrideUrlLoading(view: WebView?, urlString: String?): Boolean {
-                            if (urlString != null && (urlString.startsWith("http://") || urlString.startsWith("https://"))) {
-                                return false
-                            }
-                            try {
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(urlString))
-                                context.startActivity(intent)
-                                return true
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                            return true
-                        }
-                    }
-                    webChromeClient = WebChromeClient()
-                    onWebViewCreated(this)
-                    loadUrl(url)
-                }
-            },
-            modifier = Modifier.fillMaxSize()
-        )
-
-        // Floating Close Action Switch to slide back into history views
-        IconButton(
-            onClick = onClose,
-            modifier = Modifier
-                .padding(16.dp)
-                .align(Alignment.TopEnd)
-                .background(Color(0x99000000), shape = RoundedCornerShape(50.dp))
-        ) {
-            Icon(Icons.Default.Close, contentDescription = "Close View", tint = Color.White)
         }
     }
 }
