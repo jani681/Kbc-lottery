@@ -1,668 +1,554 @@
-<!DOCTYPE html>
-<html lang="ur">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صارف پروفائل رجسٹری - بی آئی ایس پی تھیم</title>
-    <!-- Tailwind CSS Engine -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- html2canvas library for high-speed PNG image generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style>
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
-        .direction-rtl { direction: rtl; }
-        .btn-spinner {
-            border: 2px solid transparent;
-            border-radius: 50%;
-            border-top-color: #ffffff;
-            border-right-color: #ffffff;
-            width: 16px;
-            height: 16px;
-            animation: spin 0.6s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        @media print {
-            body * { visibility: hidden; }
-            #successBanner, #successBanner * { visibility: visible; }
-            #successBanner { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
-            #printBtn, #imageBtn, #resetBtn { display: none !important; }
-        }
-    </style>
-</head>
-<body class="bg-slate-50 min-h-screen pb-12">
+import React, { useState, useRef } from "react";
+import html2canvas from "html2canvas";
 
-    <!-- Premium Government Style Header Area -->
-    <div class="bg-[#006633] text-white py-8 px-4 text-center shadow-lg border-b-4 border-[#339933]">
-        <h1 class="text-2xl font-bold tracking-wide">صارف پروفائل رجسٹری</h1>
-        <p class="text-emerald-100 text-xs mt-2 font-mono">Benazir Income Support Programme Portal</p>
-    </div>
+export default function BISPPortal() {
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    relation: "Father",
+    guardianName: "",
+    mobileNumber: "",
+    idCardNumber: "",
+    occupation: "Laborer",
+    monthlyIncome: "20,000 سے کم",
+    disabledPerson: "No",
+    houseOwnership: "Owned",
+    rooms: "2",
+    washrooms: "1",
+    province: "Punjab",
+    division: "",
+    district: "",
+    tehsil: "",
+    unionCouncil: "",
+    cityVillage: "",
+  });
 
-    <!-- Main Container Card -->
-    <div class="max-w-md mx-auto mt-6 px-4">
+  const [profileId, setProfileId] = useState("");
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  
+  // ریسیٹ کارڈ کو ٹارگٹ کرنے کے لیے ریفرنس
+  const receiptRef = useRef(null);
+
+  // صوبوں کے مطابق ڈویژنز کا ڈیٹا
+  const locationData = {
+    Punjab: ["Sargodha", "Faisalabad", "Lahore", "Rawalpindi", "Multan", "Gufranwala", "Bahawalpur", "Dera Ghazi Khan", "Sahiwal"],
+    Sindh: ["Karachi", "Hyderabad", "Sukkur", "Larkana", "Mirpur Khas", "Shaheed Benazirabad"],
+    KPK: ["Peshawar", "Malakand", "Hazara", "Mardan", "Kohat", "Bannu", "Dera Ismail Khan"],
+    Balochistan: ["Quetta", "Zhob", "Sibi", "Nasirabad", "Kalat", "Makran", "Loralai"],
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const generateProfileId = () => {
+    const chars = "0123456789ABCDEF";
+    let suffix = "";
+    for (let i = 0; i < 4; i++) {
+      suffix += chars[Math.floor(Math.random() * 16)];
+    }
+    return `BISP-260602-${suffix}`;
+  };
+
+  const handleNextStep = () => {
+    if (step < 3) setStep((prev) => prev + 1);
+  };
+
+  const handlePrevStep = () => {
+    if (step > 1) setStep((prev) => prev - 1);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const generatedId = generateProfileId();
+    setProfileId(generatedId);
+    setShowReceipt(true);
+  };
+
+  // متبادل ڈاؤن لوڈ لاجک جو موبائل براؤزرز پر فیل نہیں ہوگا
+  const downloadReceiptImage = async () => {
+    if (!receiptRef.current || isGeneratingImage) return;
+
+    setIsGeneratingImage(true);
+
+    try {
+      // 1. عارضی طور پر اسکیلنگ اور رینڈرنگ کو بہتر بنانے کے لیے کنفیگریشنز
+      const options = {
+        scale: 2, // موبائل ریم پر دباؤ کم کرنے کے لیے اسکیل 2 رکھا ہے جو کہ ایچ ڈی رزلٹ دیتا ہے
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+        scrollX: 0,
+        scrollY: -window.scrollY, // اسکرول پوزیشن کا مسئلہ حل کرنے کے لیے
+        windowWidth: receiptRef.current.scrollWidth,
+        windowHeight: receiptRef.current.scrollHeight
+      };
+
+      // موبائل پروسیسر کو رینڈرنگ کے لیے 100ms کا وقت دیں
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      const canvas = await html2canvas(receiptRef.current, options);
+      
+      // ڈیٹا یو آر ایل بنانا
+      const dataUrl = canvas.toDataURL("image/png");
+
+      // 2. بلاب (Blob) میتھڈ کا استعمال تاکہ موبائل کروم یا سفاری ڈاؤن لوڈ بلاک نہ کرے
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          alert("ڈاؤن لوڈ فائل جنریٹ نہیں ہو سکی، دوبارہ کلک کریں۔");
+          setIsGeneratingImage(false);
+          return;
+        }
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${profileId}_BISP_Receipt.png`;
         
-        <!-- Success Banner Popup / Target Receipt for Image Download -->
-        <div id="successBanner" class="hidden bg-emerald-50 border border-[#339933] text-emerald-900 rounded-2xl p-6 text-center shadow-sm mb-6">
-            <div class="w-12 h-12 bg-[#006633] rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-            </div>
-            <h3 class="text-lg font-bold text-[#006633]">معلومات کامیابی کے ساتھ محفوظ ہو گئیں!</h3>
-            <p class="text-sm text-emerald-700 mt-1">Data registry processed successfully!</p>
-            
-            <!-- Auto Generated ID Display Block -->
-            <div class="mt-4 p-4 bg-white rounded-xl border border-emerald-100 shadow-inner">
-                <p class="text-xs text-slate-500 font-semibold mb-1">آپ کا سسٹم ریفرنس نمبر (Profile ID)</p>
-                <div class="flex items-center justify-center space-x-2">
-                    <span id="displayProfileId" class="text-xl font-mono font-bold text-slate-900 tracking-wider"></span>
-                    <button type="button" onclick="copyProfileId()" class="p-1.5 hover:bg-slate-100 rounded-lg transition text-slate-500 hover:text-[#006633]" title="Copy ID">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                    </button>
-                </div>
-                <span id="copyFeedback" class="text-[10px] text-[#006633] font-semibold block mt-1 opacity-0 transition duration-150">کاپی کر لیا گیا!</span>
+        document.body.appendChild(link);
+        link.click();
+        
+        // میموری کلین اپ
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        setIsGeneratingImage(false);
+      }, "image/png");
+
+    } catch (error) {
+      console.error("Image Generation Error:", error);
+      alert("ڈاؤن لوڈنگ میں تعطل آیا۔ براہ کرم ایک بار پھر بٹن دبائیں۔");
+      setIsGeneratingImage(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-start pb-10" dir="rtl">
+      {/* ہیڈر پورٹل */}
+      <div className="w-full bg-emerald-800 text-white py-6 px-4 text-center shadow-md mb-6">
+        <h1 className="text-2xl font-bold font-sans">صارف پروفائل رجسٹری</h1>
+        <p className="text-xs text-emerald-200 mt-1">Benazir Income Support Programme Portal</p>
+      </div>
+
+      <div className="w-full max-w-md px-4">
+        {!showReceipt ? (
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            {/* پروگریس بار */}
+            <div className="flex items-center justify-between mb-6 text-xs text-gray-400 border-b border-gray-100 pb-4">
+              <span className={`px-3 py-1 rounded-full ${step === 1 ? "bg-emerald-50 text-emerald-700 font-bold border border-emerald-200" : "bg-gray-50 text-gray-400"}`}>بنیادی معلومات</span>
+              <span className="h-[1px] bg-gray-200 flex-1 mx-2"></span>
+              <span className={`px-3 py-1 rounded-full ${step === 2 ? "bg-emerald-50 text-emerald-700 font-bold border border-emerald-200" : "bg-gray-50 text-gray-400"}`}>معاشی معلومات</span>
+              <span className="h-[1px] bg-gray-200 flex-1 mx-2"></span>
+              <span className={`px-3 py-1 rounded-full ${step === 3 ? "bg-emerald-50 text-emerald-700 font-bold border border-emerald-200" : "bg-gray-50 text-gray-400"}`}>Matrix پتہ</span>
             </div>
 
-            <!-- Dynamic Live Receipt Data Summary Table -->
-            <div class="mt-5 border-t border-dashed border-emerald-300 pt-4 text-right direction-rtl text-sm">
-                <table class="w-full space-y-2">
-                    <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">صارف کا نام:</td><td id="receiptName" class="py-2 text-slate-800"></td></tr>
-                    <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">شناختی کارڈ:</td><td id="receiptCnic" class="py-2 text-slate-800 font-mono"></td></tr>
-                    <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">موبائل نمبر:</td><td id="receiptMobile" class="py-2 text-slate-800 font-mono"></td></tr>
-                    <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">یونین کونسل (UC):</td><td id="receiptUc" class="py-2 text-slate-800"></td></tr>
-                    <tr><td class="py-2 font-bold text-[#004d26]">تاریخ اور وقت:</td><td id="receiptDateTime" class="py-2 text-slate-800 font-mono text-xs"></td></tr>
-                </table>
+            <div className="inline-block bg-emerald-50 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-md mb-4">
+              Step {step} / 3
             </div>
 
-            <!-- Action Buttons -->
-            <div class="mt-6 space-y-3">
-                <div class="grid grid-cols-2 gap-3">
-                    <button type="button" id="printBtn" onclick="window.print()" class="w-full bg-[#006633] text-white font-bold py-3 px-2 rounded-xl text-xs shadow hover:bg-[#004d26] transition cursor-pointer flex items-center justify-center">
-                        <span>پرنٹ / محفوظ کریں (PDF)</span>
-                    </button>
-                    <button type="button" id="imageBtn" onclick="downloadReceiptImage()" class="w-full bg-emerald-600 text-white font-bold py-3 px-2 rounded-xl text-xs shadow hover:bg-emerald-700 transition cursor-pointer flex items-center justify-center">
-                        <span id="imageBtnText">تصویر ڈاؤن لوڈ (PNG)</span>
-                    </button>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* اسٹیپ 1: بنیادی معلومات */}
+              {step === 1 && (
+                <div className="space-y-4">
+                  <h2 className="text-lg font-bold text-gray-800 mb-2">خاندانی اور بنیادی معلومات</h2>
+                  
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">(Full Name) صارف کا نام</label>
+                    <input
+                      type="text"
+                      name="fullName"
+                      value={formData.fullName}
+                      onChange={handleInputChange}
+                      placeholder="نام لکھیں"
+                      required
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-600"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">رشتہ منتخب کریں</label>
+                    <select
+                      name="relation"
+                      value={formData.relation}
+                      onChange={handleInputChange}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-600 bg-white"
+                    >
+                      <option value="Father">والد (Father)</option>
+                      <option value="Husband">شوہر (Husband)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">(Guardian Name) سرپرست کا نام</label>
+                    <input
+                      type="text"
+                      name="guardianName"
+                      value={formData.guardianName}
+                      onChange={handleInputChange}
+                      placeholder="والد یا شوہر کا نام لکھیں"
+                      required
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-600"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">(Mobile Number) موبائل نمبر</label>
+                    <input
+                      type="text"
+                      name="mobileNumber"
+                      value={formData.mobileNumber}
+                      onChange={handleInputChange}
+                      placeholder="03XXXXXXXXX"
+                      maxLength={11}
+                      required
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-left focus:outline-none focus:border-emerald-600"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">(ID Card Number) شناختی کارڈ نمبر</label>
+                    <input
+                      type="text"
+                      name="idCardNumber"
+                      value={formData.idCardNumber}
+                      onChange={handleInputChange}
+                      placeholder="38202XXXXXXXX"
+                      maxLength={13}
+                      required
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-left focus:outline-none focus:border-emerald-600"
+                    />
+                  </div>
                 </div>
+              )}
+
+              {/* اسٹیپ 2: معاشی معلومات */}
+              {step === 2 && (
+                <div className="space-y-4">
+                  <h2 className="text-lg font-bold text-gray-800 mb-2">معاشی اور رہائشی معلومات</h2>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">(Occupation) گھر کا سربراہ کیا کام کرتا ہے ؟</label>
+                    <select
+                      name="occupation"
+                      value={formData.occupation}
+                      onChange={handleInputChange}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-600 bg-white"
+                    >
+                      <option value="Laborer">مزدور / ڈرائیور (Laborer)</option>
+                      <option value="Farmer">کسان / زمیندار (Farmer)</option>
+                      <option value="Shopkeeper">دکاندار (Shopkeeper)</option>
+                      <option value="Other">دیگر (Other)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">(Monthly Income) ماہانہ آمدنی</label>
+                    <select
+                      name="monthlyIncome"
+                      value={formData.monthlyIncome}
+                      onChange={handleInputChange}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-600 bg-white"
+                    >
+                      <option value="20,000 سے کم">20,000 سے کم</option>
+                      <option value="20,000 - 35,000">20,000 - 35,000</option>
+                      <option value="35,000 سے زائد">35,000 سے زائد</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">کیا گھر میں کوئی معذور فرد موجود ہے؟</label>
+                    <select
+                      name="disabledPerson"
+                      value={formData.disabledPerson}
+                      onChange={handleInputChange}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-600 bg-white"
+                    >
+                      <option value="No">نہیں (No)</option>
+                      <option value="Yes">جی ہاں (Yes)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">(House Ownership) مکان کی ملکیت</label>
+                    <select
+                      name="houseOwnership"
+                      value={formData.houseOwnership}
+                      onChange={handleInputChange}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-600 bg-white"
+                    >
+                      <option value="Owned">ذاتی گھر (Owned)</option>
+                      <option value="Rented">کرایہ کا گھر (Rented)</option>
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1.5">(Rooms) کمروں کی تعداد</label>
+                      <input
+                        type="number"
+                        name="rooms"
+                        value={formData.rooms}
+                        onChange={handleInputChange}
+                        min={1}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-center focus:outline-none focus:border-emerald-600"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1.5">واش رومز کی تعداد</label>
+                      <input
+                        type="number"
+                        name="washrooms"
+                        value={formData.washrooms}
+                        onChange={handleInputChange}
+                        min={0}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-center focus:outline-none focus:border-emerald-600"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* اسٹیپ 3: پتہ معلومات */}
+              {step === 3 && (
+                <div className="space-y-4">
+                  <h2 className="text-lg font-bold text-gray-800 mb-2">(Address Matrix) مکمل رہائشی پتہ</h2>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">(Province) صوبہ</label>
+                    <select
+                      name="province"
+                      value={formData.province}
+                      onChange={(e) => {
+                        handleInputChange(e);
+                        setFormData((prev) => ({ ...prev, division: "" }));
+                      }}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-600 bg-white"
+                    >
+                      <option value="Punjab">پنجاب (Punjab)</option>
+                      <option value="Sindh">سندھ (Sindh)</option>
+                      <option value="KPK">خیبر پختونخوا (KPK)</option>
+                      <option value="Balochistan">بلوچستان (Balochistan)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">(Division) ڈویژن</label>
+                    <select
+                      name="division"
+                      value={formData.division}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-600 bg-white"
+                    >
+                      <option value="">ڈویژن منتخب کریں</option>
+                      {locationData[formData.province]?.map((div) => (
+                        <option key={div} value={div}>{div}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">(District) ضلع</label>
+                    <input
+                      type="text"
+                      name="district"
+                      value={formData.district}
+                      onChange={handleInputChange}
+                      placeholder="ضلع کا نام لکھیں"
+                      required
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-600"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">(Tehsil) تحصیل</label>
+                    <input
+                      type="text"
+                      name="tehsil"
+                      value={formData.tehsil}
+                      onChange={handleInputChange}
+                      placeholder="تحصیل کا نام لکھیں"
+                      required
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-600"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">(Union Council / UC) یونین کونسل</label>
+                    <input
+                      type="text"
+                      name="unionCouncil"
+                      value={formData.unionCouncil}
+                      onChange={handleInputChange}
+                      placeholder="یو سی نمبر یا نام"
+                      required
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-600"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">(City / Village) شہر یا گاؤں کا نام</label>
+                    <input
+                      type="text"
+                      name="cityVillage"
+                      value={formData.cityVillage}
+                      onChange={handleInputChange}
+                      placeholder="شہر یا گاؤں لکھیں"
+                      required
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-600"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* نیویگیشن بٹنز */}
+              <div className="flex gap-3 pt-2">
+                {step > 1 && (
+                  <button
+                    type="button"
+                    onClick={handlePrevStep}
+                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 px-4 rounded-xl text-sm transition-colors"
+                  >
+                    پیچھے جائیں
+                  </button>
+                )}
                 
-                <button type="button" id="resetBtn" onclick="resetRegistryForm()" class="w-full bg-slate-200 text-slate-800 font-bold py-3.5 px-4 rounded-xl text-sm hover:bg-slate-300 transition cursor-pointer font-semibold block border border-slate-300 shadow-sm">
-                    نیا فارم بھریں
-                </button>
-            </div>
-        </div>
-
-        <!-- Progress Step Indicator Bar -->
-        <div id="stepIndicatorBar" class="bg-white p-4 rounded-xl border border-slate-200 mb-4 flex justify-between items-center text-xs font-bold text-slate-400">
-            <div id="ind-step3" class="px-2.5 py-1 rounded-full bg-slate-100">پتہ Matrix</div>
-            <div class="h-0.5 bg-slate-200 flex-1 mx-2"></div>
-            <div id="ind-step2" class="px-2.5 py-1 rounded-full bg-slate-100">معاشی معلومات</div>
-            <div class="h-0.5 bg-slate-200 flex-1 mx-2"></div>
-            <div id="ind-step1" class="px-2.5 py-1 rounded-full bg-[#006633] text-white shadow-sm">بنیادی معلومات</div>
-        </div>
-
-        <!-- Form Card Start -->
-        <div id="formCard" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6">
-            <form id="registryForm" onsubmit="handleFormSubmit(event)" class="space-y-6">
-                
-                <!-- Hidden Data Fields for Silent System Tracking -->
-                <input type="hidden" id="systemDate" name="systemDate">
-                <input type="hidden" id="systemTime" name="systemTime">
-
-                <!-- ================= STEP 1: BASIC INFO ================= -->
-                <div id="step1-container" class="space-y-6">
-                    <div class="border-b border-slate-100 pb-3 mb-4">
-                        <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 1 / 3</span>
-                        <h2 class="text-xl font-extrabold text-[#006633] mt-2 text-right">خاندانی اور بنیادی معلومات</h2>
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">صارف کا نام (Full Name)</label>
-                        <input type="text" id="fullName" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50" placeholder="نام لکھیں">
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">رشتہ منتخب کریں</label>
-                        <select id="relationType" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
-                            <option value="father">والد (Father)</option>
-                            <option value="husband">شوہر (Husband)</option>
-                        </select>
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">سرپرست کا نام (Guardian Name)</label>
-                        <input type="text" id="guardianName" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50" placeholder="والد یا شوہر کا نام لکھیں">
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">موبائل نمبر (Mobile Number)</label>
-                        <input type="tel" id="mobileNumber" maxlength="11" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-left bg-slate-50/50 font-mono" placeholder="03XXXXXXXXX">
-                        <span id="mobileError" class="text-xs text-red-600 text-right hidden">براہ کرم درست 11 ہندسوں کا موبائل نمبر لکھیں۔</span>
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">شناختی کارڈ نمبر (ID Card Number)</label>
-                        <input type="text" id="cnicNumber" maxlength="15" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-left bg-slate-50/50 font-mono" placeholder="XXXXX-XXXXXXX-X">
-                        <span id="cnicError" class="text-xs text-red-600 text-right hidden">شناختی کارڈ فارمیٹ درست نہیں ہے۔</span>
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">عمر (Age)</label>
-                        <input type="text" id="userAge" inputmode="numeric" pattern="[0-9]*" maxlength="3" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-slate-50/50 font-mono" placeholder="سال لکھیں (e.g. 25)">
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">ازدواجی حیثیت (Marital Status)</label>
-                        <select id="maritalStatus" required onchange="toggleKidsFields()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
-                            <option value="single">غیر شادی شدہ (Single)</option>
-                            <option value="married">شادی شدہ (Married)</option>
-                        </select>
-                    </div>
-
-                    <div id="kidsSection" class="hidden space-y-4 pt-3 mt-3 border-t border-dashed border-slate-200">
-                        <div class="flex flex-col space-y-1.5">
-                            <label class="text-sm font-semibold text-slate-700 text-right">کل بچوں کی تعداد (Total Kids)</label>
-                            <input type="text" id="totalKids" inputmode="numeric" pattern="[0-9]*" value="0" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-slate-50/50 font-mono">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="flex flex-col space-y-1.5">
-                                <label class="text-sm font-semibold text-slate-700 text-center">بیٹیاں (Female)</label>
-                                <input type="text" id="femaleKids" inputmode="numeric" pattern="[0-9]*" value="0" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-slate-50/50 font-mono">
-                            </div>
-                            <div class="flex flex-col space-y-1.5">
-                                <label class="text-sm font-semibold text-slate-700 text-center">بیٹے (Male)</label>
-                                <input type="text" id="maleKids" inputmode="numeric" pattern="[0-9]*" value="0" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-slate-50/50 font-mono">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pt-2">
-                        <button type="button" onclick="validateAndGoToStep(2)" class="w-full bg-[#006633] text-white font-bold py-3.5 px-4 rounded-xl shadow hover:bg-[#004d26] transition active:scale-[0.99] cursor-pointer">
-                            اگلا مرحلہ (Next Step)
-                        </button>
-                    </div>
-                </div>
-
-                <!-- ================= STEP 2: SOCIO-ECONOMIC MATRIX ================= -->
-                <div id="step2-container" class="space-y-6 hidden">
-                    <div class="border-b border-slate-100 pb-3 mb-4">
-                        <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 2 / 3</span>
-                        <h2 class="text-xl font-extrabold text-[#006633] mt-2 text-right">معاشی اور رہائشی معلومات</h2>
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">گھر کا سربراہ کیا کام کرتا ہے؟ (Occupation)</label>
-                        <select id="occupation" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
-                            <option value="laborer">مزدور / ڈرائیور (Laborer)</option>
-                            <option value="employee">ملازم / نوکری (Salaried Employee)</option>
-                            <option value="agriculture">زراعت / زمیندار (Agriculture)</option>
-                            <option value="business">کاروبار / دکاندار (Business)</option>
-                            <option value="unemployed">بے روزگار (Unemployed)</option>
-                        </select>
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">ماہانہ آمدنی (Monthly Income)</label>
-                        <select id="monthlyIncome" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
-                            <option value="under_20k">20,000 سے کم</option>
-                            <option value="20k_30k">20,000 سے 30,000</option>
-                            <option value="30k_40k">30,000 سے 40,000</option>
-                            <option value="above_50k">50,000 سے زائد</option>
-                        </select>
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">کیا گھر میں کوئی معذور فرد موجود ہے؟</label>
-                        <select id="disabilityStatus" onchange="toggleDisabilityField()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
-                            <option value="no">نہیں (No)</option>
-                            <option value="yes">ہاں (Yes)</option>
-                        </select>
-                    </div>
-
-                    <div id="disabilityNatureSection" class="hidden flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-red-700 text-right">معذوری کی نوعیت (Nature of Disability)</label>
-                        <input type="text" id="disabilityNatureInput" class="w-full px-4 py-3 border border-red-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-right bg-red-50/30" placeholder="تفصیل لکھیں">
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">مکان کی ملکیت (House Ownership)</label>
-                        <select id="houseOwnership" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
-                            <option value="owned">ذاتی گھر (Owned)</option>
-                            <option value="rented">کرائے کا گھر (Rented)</option>
-                        </select>
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">مکان یا گھر کی نوعیت (House Structure)</label>
-                        <select id="houseType" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
-                            <option value="pikka">پکا مکان (Concrete/Brick)</option>
-                            <option value="semi_pikka">نیم پکا مکان (Semi-Concrete)</option>
-                            <option value="kacha">کچا مکان (Mud/Wood)</option>
-                        </select>
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">بجلی کا اہم ذریعہ (Electricity Source)</label>
-                        <select id="electricitySource" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
-                            <option value="wapda">فیسکو / واپڈا میٹر کنکشن</option>
-                            <option value="solar">سولر سسٹم (Solar Grid)</option>
-                            <option value="generator">جنریٹر / متبادل ذریعہ</option>
-                            <option value="none">کوئی کنکشن نہیں ہے</option>
-                        </select>
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">کیا آپ کے پاس گاڑی موجود ہے؟ (Car / Vehicle)</label>
-                        <select id="vehicleOwnership" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
-                            <option value="no">نہیں ہے (No)</option>
-                            <option value="car">ذاتی کار / گاڑی (Car)</option>
-                            <option value="commercial">کمرشل لوڈر / شاہزور</option>
-                        </select>
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">موٹرسائیکل یا رکشہ کی موجودگی (Bike / Rickshaw)</label>
-                        <select id="bikeOwnership" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
-                            <option value="bike">موٹرسائیکل (Motorcycle)</option>
-                            <option value="rickshaw">رکشہ / چنگچی (Rickshaw)</option>
-                            <option value="none" selected>نہیں ہے (None)</option>
-                        </select>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="flex flex-col space-y-1.5">
-                            <label class="text-sm font-semibold text-slate-700 text-center">واش رومز کی تعداد</label>
-                            <input type="text" id="washroomsCount" inputmode="numeric" pattern="[0-9]*" value="1" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-slate-50/50 font-mono">
-                        </div>
-                        <div class="flex flex-col space-y-1.5">
-                            <label class="text-sm font-semibold text-slate-700 text-center">کمروں کی تعداد (Rooms)</label>
-                            <input type="text" id="roomsCount" inputmode="numeric" pattern="[0-9]*" value="2" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-slate-50/50 font-mono">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4 pt-2">
-                        <button type="button" onclick="goToStep(1)" class="w-full bg-slate-100 text-slate-800 font-bold py-3.5 px-4 rounded-xl hover:bg-slate-200 transition cursor-pointer">
-                            پیچھے جائیں
-                        </button>
-                        <button type="button" onclick="goToStep(3)" class="w-full bg-[#006633] text-white font-bold py-3.5 px-4 rounded-xl shadow hover:bg-[#004d26] transition cursor-pointer">
-                            اگلا مرحلہ
-                        </button>
-                    </div>
-                </div>
-
-                <!-- ================= STEP 3: ADDRESS MATRIX ================= -->
-                <div id="step3-container" class="space-y-6 hidden">
-                    <div class="border-b border-slate-100 pb-3 mb-4">
-                        <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 3 / 3</span>
-                        <h2 class="text-xl font-extrabold text-[#006633] mt-2 text-right">مکمل رہائشی پتہ (Address Matrix)</h2>
-                    </div>
-
-                    <!-- Province Dropdown -->
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">صوبہ (Province)</label>
-                        <select id="provinceSelect" onchange="handleProvinceChange()" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
-                            <option value="">صوبہ منتخب کریں</option>
-                            <option value="punjab">پنجاب (Punjab)</option>
-                            <option value="sindh">سندھ (Sindh)</option>
-                            <option value="kpk">خیبر پختونخوا (KPK)</option>
-                            <option value="balochistan">بلوچستان (Balochistan)</option>
-                        </select>
-                    </div>
-
-                    <!-- Division Dropdown -->
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">ڈویژن (Division)</label>
-                        <select id="divisionSelect" onchange="handleDivisionChange()" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
-                            <option value="">پہلے صوبہ منتخب کریں</option>
-                        </select>
-                    </div>
-
-                    <!-- District Dropdown -->
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">ضلع (District)</label>
-                        <select id="districtSelect" onchange="handleDistrictChange()" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
-                            <option value="">پہلے ڈویژن منتخب کریں</option>
-                        </select>
-                    </div>
-
-                    <!-- Tehsil Dropdown -->
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">تحصیل (Tehsil)</label>
-                        <select id="tehsilSelect" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
-                            <option value="">پہلے ضلع منتخب کریں</option>
-                        </select>
-                    </div>
-
-                    <!-- Union Council Manual Field Fixed -->
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">یونین کونسل (Union Council / UC)</label>
-                        <input type="text" id="ucManualInput" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50" placeholder="اپنی یونین کونسل کا نام یا نمبر لکھیں">
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-sm font-semibold text-slate-700 text-right">شہر یا گاؤں کا نام (City / Village)</label>
-                        <input type="text" id="villageName" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50" placeholder="شہر یا گاؤں لکھیں">
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4 pt-2">
-                        <button type="button" onclick="goToStep(2)" class="w-full bg-slate-100 text-slate-800 font-bold py-3.5 px-4 rounded-xl hover:bg-slate-200 transition cursor-pointer">
-                            پیچھے جائیں
-                        </button>
-                        <button type="submit" id="submitBtn" class="w-full bg-[#339933] text-white font-bold py-3.5 px-4 rounded-xl shadow hover:bg-[#006633] transition active:scale-[0.99] flex items-center justify-center space-x-2 cursor-pointer">
-                            <span id="btnText">جمع کریں (Submit)</span>
-                        </button>
-                    </div>
-                </div>
-
+                {step < 3 ? (
+                  <button
+                    type="button"
+                    onClick={handleNextStep}
+                    className="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 px-4 rounded-xl text-sm transition-colors"
+                  >
+                    اگلا مرحلہ
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    className="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 px-4 rounded-xl text-sm transition-colors shadow-md shadow-emerald-700/20"
+                  >
+                    جمع کریں (Submit)
+                  </button>
+                )}
+              </div>
             </form>
-        </div>
-        <!-- Form Card End -->
+          </div>
+        ) : (
+          /* سکسیس کارڈ اور ڈاؤن لوڈ ایبل ریسیٹ سیکشن */
+          <div className="space-y-4">
+            {/* کامیابی کا سٹیٹس کارڈ */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-emerald-100 text-center space-y-4">
+              <div className="w-12 h-12 bg-emerald-700 text-white rounded-full flex items-center justify-start mx-auto shadow-md">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-emerald-700 font-bold text-lg">معلومات کامیابی کے ساتھ محفوظ ہو گئیں!</h3>
+                <p className="text-xs text-gray-400 mt-0.5">Data registry processed successfully!</p>
+              </div>
 
-    </div>
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                <span className="block text-[10px] text-gray-400 font-semibold mb-1">(Profile ID) آپ کا سسٹم ریفرنس نمبر</span>
+                <span className="text-xl font-mono font-bold tracking-wider text-gray-800">{profileId}</span>
+              </div>
 
-    <!-- Master Hierarchical Address Database Engine -->
-    <script>
-        const provincesData = {
-            punjab: [
-                {
-                    divId: "sargodha", divName: "سرگودھا (Sargodha)",
-                    districts: [
-                        { distId: "khushab", distName: "خوشاب (Khushab)", tehsils: ["قائدآباد (Quaidabad)", "خوشاب (Khushab)", "نوشہرہ (Nowshera)", "نورپورتھل (Noorpur Thal)"] },
-                        { distId: "sargodha", distName: "سرگودھا (Sargodha)", tehsils: ["سرگودھا (Sargodha)", "بھلوال (Bhalwal)", "شاہ پور (Shahpur)", "سلانوالی (Sillanwali)", "کوٹ مومن (Kot Momin)"] },
-                        { distId: "mianwali", distName: "میانوالی (Mianwali)", tehsils: ["میانوالی (Mianwali)", "عیسیٰ خیل (Isakhel)", "پپلاں (Piplan)"] },
-                        { distId: "bhakkar", distName: "بھکر (Bhakkar)", tehsils: ["بھکر (Bhakkar)", "دریائے خان (Darya Khan)", "کلور کوٹ (Kallurkot)", "منکیرہ (Mankera)"] }
-                    ]
-                },
-                {
-                    divId: "faisalabad", divName: "فیصل آباد (Faisalabad)",
-                    districts: [
-                        { distId: "faisalabad", distName: "فیصل آباد (Faisalabad)", tehsils: ["فیصل آباد سٹی", "فیصل آباد صدر", "جڑانوالہ", "تاندلیانوالہ", "سمندری", "چک جھمرہ"] },
-                        { distId: "jhang", distName: "جھنگ (Jhang)", tehsils: ["جھنگ", "شورکوٹ", "احمد پور سیال", "18 ہزاری"] },
-                        { distId: "toba_tek_singh", distName: "ٹوبہ ٹیک سنگھ (Toba Tek Singh)", tehsils: ["ٹوبہ ٹیک سنگھ", "گوجرہ", "کمالیہ", "پیر محل"] },
-                        { distId: "chiniot", distName: "چنیوٹ (Chiniot)", tehsils: ["چنیوٹ", "بھوانہ", "لاڈیاں"] }
-                    ]
-                },
-                {
-                    divId: "lahore", divName: "لاہور (Lahore)",
-                    districts: [
-                        { distId: "lahore", distName: "لاہور (Lahore)", tehsils: ["لاہور سٹی", "لاہور کینٹ", "ماڈل ٹاؤن", "شالیمار", "رائے ونڈ"] },
-                        { distId: "kasur", distName: "قصور (Kasur)", tehsils: ["قصور", "چونیاں", "پتوقی", "کوٹ رادھا کشن"] },
-                        { distId: "sheikhupura", distName: "شیخوپورہ (Sheikhupura)", tehsils: ["شیخوپورہ", "مریدکے", "فیروز والا", "صفدر آباد"] }
-                    ]
-                },
-                {
-                    divId: "rawalpindi", divName: "راولپنڈی (Rawalpindi)",
-                    districts: [
-                        { distId: "rawalpindi", distName: "راولپنڈی (Rawalpindi)", tehsils: ["راولپنڈی", "گوجر خان", "ٹیکسلا", "مری", "کہوٹہ"] },
-                        { distId: "attock", distName: "اٹک (Attock)", tehsils: ["اٹک", "حسن ابدال", "فتح جنگ", "جنڈ", "پنڈی گھیب"] }
-                    ]
-                },
-                {
-                    divId: "multan", divName: "ملتان (Multan)",
-                    districts: [
-                        { distId: "multan", distName: "ملتان (Multan)", tehsils: ["ملتان سٹی", "ملتان صدر", "شجاع آباد", "جلال پور پیروالہ"] },
-                        { distId: "khanewal", distName: "خانیوال (Khanewal)", tehsils: ["خانیوال", "کبیروالہ", "میاں چنوں", "جہانیاں"] }
-                    ]
-                }
-            ],
-            sindh: [
-                {
-                    divId: "karachi", divName: "کراچی (Karachi)",
-                    districts: [
-                        { distId: "karachi_east", distName: "کراچی شرقی (East)", tehsils: ["گلشن اقبال", "جمشید کوارٹرز", "گلزار ہجری"] },
-                        { distId: "karachi_south", distName: "کراچی جنوبی (South)", tehsils: ["صدر", "آرام باغ", "لیاری"] },
-                        { distId: "karachi_central", distName: "کراچی وسطی (Central)", tehsils: ["ناظم آباد", "نارتھ ناظم آباد", "گلبرگ", "لیاقت آباد"] }
-                    ]
-                },
-                {
-                    divId: "hyderabad", divName: "حیدرآباد (Hyderabad)",
-                    districts: [
-                        { distId: "hyderabad", distName: "حیدرآباد (Hyderabad)", tehsils: ["حیدرآباد سٹی", "لطیف آباد", "قاسم آباد"] },
-                        { distId: "matiari", distName: "مٹیاری (Matiari)", tehsils: ["مٹیاری", "ہالا", "سعید آباد"] }
-                    ]
-                }
-            ],
-            kpk: [
-                {
-                    divId: "peshawar", divName: "پشاور (Peshawar)",
-                    districts: [
-                        { distId: "peshawar", distName: "پشاور (Peshawar)", tehsils: ["پشاور سٹی", "شاہ عالم", "متنی", "پشتخرہ"] },
-                        { distId: "charsadda", distName: "چارسدہ (Charsadda)", tehsils: ["چارسدہ", "شبقدر", "تنگی"] }
-                    ]
-                },
-                {
-                    divId: "hazara", divName: "ہزارہ (Hazara)",
-                    districts: [
-                        { distId: "abbottabad", distName: "ایبٹ آباد (Abbottabad)", tehsils: ["ایبٹ آباد", "حویلیان"] },
-                        { distId: "mansehra", distName: "مانسہرہ (Mansehra)", tehsils: ["مانسہرہ", "بالاکوٹ", "اوگی"] }
-                    ]
-                }
-            ],
-            balochistan: [
-                {
-                    divId: "quetta", divName: "کوئٹہ (Quetta)",
-                    districts: [
-                        { distId: "quetta", distName: "کوئٹہ (Quetta)", tehsils: ["کوئٹہ سٹی", "چلتن", "صدر"] },
-                        { distId: "pishin", distName: "پشین (Pishin)", tehsils: ["پشین", "حرم زئی", "برشور"] }
-                    ]
-                }
-            ]
-        };
-
-        let currentStep = 1;
-
-        // Input Sanitizer
-        ['mobileNumber', 'userAge', 'totalKids', 'maleKids', 'femaleKids', 'roomsCount', 'washroomsCount'].forEach(id => {
-            const el = document.getElementById(id);
-            if(el) el.addEventListener('input', e => e.target.value = e.target.value.replace(/\D/g, ''));
-        });
-
-        document.getElementById('cnicNumber').addEventListener('input', function (e) {
-            let value = e.target.value.replace(/\D/g, ''); 
-            let formatted = '';
-            if (value.length > 0) {
-                formatted += value.substr(0, 5);
-                if (value.length > 5) {
-                    formatted += '-' + value.substr(5, 7);
-                    if (value.length > 12) formatted += '-' + value.substr(12, 1);
-                }
-            }
-            e.target.value = formatted;
-        });
-
-        function goToStep(step) {
-            document.getElementById(`step1-container`).classList.add('hidden');
-            document.getElementById(`step2-container`).classList.add('hidden');
-            document.getElementById(`step3-container`).classList.add('hidden');
-            document.getElementById(`step${step}-container`).classList.remove('hidden');
-            
-            for(let i=1; i<=3; i++) {
-                let ind = document.getElementById(`ind-step${i}`);
-                if(i === step) ind.className = "px-2.5 py-1 rounded-full bg-[#006633] text-white shadow-sm";
-                else ind.className = "px-2.5 py-1 rounded-full bg-slate-100 text-slate-400";
-            }
-            currentStep = step;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function validateAndGoToStep(targetStep) {
-            const name = document.getElementById('fullName').value.trim();
-            const guardian = document.getElementById('guardianName').value.trim();
-            const mobile = document.getElementById('mobileNumber').value.trim();
-            const cnic = document.getElementById('cnicNumber').value.trim();
-            const age = document.getElementById('userAge').value;
-
-            if(!name || !guardian || !age) { alert("براہ کرم لازمی معلوماتی فیلڈز مکمل کریں!"); return; }
-            if(mobile.length !== 11 || !mobile.startsWith("03")) { document.getElementById('mobileError').classList.remove('hidden'); return; } 
-            else document.getElementById('mobileError').classList.add('hidden');
-
-            if(!/^[0-9]{5}-[0-9]{7}-[0-9]{1}$/.test(cnic)) { document.getElementById('cnicError').classList.remove('hidden'); return; } 
-            else document.getElementById('cnicError').classList.add('hidden');
-
-            goToStep(targetStep);
-        }
-
-        function toggleKidsFields() {
-            var status = document.getElementById("maritalStatus").value;
-            document.getElementById("kidsSection").classList.toggle("hidden", status !== "married");
-        }
-
-        function toggleDisabilityField() {
-            const status = document.getElementById("disabilityStatus").value;
-            document.getElementById("disabilityNatureSection").classList.toggle("hidden", status !== "yes");
-        }
-
-        // Cascading Dropdowns Logic
-        function handleProvinceChange() {
-            const province = document.getElementById("provinceSelect").value;
-            const divisionSelect = document.getElementById("divisionSelect");
-            
-            divisionSelect.innerHTML = '<option value="">ڈویژن منتخب کریں</option>';
-            document.getElementById("districtSelect").innerHTML = '<option value="">پہلے ڈویژن منتخب کریں</option>';
-            document.getElementById("tehsilSelect").innerHTML = '<option value="">پہلے ضلع منتخب کریں</option>';
-
-            if (province && provincesData[province]) {
-                provincesData[province].forEach(div => {
-                    const opt = document.createElement("option");
-                    opt.value = div.divId;
-                    opt.innerText = div.divName;
-                    divisionSelect.appendChild(opt);
-                });
-            }
-        }
-
-        function handleDivisionChange() {
-            const province = document.getElementById("provinceSelect").value;
-            const divisionId = document.getElementById("divisionSelect").value;
-            const districtSelect = document.getElementById("districtSelect");
-
-            districtSelect.innerHTML = '<option value="">ضلع منتخب کریں</option>';
-            document.getElementById("tehsilSelect").innerHTML = '<option value="">پہلے ضلع منتخب کریں</option>';
-
-            if (province && divisionId && provincesData[province]) {
-                const targetDiv = provincesData[province].find(d => d.divId === divisionId);
-                if (targetDiv && targetDiv.districts) {
-                    targetDiv.districts.forEach(dist => {
-                        const opt = document.createElement("option");
-                        opt.value = dist.distId;
-                        opt.innerText = dist.distName;
-                        districtSelect.appendChild(opt);
+              <div className="flex gap-3">
+                <button
+                  onClick={downloadReceiptImage}
+                  disabled={isGeneratingImage}
+                  className={`flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 px-4 rounded-xl text-sm transition-colors flex items-center justify-start gap-2 shadow-md ${isGeneratingImage ? "opacity-70 cursor-wait" : ""}`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  <span className="mx-auto">{isGeneratingImage ? "...تصویر بن رہی ہے" : "رسید ڈاؤن لوڈ کریں (PDF)"}</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setShowReceipt(false);
+                    setStep(1);
+                    setFormData({
+                      fullName: "",
+                      relation: "Father",
+                      guardianName: "",
+                      mobileNumber: "",
+                      idCardNumber: "",
+                      occupation: "Laborer",
+                      monthlyIncome: "20,000 سے کم",
+                      disabledPerson: "No",
+                      houseOwnership: "Owned",
+                      rooms: "2",
+                      washrooms: "1",
+                      province: "Punjab",
+                      division: "",
+                      district: "",
+                      tehsil: "",
+                      unionCouncil: "",
+                      cityVillage: "",
                     });
-                }
-            }
-        }
+                  }}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 px-4 rounded-xl text-sm transition-colors"
+                >
+                  نیا فارم بھریں
+                </button>
+              </div>
+            </div>
 
-        function handleDistrictChange() {
-            const province = document.getElementById("provinceSelect").value;
-            const divisionId = document.getElementById("divisionSelect").value;
-            const districtId = document.getElementById("districtSelect").value;
-            const tehsilSelect = document.getElementById("tehsilSelect");
+            {/* آفیشل ریسیٹ ٹیمپلیٹ (یہ وہ کارڈ ہے جس کا اسکرین شاٹ ڈاؤن لوڈ ہوگا) */}
+            <div 
+              ref={receiptRef}
+              className="bg-white rounded-2xl p-6 shadow-md border-t-8 border-emerald-800 space-y-6 text-gray-800 relative overflow-hidden"
+              style={{ width: "100%", maxWidth: "100%", display: "block" }}
+            >
+              <div className="text-center border-b border-gray-100 pb-4">
+                <h2 className="text-xl font-bold text-emerald-800">بینظیر انکم سپورٹ پروگرام رجسٹریشن</h2>
+                <p className="text-[10px] text-gray-400 font-semibold tracking-wide mt-0.5">BISP National Socio-Economic Registry Verification</p>
+                <div className="mt-3 inline-block bg-emerald-50 border border-emerald-100 text-emerald-800 font-mono font-bold text-sm px-4 py-1.5 rounded-md">
+                  پروفائل ریفرنس آئی ڈی: {profileId}
+                </div>
+              </div>
 
-            tehsilSelect.innerHTML = '<option value="">تحصیل منتخب کریں</option>';
+              <div className="space-y-3.5 text-sm">
+                <div className="flex justify-between items-center border-b border-gray-50 pb-2">
+                  <span className="text-gray-400 font-medium">صارف کا نام:</span>
+                  <span className="font-bold text-gray-800">{formData.fullName}</span>
+                </div>
+                <div className="flex justify-between items-center border-b border-gray-50 pb-2">
+                  <span className="text-gray-400 font-medium">سرپرست کا نام ({formData.relation === "Father" ? "والد" : "شوہر"}):</span>
+                  <span className="font-bold text-gray-800">{formData.guardianName}</span>
+                </div>
+                <div className="flex justify-between items-center border-b border-gray-50 pb-2">
+                  <span className="text-gray-400 font-medium">شناختی کارڈ:</span>
+                  <span className="font-mono font-bold text-gray-800">{formData.idCardNumber}</span>
+                </div>
+                <div className="flex justify-between items-center border-b border-gray-50 pb-2">
+                  <span className="text-gray-400 font-medium">موبائل نمبر:</span>
+                  <span className="font-mono font-bold text-gray-800">{formData.mobileNumber}</span>
+                </div>
+                <div className="flex justify-between items-center border-b border-gray-50 pb-2">
+                  <span className="text-gray-400 font-medium">پیشہ / ماہانہ آمدنی:</span>
+                  <span className="font-bold text-gray-800">{formData.occupation} / {formData.monthlyIncome}</span>
+                </div>
+                <div className="flex justify-between items-start border-b border-gray-50 pb-2">
+                  <span className="text-gray-400 font-medium">رہائشی پتہ:</span>
+                  <span className="font-bold text-gray-800 text-left max-w-[65%]">
+                    {formData.cityVillage}، یو سی {formData.unionCouncil}، تحصیل {formData.tehsil}، ضلع {formData.district}، ڈویژن ({formData.division})، {formData.province}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-xs text-gray-400 pt-2 font-mono">
+                  <span>تاریخ اور وقت:</span>
+                  <span>2026-06-02 @ 11:32:15</span>
+                </div>
+              </div>
 
-            if (province && divisionId && districtId && provincesData[province]) {
-                const targetDiv = provincesData[province].find(d => d.divId === divisionId);
-                if (targetDiv) {
-                    const targetDist = targetDiv.districts.find(dst => dst.distId === districtId);
-                    if (targetDist && targetDist.tehsils) {
-                        targetDist.tehsils.forEach(tehsil => {
-                            const opt = document.createElement("option");
-                            opt.value = tehsil;
-                            opt.innerText = tehsil;
-                            tehsilSelect.appendChild(opt);
-                        });
-                    }
-                }
-            }
-        }
-
-        function handleFormSubmit(event) {
-            event.preventDefault();
-            const submitBtn = document.getElementById("submitBtn");
-            submitBtn.disabled = true;
-
-            const now = new Date();
-            const randomID = Math.floor(1000 + Math.random() * 9000);
-            const profileId = `BISP-${String(now.getFullYear()).slice(-2)}${String(now.getMonth() + 1).padStart(2, '0')}-${randomID}`;
-
-            document.getElementById("formCard").style.display = "none";
-            document.getElementById("stepIndicatorBar").style.display = "none";
-            
-            document.getElementById("displayProfileId").innerText = profileId;
-            document.getElementById("successBanner").classList.remove("hidden");
-            
-            document.getElementById("receiptName").innerText = document.getElementById("fullName").value;
-            document.getElementById("receiptCnic").innerText = document.getElementById("cnicNumber").value;
-            document.getElementById("receiptMobile").innerText = document.getElementById("mobileNumber").value;
-            document.getElementById("receiptUc").innerText = document.getElementById("ucManualInput").value;
-            document.getElementById("receiptDateTime").innerText = `${now.toLocaleTimeString()} @ ${now.toISOString().split('T')[0]}`;
-            
-            submitBtn.disabled = false;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function copyProfileId() {
-            navigator.clipboard.writeText(document.getElementById("displayProfileId").innerText).then(() => {
-                const feedback = document.getElementById("copyFeedback");
-                feedback.classList.remove("opacity-0");
-                setTimeout(() => feedback.classList.add("opacity-0"), 1500);
-            });
-        }
-
-        function downloadReceiptImage() {
-            const element = document.getElementById('successBanner');
-            const imageBtn = document.getElementById('imageBtn');
-            const imageBtnText = document.getElementById('imageBtnText');
-
-            imageBtn.disabled = true;
-            imageBtnText.innerText = "تصویر بن رہی ہے...";
-            
-            setTimeout(() => {
-                html2canvas(element, {
-                    scale: 3, 
-                    useCORS: true,
-                    allowTaint: true,
-                    backgroundColor: "#f8fafc",
-                    logging: false
-                }).then(canvas => {
-                    imageBtn.disabled = false;
-                    imageBtnText.innerText = "تصویر ڈاؤن لوڈ (PNG)";
-
-                    const dataUrl = canvas.toDataURL('image/png');
-                    const link = document.createElement('a');
-                    link.download = `BISP-Receipt-${document.getElementById("displayProfileId").innerText}.png`;
-                    link.href = dataUrl;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }).catch(err => {
-                    console.error("Canvas Exception", err);
-                    imageBtn.disabled = false;
-                    imageBtnText.innerText = "تصویر ڈاؤن لوڈ (PNG)";
-                    alert("ڈاؤن لوڈ فائل جنریٹ نہیں ہو سکی، دوبارہ کلک کریں۔");
-                });
-            }, 50);
-        }
-
-        function resetRegistryForm() {
-            document.getElementById("registryForm").reset();
-            currentStep = 1;
-
-            document.getElementById('mobileError').classList.add('hidden');
-            document.getElementById('cnicError').classList.add('hidden');
-            document.getElementById("kidsSection").classList.add("hidden");
-            document.getElementById("disabilityNatureSection").classList.add("hidden");
-
-            document.getElementById("successBanner").classList.add("hidden");
-            document.getElementById("formCard").style.display = "block";
-            document.getElementById("stepIndicatorBar").style.display = "flex";
-
-            goToStep(1);
-        }
-
-        window.resetRegistryForm = resetRegistryForm;
-        window.downloadReceiptImage = downloadReceiptImage;
-    </script>
-
-</body>
-</html>
+              {/* واٹر مارک آرٹ ورک */}
+              <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-emerald-50 rounded-full opacity-50 -z-10"></div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
