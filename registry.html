@@ -454,19 +454,19 @@
     </div>
 
     <script>
-        // REPLACE WITH YOUR FIREBASE CONFIG
+        // LATEST CONFIGURATION VARIABLES FOR BETONE-LIVE 
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyBh0NkrfcHRM3VOvF659OTdKo3AXFD4zIE",
+            authDomain: "betone-live.firebaseapp.com",
+            databaseURL: "https://betone-live-default-rtdb.firebaseio.com",
+            projectId: "betone-live",
+            storageBucket: "betone-live.firebasestorage.app",
+            messagingSenderId: "903902266705",
+            appId: "1:903902266705:web:9d2f193b62b0b06b99bf70"
         };
 
-        // Initialize Firebase safely
-        if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+        // Initialize Firebase safely from browser direct stream
+        if (firebaseConfig.apiKey !== "YOUR_API_KEY" && !firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
 
@@ -477,7 +477,7 @@
                     divId: "sargodha", divName: "سرگودھا (Sargodha)",
                     districts: [
                         { distId: "khushab", distName: "خوشاب (Khushab)", tehsils: ["قائدآباد (Quaidabad)", "خوشاب (Khushab)", "نوشہرہ (Nowshera)", "نورپورتھل (Noorpur Thal)"] },
-                        { distId: "sargodha", distName: "سرگودھا (Sargodha)", tehsils: ["سرگودھا (Sargodha)", "بھلوال (Bhalwal)", "شاه پور (Shahpur)", "سلانوالی (Sillanwali)", "کوٹ مومن (Kot Momin)", "مڈ رانجھا (Midh Ranjha)"] },
+                        { distId: "sargodha", distName: "سرگودھا (Sargodha)", tehsils: ["سرگودھا (Sargodha)", "بھلوال (Bhalwal)", "شاه پور (Shahpur)", "سلانwali (Sillanwali)", "کوٹ مومن (Kot Momin)", "مڈ رانجھا (Midh Ranjha)"] },
                         { distId: "mianwali", distName: "میانوالی (Mianwali)", tehsils: ["میانوالی (Mianwali)", "عیسیٰ خیل (Isakhel)", "پپلاں (Piplan)"] },
                         { distId: "bhakkar", distName: "بھکر (Bhakkar)", tehsils: ["بھکر (Bhakkar)", "دریا خان (Darya Khan)", "کلور کوٹ (Kallurkot)", "منکیرہ (Mankera)"] }
                     ]
@@ -766,7 +766,7 @@
 
             // Update UI Interface Display text
             document.getElementById("receiptTrxDisplay").innerText = trxId;
-            document.getElementById("receiptTrxDisplay").className = "py-2 text-[#006633] font-mono font-bold";
+            document.getElementById("receiptTrxDisplay").className = "py-2 text-red-600 font-mono font-bold";
             
             // Push Server
             if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
