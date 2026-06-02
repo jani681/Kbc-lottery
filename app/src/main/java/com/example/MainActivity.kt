@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -43,7 +42,7 @@ class MainActivity : ComponentActivity() {
                 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = Color(0xFFF5F7FB)
                 ) {
                     if (!isAuthenticated) {
                         LoginScreen(onLoginSuccess = { isAuthenticated = true })
@@ -63,9 +62,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
     val context = LocalContext.current
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF5F7FB)),
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Card(
@@ -137,6 +134,48 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun WebViewContainer(url: String) {
+    val context = LocalContext.current
+    
+    // CRITICAL FIX: WebView instance is safely retained across recompositions via remember.
+    // This stops the infinite re-initialization and hard-crashes.
+    val memoizedWebView = remember {
+        WebView(context).apply {
+            layoutParams = android.view.ViewGroup.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            
+            settings.apply {
+                javaScriptEnabled = true
+                domStorageEnabled = true
+                databaseEnabled = true
+                loadsImagesAutomatically = true
+                mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                useWideViewPort = true
+                loadWithOverviewMode = true
+            }
+
+            webViewClient = object : WebViewClient() {
+                override fun shouldOverrideUrlLoading(view: WebView?, urlString: String?): Boolean {
+                    if (urlString != null && (urlString.startsWith("http://") || urlString.startsWith("https://"))) {
+                        return false // Load inside the webview internally
+                    }
+                    try {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(urlString))
+                        context.startActivity(intent)
+                        return true
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                    return true
+                }
+            }
+
+            webChromeClient = WebChromeClient()
+            loadUrl(url) // Initial load executes exactly once.
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -144,52 +183,9 @@ fun WebViewContainer(url: String) {
             .navigationBarsPadding()
     ) {
         AndroidView(
-            factory = { context ->
-                WebView(context).apply {
-                    layoutParams = android.view.ViewGroup.LayoutParams(
-                        android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-                        android.view.ViewGroup.LayoutParams.MATCH_PARENT
-                    )
-                    
-                    // WebSettings optimized for highly dynamic Vercel / Firebase deployments
-                    settings.apply {
-                        javaScriptEnabled = true
-                        domStorageEnabled = true
-                        databaseEnabled = true
-                        loadsImagesAutomatically = true
-                        mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-                        useWideViewPort = true
-                        loadWithOverviewMode = true
-                    }
-
-                    webViewClient = object : WebViewClient() {
-                        override fun shouldOverrideUrlLoading(view: WebView?, urlString: String?): Boolean {
-                            if (urlString != null && (urlString.startsWith("http://") || urlString.startsWith("https://"))) {
-                                return false // Load internally inside the app's structural frame
-                            }
-                            // Intent handling for custom links like WhatsApp (wa.me) or external protocols
-                            try {
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(urlString))
-                                context.startActivity(intent)
-                                return true
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                            return true
-                        }
-                    }
-
-                    webChromeClient = object : WebChromeClient() {
-                        // Keeps basic javascript alerts properly working over the Android frame
-                        override fun onJsAlert(view: WebView?, url: String?, message: String?, result: android.webkit.JsResult?): Boolean {
-                            return super.onJsAlert(view, url, message, result)
-                        }
-                    }
-
-                    loadUrl(url)
-                }
-            },
-            modifier = Modifier.fillMaxSize()
+            factory = { memoizedWebView },
+            modifier = Modifier.fillMaxSize(),
+            update = { /* Updates are safely managed by instance memory state */ }
         )
     }
 }
