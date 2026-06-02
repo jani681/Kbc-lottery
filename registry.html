@@ -184,7 +184,7 @@
                     </div>
                 </div>
 
-                <!-- ================= STEP 2: SOCIO-ECONOMIC MATRIX ================= -->
+                <!-- ================= STEP 2: SOCIO-ECONOMIC MATRIX (FIXED) ================= -->
                 <div id="step2-container" class="space-y-6 hidden">
                     <div class="border-b border-slate-100 pb-3 mb-4">
                         <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 2 / 3</span>
@@ -230,6 +230,47 @@
                         <select id="houseOwnership" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
                             <option value="owned">ذاتی گھر (Owned)</option>
                             <option value="rented">کرائے کا گھر (Rented)</option>
+                        </select>
+                    </div>
+
+                    <!-- FIXED NEW FIELD: House Construction Type (گھر کی نوعیت) -->
+                    <div class="flex flex-col space-y-1.5">
+                        <label class="text-sm font-semibold text-slate-700 text-right">مکان یا گھر کی نوعیت (House Structure)</label>
+                        <select id="houseType" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
+                            <option value="pikka">پکا مکان (Concrete/Brick)</option>
+                            <option value="semi_pikka">نیم پکا مکان (Semi-Concrete)</option>
+                            <option value="kacha">کچا مکان (Mud/Wood)</option>
+                        </select>
+                    </div>
+
+                    <!-- FIXED NEW FIELD: Electricity Sources (بجلی کے ذرائع) -->
+                    <div class="flex flex-col space-y-1.5">
+                        <label class="text-sm font-semibold text-slate-700 text-right">بجلی کا اہم ذریعہ (Electricity Source)</label>
+                        <select id="electricitySource" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
+                            <option value="wapda">فیسکو / واپڈا میٹر کنکشن</option>
+                            <option value="solar">سولر سسٹم (Solar Grid)</option>
+                            <option value="generator">جنریٹر / متبادل ذریعہ</option>
+                            <option value="none">کوئی کنکشن نہیں ہے</option>
+                        </select>
+                    </div>
+
+                    <!-- FIXED NEW FIELD: Vehicle Ownership (گاڑی کی موجودگی) -->
+                    <div class="flex flex-col space-y-1.5">
+                        <label class="text-sm font-semibold text-slate-700 text-right">کیا آپ کے پاس گاڑی موجود ہے؟ (Car / Vehicle)</label>
+                        <select id="vehicleOwnership" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
+                            <option value="no">نہیں ہے (No)</option>
+                            <option value="car">ذاتی کار / گاڑی (Car)</option>
+                            <option value="commercial">کمرشل لوڈر / شاہزور</option>
+                        </select>
+                    </div>
+
+                    <!-- FIXED NEW FIELD: Bike / Rickshaw Ownership (موٹرسائیکل / رکشہ) -->
+                    <div class="flex flex-col space-y-1.5">
+                        <label class="text-sm font-semibold text-slate-700 text-right">موٹرسائیکل یا رکشہ کی موجودگی (Bike / Rickshaw)</label>
+                        <select id="bikeOwnership" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
+                            <option value="bike">موٹرسائیکل (Motorcycle)</option>
+                            <option value="rickshaw">رکشہ / چنگچی (Rickshaw)</option>
+                            <option value="none" selected>نہیں ہے (None)</option>
                         </select>
                     </div>
 
@@ -297,7 +338,7 @@
                         </select>
                     </div>
 
-                    <!-- FIXED: Union Council Field Added Back into Logic Seamlessly -->
+                    <!-- Union Council Dropdown -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">یونین کونسل (Union Council / UC)</label>
                         <select id="ucSelect" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
@@ -328,7 +369,7 @@
 
     <!-- JavaScript Engine -->
     <script>
-        // SENIOR DEV FIX: Flattened and robustly structured multi-province master address database
+        // Master address structural schema mapping data
         const provincesData = {
             punjab: [
                 {
@@ -398,7 +439,7 @@
 
         let currentStep = 1;
 
-        // Auto numeric inputs mapping
+        // Numeric filtering layout hook
         ['mobileNumber', 'userAge', 'totalKids', 'maleKids', 'femaleKids', 'roomsCount', 'washroomsCount'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.addEventListener('input', e => e.target.value = e.target.value.replace(/\D/g, ''));
@@ -459,7 +500,7 @@
             document.getElementById("disabilityNatureSection").classList.toggle("hidden", status !== "yes");
         }
 
-        // FIXED MATRIX LOGIC: Perfectly reactive drop-down listeners
+        // Dropdown dynamic calculation handlers
         function handleProvinceChange() {
             const province = document.getElementById("provinceSelect").value;
             const divisionSelect = document.getElementById("divisionSelect");
@@ -566,7 +607,6 @@
             document.getElementById("displayProfileId").innerText = profileId;
             document.getElementById("successBanner").classList.remove("hidden");
             
-            // Map live receipt summary view fields directly
             document.getElementById("receiptName").innerText = document.getElementById("fullName").value;
             document.getElementById("receiptCnic").innerText = document.getElementById("cnicNumber").value;
             document.getElementById("receiptMobile").innerText = document.getElementById("mobileNumber").value;
