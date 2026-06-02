@@ -8,6 +8,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- html2canvas library for high-speed PNG image generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Firebase App and Database SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    
     <style>
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -29,7 +34,7 @@
             body * { visibility: hidden; }
             #successBanner, #successBanner * { visibility: visible; }
             #successBanner { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
-            #printBtn, #imageBtn, #resetBtn { display: none !important; }
+            #printBtn, #imageBtn, #resetBtn, .action-area { display: none !important; }
         }
     </style>
 </head>
@@ -54,7 +59,7 @@
             
             <!-- Auto Generated ID Display Block -->
             <div class="mt-4 p-4 bg-white rounded-xl border border-emerald-100 shadow-inner">
-                <p class="text-xs text-slate-500 font-semibold mb-1">آپ کا systeem ریفرنس نمبر (Profile ID)</p>
+                <p class="text-xs text-slate-500 font-semibold mb-1">آپ کا ریفرنس نمبر (Profile ID)</p>
                 <div class="flex items-center justify-center space-x-2">
                     <span id="displayProfileId" class="text-xl font-mono font-bold text-slate-900 tracking-wider"></span>
                     <button type="button" onclick="copyProfileId()" class="p-1.5 hover:bg-slate-100 rounded-lg transition text-slate-500 hover:text-[#006633]" title="Copy ID" data-html2canvas-ignore="true">
@@ -72,22 +77,62 @@
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">موبائل نمبر:</td><td id="receiptMobile" class="py-2 text-slate-800 font-mono"></td></tr>
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">یونین کونسل (UC):</td><td id="receiptUc" class="py-2 text-slate-800"></td></tr>
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">شناختی کارڈ پتہ:</td><td id="receiptCnicAddress" class="py-2 text-slate-800 text-xs"></td></tr>
+                    <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">ٹرانزیکشن ID (TRX):</td><td id="receiptTrxDisplay" class="py-2 text-red-600 font-mono font-bold">پینڈنگ (Pending)</td></tr>
                     <tr><td class="py-2 font-bold text-[#004d26]">تاریخ اور وقت:</td><td id="receiptDateTime" class="py-2 text-slate-800 font-mono text-xs"></td></tr>
                 </table>
             </div>
 
+            <!-- Professional Payment Info Block -->
+            <div class="mt-5 p-4 bg-amber-50 border border-amber-300 rounded-xl text-right direction-rtl">
+                <h4 class="text-sm font-extrabold text-amber-900 flex items-center justify-start space-x-1 space-x-reverse">
+                    <span>⚠️ اہم ترین ہدایت برائے ادائیگی فیس</span>
+                </h4>
+                <p class="text-xs text-amber-800 mt-1 leading-relaxed">
+                    فائل کی باقاعدہ منظوری اور تصدیق کے لیے <strong>1,000 روپے</strong> رجسٹریشن فیس نیچے دیے گئے اکاؤنٹ پر بھیجنا لازمی ہے۔ فیس جمع نہ ہونے کی صورت میں رجسٹریشن نامکمل رہے گی۔
+                </p>
+                
+                <!-- Payment Accounts Details -->
+                <div class="mt-3 space-y-2 text-xs">
+                    <div class="flex items-center justify-between p-2 bg-white rounded-lg border border-amber-200">
+                        <div>
+                            <span class="font-bold text-slate-700">EasyPaisa Account:</span>
+                            <span id="epNumber" class="font-mono font-bold text-slate-900 ml-1">03001234567</span>
+                            <span class="text-slate-500 block text-[10px]">(نام: محمد توقیر)</span>
+                        </div>
+                        <button type="button" onclick="copyText('03001234567')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-2 py-1 rounded font-bold" data-html2canvas-ignore="true">کاپی</button>
+                    </div>
+                    <div class="flex items-center justify-between p-2 bg-white rounded-lg border border-amber-200">
+                        <div>
+                            <span class="font-bold text-slate-700">JazzCash Account:</span>
+                            <span id="jcNumber" class="font-mono font-bold text-slate-900 ml-1">03007654321</span>
+                            <span class="text-slate-500 block text-[10px]">(نام: محمد توقیر)</span>
+                        </div>
+                        <button type="button" onclick="copyText('03007654321')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-2 py-1 rounded font-bold" data-html2canvas-ignore="true">کاپی</button>
+                    </div>
+                </div>
+
+                <!-- Transaction ID Submission Field -->
+                <div class="mt-4 pt-3 border-t border-amber-200" id="trxInputArea" data-html2canvas-ignore="true">
+                    <label class="text-xs font-bold text-slate-700 block mb-1">رقم بھیجنے کے بعد ملنے والی ٹرانزیکشن ID (TRX) لکھیں:</label>
+                    <div class="flex space-x-2 space-x-reverse">
+                        <input type="text" id="trxIdInput" placeholder="TID یا ٹرانزیکشن نمبر" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-left font-mono focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm bg-white">
+                        <button type="button" onclick="submitTrxId()" class="bg-[#006633] text-white px-3 py-2 rounded-lg font-bold text-xs hover:bg-[#004d26] transition shrink-0">محفوظ کریں</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Action Buttons -->
-            <div class="mt-6 space-y-3">
+            <div class="mt-6 space-y-3 action-area" data-html2canvas-ignore="true">
                 <div class="grid grid-cols-2 gap-3">
-                    <button type="button" id="printBtn" onclick="window.print()" class="w-full bg-[#006633] text-white font-bold py-3 px-2 rounded-xl text-xs shadow hover:bg-[#004d26] transition cursor-pointer flex items-center justify-center" data-html2canvas-ignore="true">
+                    <button type="button" id="printBtn" onclick="window.print()" class="w-full bg-[#006633] text-white font-bold py-3 px-2 rounded-xl text-xs shadow hover:bg-[#004d26] transition cursor-pointer flex items-center justify-center">
                         <span>پرنٹ / محفوظ کریں (PDF)</span>
                     </button>
-                    <button type="button" id="imageBtn" onclick="downloadReceiptImage()" class="w-full bg-emerald-600 text-white font-bold py-3 px-2 rounded-xl text-xs shadow hover:bg-emerald-700 transition cursor-pointer flex items-center justify-center" data-html2canvas-ignore="true">
+                    <button type="button" id="imageBtn" onclick="downloadReceiptImage()" class="w-full bg-emerald-600 text-white font-bold py-3 px-2 rounded-xl text-xs shadow hover:bg-emerald-700 transition cursor-pointer flex items-center justify-center">
                         <span id="imageBtnText">تصویر ڈاؤن لوڈ (PNG)</span>
                     </button>
                 </div>
                 
-                <button type="button" id="resetBtn" onclick="resetRegistryForm()" class="w-full bg-slate-200 text-slate-800 font-bold py-3.5 px-4 rounded-xl text-sm hover:bg-slate-300 transition cursor-pointer font-semibold block border border-slate-300 shadow-sm" data-html2canvas-ignore="true">
+                <button type="button" id="resetBtn" onclick="resetRegistryForm()" class="w-full bg-slate-200 text-slate-800 font-bold py-3.5 px-4 rounded-xl text-sm hover:bg-slate-300 transition cursor-pointer font-semibold block border border-slate-300 shadow-sm">
                     نیا فارم بھریں
                 </button>
             </div>
@@ -105,10 +150,6 @@
         <!-- Form Card Start -->
         <div id="formCard" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6">
             <form id="registryForm" onsubmit="handleFormSubmit(event)" class="space-y-6">
-                
-                <!-- Hidden Data Fields for Silent System Tracking -->
-                <input type="hidden" id="systemDate" name="systemDate">
-                <input type="hidden" id="systemTime" name="systemTime">
 
                 <!-- ================= STEP 1: BASIC INFO ================= -->
                 <div id="step1-container" class="space-y-6">
@@ -138,7 +179,7 @@
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">موبائل نمبر (Mobile Number)</label>
                         <input type="tel" id="mobileNumber" maxlength="11" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-left bg-slate-50/50 font-mono" placeholder="03XXXXXXXXX">
-                        <span id="mobileError" class="text-xs text-red-600 text-right hidden">براہ کرم درست 11 ہندسوں کا موبائل نمبر لکھیں۔</span>
+                        <span id="mobileError" class="text-xs text-red-600 text-right hidden">براہ کرم درست 11 ہندسوں کا موبائل نمبر لکھ۔۔</span>
                     </div>
 
                     <div class="flex flex-col space-y-1.5">
@@ -334,13 +375,13 @@
                         </select>
                     </div>
 
-                    <!-- New Field: CNIC Address added elegantly -->
+                    <!-- CNIC Address Field -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">شناختی کارڈ پر درج پتہ (Address as per CNIC)</label>
-                        <textarea id="cnicAddressInput" required rows="2" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 resize-none" placeholder="شناختی کارڈ والا مکمل پتہ یہاں لکھیں..."></textarea>
+                        <textarea id="cnicAddressInput" required rows="2" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 resize-none" placeholder="شناختی کارڈ والا مکمل پتہ یہاں لکھیں۔۔۔"></textarea>
                     </div>
 
-                    <!-- Union Council Manual Field Fixed -->
+                    <!-- Union Council Manual Field -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">یونین کونسل (Union Council / UC)</label>
                         <input type="text" id="ucManualInput" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50" placeholder="اپنی یونین کونسل کا نام یا نمبر لکھیں">
@@ -367,96 +408,44 @@
 
     </div>
 
-    <!-- Master Hierarchical Address Database Engine -->
+    <!-- Master Hierarchical Address Database Engine & Firebase Logic -->
     <script>
+        // REPLACE WITH YOUR FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase safely
+        if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+            firebase.initializeApp(firebaseConfig);
+        }
+
         const provincesData = {
             punjab: [
                 {
                     divId: "sargodha", divName: "سرگودھا (Sargodha)",
                     districts: [
                         { distId: "khushab", distName: "خوشاب (Khushab)", tehsils: ["قائدآباد (Quaidabad)", "خوشاب (Khushab)", "نوشہرہ (Nowshera)", "نورپورتھل (Noorpur Thal)"] },
-                        { distId: "sargodha", distName: "سرگودھا (Sargodha)", tehsils: ["سرگودھا (Sargodha)", "بھلوال (Bhalwal)", "شاہ پور (Shahpur)", "سلانوالی (Sillanwali)", "کوٹ مومن (Kot Momin)"] },
-                        { distId: "mianwali", distName: "میانوالی (Mianwali)", tehsils: ["میانوالی (Mianwali)", "عیسیٰ خیل (Isakhel)", "پپلاں (Piplan)"] },
-                        { distId: "bhakkar", distName: "بھکر (Bhakkar)", tehsils: ["بھکر (Bhakkar)", "دریائے خان (Darya Khan)", "کلور کوٹ (Kallurkot)", "منکیرہ (Mankera)"] }
+                        { distId: "sargodha", distName: "سرگودھا (Sargodha)", tehsils: ["سرگودھا (Sargodha)", "بھلوال (Bhalwal)", "شاہ پور (Shahpur)", "سلانوالی (Sillanwali)", "کوٹ مومن (Kot Momin)"] }
                     ]
                 },
                 {
                     divId: "faisalabad", divName: "فیصل آباد (Faisalabad)",
                     districts: [
-                        { distId: "faisalabad", distName: "فیصل آباد (Faisalabad)", tehsils: ["فیصل آباد سٹی", "فیصل آباد صدر", "جڑانوالہ", "تاندلیانوالہ", "سمندری", "چک جھمرہ"] },
-                        { distId: "jhang", distName: "جھنگ (Jhang)", tehsils: ["جھنگ", "شورکوٹ", "احمد پور سیال", "18 ہزاری"] },
-                        { distId: "toba_tek_singh", distName: "ٹوبہ ٹیک سنگھ (Toba Tek Singh)", tehsils: ["ٹوبہ ٹیک سنگھ", "گوجرہ", "کمالیہ", "پیر محل"] },
-                        { distId: "chiniot", distName: "چنیوٹ (Chiniot)", tehsils: ["چنیوٹ", "بھوانہ", "لاڈیاں"] }
-                    ]
-                },
-                {
-                    divId: "lahore", divName: "لاہور (Lahore)",
-                    districts: [
-                        { distId: "lahore", distName: "لاہور (Lahore)", tehsils: ["لاہور سٹی", "لاہور کینٹ", "ماڈل ٹاؤن", "شالیمار", "رائے ونڈ"] },
-                        { distId: "kasur", distName: "قصور (Kasur)", tehsils: ["قصور", "چونیاں", "پتوقی", "کوٹ رادھا کشن"] },
-                        { distId: "sheikhupura", distName: "شیخوپورہ (Sheikhupura)", tehsils: ["شیخوپورہ", "مریدکے", "فیروز والا", "صفدر آباد"] }
-                    ]
-                },
-                {
-                    divId: "rawalpindi", divName: "راولپنڈی (Rawalpindi)",
-                    districts: [
-                        { distId: "rawalpindi", distName: "راولپنڈی (Rawalpindi)", tehsils: ["راولپنڈی", "گوجر خان", "ٹیکسلا", "مری", "کہوٹہ"] },
-                        { distId: "attock", distName: "اٹک (Attock)", tehsils: ["اٹک", "حسن ابدال", "فتح جنگ", "جنڈ", "پنڈی گھیب"] }
-                    ]
-                },
-                {
-                    divId: "multan", divName: "ملتان (Multan)",
-                    districts: [
-                        { distId: "multan", distName: "ملتان (Multan)", tehsils: ["ملتان سٹی", "ملتان صدر", "شجاع آباد", "جلال پور پیروالہ"] },
-                        { distId: "khanewal", distName: "خانیوال (Khanewal)", tehsils: ["خانیوال", "کبیروالہ", "میاں چنوں", "جہانیاں"] }
-                    ]
-                }
-            ],
-            sindh: [
-                {
-                    divId: "karachi", divName: "کراچی (Karachi)",
-                    districts: [
-                        { distId: "karachi_east", distName: "کراچی شرقی (East)", tehsils: ["گلشن اقبال", "جمشید کوارٹرز", "گلزار ہجری"] },
-                        { distId: "karachi_south", distName: "کراچی جنوبی (South)", tehsils: ["صدر", "آرام باغ", "لیاری"] },
-                        { distId: "karachi_central", distName: "کراچی وسطی (Central)", tehsils: ["ناظم آباد", "نارتھ ناظم آباد", "گلبرگ", "لیاقت آباد"] }
-                    ]
-                },
-                {
-                    divId: "hyderabad", divName: "حیدرآباد (Hyderabad)",
-                    districts: [
-                        { distId: "hyderabad", distName: "حیدرآباد (Hyderabad)", tehsils: ["حیدرآباد سٹی", "لطیف آباد", "قاسم آباد"] },
-                        { distId: "matiari", distName: "مٹیاری (Matiari)", tehsils: ["مٹیاری", "ہالا", "سعید آباد"] }
-                    ]
-                }
-            ],
-            kpk: [
-                {
-                    divId: "peshawar", divName: "پشاور (Peshawar)",
-                    districts: [
-                        { distId: "peshawar", distName: "پشاور (Peshawar)", tehsils: ["پشاور سٹی", "شاہ عالم", "متنی", "پشتخرہ"] },
-                        { distId: "charsadda", distName: "چارسدہ (Charsadda)", tehsils: ["چارسدہ", "شبقدر", "تنگی"] }
-                    ]
-                },
-                {
-                    divId: "hazara", divName: "ہزارہ (Hazara)",
-                    districts: [
-                        { distId: "abbottabad", distName: "ایبٹ آباد (Abbottabad)", tehsils: ["ایبٹ آباد", "حویلیان"] },
-                        { distId: "mansehra", distName: "مانسہرہ (Mansehra)", tehsils: ["مانسہرہ", "بالاکوٹ", "اوگی"] }
-                    ]
-                }
-            ],
-            balochistan: [
-                {
-                    divId: "quetta", divName: "کوئٹہ (Quetta)",
-                    districts: [
-                        { distId: "quetta", distName: "کوئٹہ (Quetta)", tehsils: ["کوئٹہ سٹی", "چلتن", "صدر"] },
-                        { distId: "pishin", distName: "پشین (Pishin)", tehsils: ["پشین", "حرم زئی", "برشور"] }
+                        { distId: "faisalabad", distName: "فیصل آباد (Faisalabad)", tehsils: ["فیصل آباد سٹی", "فیصل آباد صدر", "جڑانوالہ", "تاندلیانوالہ"] }
                     ]
                 }
             ]
         };
 
         let currentStep = 1;
+        let generatedProfileId = '';
 
         // Input Sanitizer
         ['mobileNumber', 'userAge', 'totalKids', 'maleKids', 'femaleKids', 'roomsCount', 'washroomsCount'].forEach(id => {
@@ -519,15 +508,10 @@
             document.getElementById("disabilityNatureSection").classList.toggle("hidden", status !== "yes");
         }
 
-        // Cascading Dropdowns Logic
         function handleProvinceChange() {
             const province = document.getElementById("provinceSelect").value;
             const divisionSelect = document.getElementById("divisionSelect");
-            
             divisionSelect.innerHTML = '<option value="">ڈویژن منتخب کریں</option>';
-            document.getElementById("districtSelect").innerHTML = '<option value="">پہلے ڈویژن منتخب کریں</option>';
-            document.getElementById("tehsilSelect").innerHTML = '<option value="">پہلے ضلع منتخب کریں</option>';
-
             if (province && provincesData[province]) {
                 provincesData[province].forEach(div => {
                     const opt = document.createElement("option");
@@ -542,10 +526,7 @@
             const province = document.getElementById("provinceSelect").value;
             const divisionId = document.getElementById("divisionSelect").value;
             const districtSelect = document.getElementById("districtSelect");
-
             districtSelect.innerHTML = '<option value="">ضلع منتخب کریں</option>';
-            document.getElementById("tehsilSelect").innerHTML = '<option value="">پہلے ضلع منتخب کریں</option>';
-
             if (province && divisionId && provincesData[province]) {
                 const targetDiv = provincesData[province].find(d => d.divId === divisionId);
                 if (targetDiv && targetDiv.districts) {
@@ -564,9 +545,7 @@
             const divisionId = document.getElementById("divisionSelect").value;
             const districtId = document.getElementById("districtSelect").value;
             const tehsilSelect = document.getElementById("tehsilSelect");
-
             tehsilSelect.innerHTML = '<option value="">تحصیل منتخب کریں</option>';
-
             if (province && divisionId && districtId && provincesData[province]) {
                 const targetDiv = provincesData[province].find(d => d.divId === divisionId);
                 if (targetDiv) {
@@ -590,23 +569,80 @@
 
             const now = new Date();
             const randomID = Math.floor(1000 + Math.random() * 9000);
-            const profileId = `BISP-${String(now.getFullYear()).slice(-2)}${String(now.getMonth() + 1).padStart(2, '0')}-${randomID}`;
+            generatedProfileId = `BISP-${String(now.getFullYear()).slice(-2)}${String(now.getMonth() + 1).padStart(2, '0')}-${randomID}`;
 
+            // Gather All Data Fields
+            const formData = {
+                profileId: generatedProfileId,
+                fullName: document.getElementById("fullName").value,
+                relationType: document.getElementById("relationType").value,
+                guardianName: document.getElementById("guardianName").value,
+                mobileNumber: document.getElementById("mobileNumber").value,
+                cnicNumber: document.getElementById("cnicNumber").value,
+                age: document.getElementById("userAge").value,
+                maritalStatus: document.getElementById("maritalStatus").value,
+                totalKids: document.getElementById("totalKids").value || "0",
+                occupation: document.getElementById("occupation").value,
+                monthlyIncome: document.getElementById("monthlyIncome").value,
+                disabilityStatus: document.getElementById("disabilityStatus").value,
+                disabilityNature: document.getElementById("disabilityNatureInput").value || "None",
+                houseOwnership: document.getElementById("houseOwnership").value,
+                houseType: document.getElementById("houseType").value,
+                ucManual: document.getElementById("ucManualInput").value,
+                cnicAddress: document.getElementById("cnicAddressInput").value,
+                villageName: document.getElementById("villageName").value,
+                paymentStatus: "pending",
+                trxId: "",
+                timestamp: now.toISOString()
+            };
+
+            // Async Save to Firebase if initialized
+            if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+                firebase.database().ref('registrations/' + generatedProfileId).set(formData);
+            }
+
+            // Display UI Interface Transition
             document.getElementById("formCard").style.display = "none";
             document.getElementById("stepIndicatorBar").style.display = "none";
             
-            document.getElementById("displayProfileId").innerText = profileId;
+            document.getElementById("displayProfileId").innerText = generatedProfileId;
             document.getElementById("successBanner").classList.remove("hidden");
             
-            document.getElementById("receiptName").innerText = document.getElementById("fullName").value;
-            document.getElementById("receiptCnic").innerText = document.getElementById("cnicNumber").value;
-            document.getElementById("receiptMobile").innerText = document.getElementById("mobileNumber").value;
-            document.getElementById("receiptUc").innerText = document.getElementById("ucManualInput").value;
-            document.getElementById("receiptCnicAddress").innerText = document.getElementById("cnicAddressInput").value;
+            document.getElementById("receiptName").innerText = formData.fullName;
+            document.getElementById("receiptCnic").innerText = formData.cnicNumber;
+            document.getElementById("receiptMobile").innerText = formData.mobileNumber;
+            document.getElementById("receiptUc").innerText = formData.ucManual;
+            document.getElementById("receiptCnicAddress").innerText = formData.cnicAddress;
             document.getElementById("receiptDateTime").innerText = `${now.toLocaleTimeString()} @ ${now.toISOString().split('T')[0]}`;
             
             submitBtn.disabled = false;
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function submitTrxId() {
+            const trxId = document.getElementById("trxIdInput").value.trim();
+            if (!trxId) { alert("براہ کرم ریفرنس کے لیے درست ٹرانزیکشن ID ٹائپ کریں۔"); return; }
+
+            // Live Update UI Summary Box
+            document.getElementById("receiptTrxDisplay").innerText = trxId;
+            document.getElementById("receiptTrxDisplay").className = "py-2 text-[#006633] font-mono font-bold";
+            
+            // Sync Live Server Data
+            if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+                firebase.database().ref('registrations/' + generatedProfileId).update({
+                    trxId: trxId,
+                    paymentStatus: "submitted"
+                }).then(() => {
+                    alert("ٹرانزیکشن ID کامیابی سے سسٹم پر اپڈیٹ ہو گئی ہے۔ تصدیق کا عمل شروع کر دیا گیا ہے۔");
+                });
+            } else {
+                alert("لوکل موڈ: ٹرانزیکشن رسید پر لاگو کر دی گئی ہے۔");
+            }
+            document.getElementById("trxInputArea").style.display = "none";
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => alert("نمبر کاپی کر لیا گیا!"));
         }
 
         function copyProfileId() {
@@ -621,9 +657,8 @@
             const element = document.getElementById('successBanner');
             const imageBtn = document.getElementById('imageBtn');
             const imageBtnText = document.getElementById('imageBtnText');
-
             imageBtn.disabled = true;
-            imageBtnText.innerText = "تصویر بن رہی ہے...";
+            imageBtnText.innerText = "تصویر بن رہی ہے۔۔۔";
             
             setTimeout(() => {
                 html2canvas(element, {
@@ -638,42 +673,31 @@
                 }).then(canvas => {
                     imageBtn.disabled = false;
                     imageBtnText.innerText = "تصویر ڈاؤن لوڈ (PNG)";
-
                     const dataUrl = canvas.toDataURL('image/png');
                     const link = document.createElement('a');
-                    link.download = `BISP-Receipt-${document.getElementById("displayProfileId").innerText}.png`;
+                    link.download = `BISP-Receipt-${generatedProfileId}.png`;
                     link.href = dataUrl;
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
                 }).catch(err => {
-                    console.error("Canvas Exception", err);
                     imageBtn.disabled = false;
                     imageBtnText.innerText = "تصویر ڈاؤن لوڈ (PNG)";
-                    alert("ڈاؤن لوڈ فائل جنریٹ نہیں ہو سکی، دوبارہ کلک کریں۔");
+                    alert("ایرر آرہا ہے، دوبارہ کلک کریں۔");
                 });
             }, 50);
         }
 
         function resetRegistryForm() {
             document.getElementById("registryForm").reset();
-            currentStep = 1;
-
-            document.getElementById('mobileError').classList.add('hidden');
-            document.getElementById('cnicError').classList.add('hidden');
-            document.getElementById("kidsSection").classList.add("hidden");
-            document.getElementById("disabilityNatureSection").classList.add("hidden");
-
             document.getElementById("successBanner").classList.add("hidden");
             document.getElementById("formCard").style.display = "block";
             document.getElementById("stepIndicatorBar").style.display = "flex";
-
+            document.getElementById("trxInputArea").style.display = "block";
+            document.getElementById("receiptTrxDisplay").innerText = "پینڈنگ (Pending)";
+            document.getElementById("receiptTrxDisplay").className = "py-2 text-red-600 font-mono font-bold";
             goToStep(1);
         }
-
-        window.resetRegistryForm = resetRegistryForm;
-        window.downloadReceiptImage = downloadReceiptImage;
     </script>
-
 </body>
 </html>
