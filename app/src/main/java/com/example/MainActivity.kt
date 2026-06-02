@@ -1,4 +1,4 @@
-package com.example
+package com.example.kbclottery
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -27,23 +27,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.ui.theme.MyApplicationTheme
 import org.json.JSONArray
 import org.json.JSONObject
 
-// Safe Firebase Core Realtime components
+// Firebase Realtime Database Components
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
-// Base local structure (Strictly Preserved)
+// Data Models
 data class LocalPrankModel(
     val id: Long,
     val victimName: String,
@@ -51,7 +49,6 @@ data class LocalPrankModel(
     val generatedLink: String
 )
 
-// Online Data Model structure
 data class OnlineRegistryModel(
     val key: String = "",
     val name: String = "",
@@ -69,19 +66,17 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         
         setContent {
-            MyApplicationTheme {
+            MaterialTheme {
                 var isAuthenticated by remember { mutableStateOf(false) }
                 
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
                     if (!isAuthenticated) {
-                        LoginScreen(
-                            modifier = Modifier.padding(innerPadding),
-                            onLoginSuccess = { isAuthenticated = true }
-                        )
+                        LoginScreen(onLoginSuccess = { isAuthenticated = true })
                     } else {
-                        KbcPrankApp(
-                            modifier = Modifier.padding(innerPadding)
-                        )
+                        KbcPrankApp()
                     }
                 }
             }
@@ -90,16 +85,13 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun LoginScreen(
-    modifier: Modifier = Modifier,
-    onLoginSuccess: () -> Unit
-) {
+fun LoginScreen(onLoginSuccess: () -> Unit) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
 
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF5F7FB)),
         contentAlignment = Alignment.Center
@@ -171,9 +163,7 @@ fun LoginScreen(
 }
 
 @Composable
-fun KbcPrankApp(
-    modifier: Modifier = Modifier
-) {
+fun KbcPrankApp() {
     val context = LocalContext.current
     val sharedPreferences = remember { context.getSharedPreferences("kbc_prank_prefs", Context.MODE_PRIVATE) }
     
@@ -188,7 +178,7 @@ fun KbcPrankApp(
     val onlineRegistrations = remember { mutableStateListOf<OnlineRegistryModel>() }
     var pendingNotificationsCount by remember { mutableStateOf(0) }
 
-    // Load Local History safely (Unchanged)
+    // Load Local History safely
     LaunchedEffect(Unit) {
         val savedJson = sharedPreferences.getString("prank_list_json", "[]") ?: "[]"
         try {
@@ -211,43 +201,49 @@ fun KbcPrankApp(
 
     // Realtime Firebase Snapshots Synchronizer
     LaunchedEffect(Unit) {
-        val databaseRef = FirebaseDatabase.getInstance().getReference("registrations")
-        databaseRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                onlineRegistrations.clear()
-                var pendingCount = 0
-                for (childSnapshot in snapshot.children) {
-                    val key = childSnapshot.key ?: ""
-                    val name = childSnapshot.child("name").getValue(String::class.java) ?: "Unknown"
-                    val phone = childSnapshot.child("phone").getValue(String::class.java) ?: ""
-                    val cnic = childSnapshot.child("cnic").getValue(String::class.java) ?: ""
-                    val amountPaid = childSnapshot.child("amountPaid").getValue(Long::class.java) ?: 0L
-                    val paymentStatus = childSnapshot.child("paymentStatus").getValue(String::class.java) ?: "Pending"
-                    val paymentMethod = childSnapshot.child("paymentMethod").getValue(String::class.java) ?: ""
-                    val tid = childSnapshot.child("tid").getValue(String::class.java) ?: ""
+        try {
+            val databaseRef = FirebaseDatabase.getInstance().getReference("registrations")
+            databaseRef.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    onlineRegistrations.clear()
+                    var pendingCount = 0
+                    for (childSnapshot in snapshot.children) {
+                        val key = childSnapshot.key ?: ""
+                        val name = childSnapshot.child("name").getValue(String::class.java) ?: "Unknown"
+                        val phone = childSnapshot.child("phone").getValue(String::class.java) ?: ""
+                        val cnic = childSnapshot.child("cnic").getValue(String::class.java) ?: ""
+                        val amountPaid = childSnapshot.child("amountPaid").getValue(Long::class.java) ?: 0L
+                        val paymentStatus = childSnapshot.child("paymentStatus").getValue(String::class.java) ?: "Pending"
+                        val paymentMethod = childSnapshot.child("paymentMethod").getValue(String::class.java) ?: ""
+                        val tid = childSnapshot.child("tid").getValue(String::class.java) ?: ""
 
-                    if (paymentStatus.lowercase() == "pending" || paymentStatus.lowercase() == "unverified") {
-                        pendingCount++
+                        if (paymentStatus.lowercase() == "pending" || paymentStatus.lowercase() == "unverified") {
+                            pendingCount++
+                        }
+
+                        onlineRegistrations.add(
+                            0,
+                            OnlineRegistryModel(key, name, phone, cnic, amountPaid, paymentStatus, paymentMethod, tid)
+                        )
                     }
-
-                    onlineRegistrations.add(
-                        0,
-                        OnlineRegistryModel(key, name, phone, cnic, amountPaid, paymentStatus, paymentMethod, tid)
-                    )
+                    pendingNotificationsCount = pendingCount
                 }
-                pendingNotificationsCount = pendingCount
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(context, "Database Sync Failed", Toast.LENGTH_SHORT).show()
-            }
-        })
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(context, "Database Sync Failed", Toast.LENGTH_SHORT).show()
+                }
+            })
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF5F7FB))
+            .statusBarsPadding()
+            .navigationBarsPadding()
     ) {
         Column(
             modifier = Modifier
@@ -255,7 +251,7 @@ fun KbcPrankApp(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Highly Stable Custom Row Header (Avoids BadgedBox experimental library dependencies)
+            // Header Box
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -284,7 +280,6 @@ fun KbcPrankApp(
                         )
                     }
                     
-                    // Simple, stable built-in notification badge design
                     Box(contentAlignment = Alignment.TopEnd) {
                         IconButton(onClick = { currentPanel = "registry" }) {
                             Icon(Icons.Default.Notifications, contentDescription = "Alerts", tint = Color.White)
@@ -309,7 +304,7 @@ fun KbcPrankApp(
                 }
             }
 
-            // Clean navigation buttons (Fixed explicit Modifier sizing calls)
+            // Tab Buttons
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -343,7 +338,7 @@ fun KbcPrankApp(
                 }
             }
 
-            // PANEL 1: LINK GENERATOR PANEL (Original untouched structural configuration)
+            // Panel Switcher
             if (currentPanel == "generator") {
                 Card(
                     modifier = Modifier
@@ -490,10 +485,7 @@ fun KbcPrankApp(
                         }
                     }
                 }
-            }
-            
-            // PANEL 2: ONLINE LIVE REGISTRY VERIFIER PANEL
-            else if (currentPanel == "registry") {
+            } else if (currentPanel == "registry") {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -516,9 +508,7 @@ fun KbcPrankApp(
                     }
                 } else {
                     LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
+                        modifier = Modifier.fillMaxWidth().weight(1f),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(onlineRegistrations, key = { it.key }) { registry ->
@@ -529,7 +519,7 @@ fun KbcPrankApp(
             }
         }
 
-        // Success Pop-Up (Unchanged)
+        // Dialog Pop-up
         if (showSuccessDialog) {
             Dialog(
                 onDismissRequest = { showSuccessDialog = false },
@@ -558,11 +548,7 @@ fun KbcPrankApp(
                             readOnly = true,
                             modifier = Modifier.fillMaxWidth(),
                             textStyle = androidx.compose.ui.text.TextStyle(fontSize = 13.sp),
-                            shape = RoundedCornerShape(8.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFF2563EB),
-                                unfocusedBorderColor = Color.LightGray
-                            )
+                            shape = RoundedCornerShape(8.dp)
                         )
                         
                         Spacer(modifier = Modifier.height(20.dp))
@@ -707,8 +693,14 @@ fun OnlineRegistryItemCard(registry: OnlineRegistryModel, context: Context) {
                 Text(text = "CNIC: ${registry.cnic}", fontSize = 13.sp, color = Color.Gray)
             }
             
-            Spacer(modifier = Modifier.height(4.dp))
-            HorizontalDivider(color = Color(0xFFE5E7EB), thickness = 1.dp)
+            Spacer(modifier = Modifier.height(6.dp))
+            // Stable Custom Divider Line
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(Color(0xFFE5E7EB))
+            )
             Spacer(modifier = Modifier.height(6.dp))
             
             Row(
