@@ -4,23 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>صارف پروفائل رجسٹری - بی آئی ایس پی تھیم</title>
-    <!-- Tailwind CSS with Custom BISP Color Palette Config -->
+    <!-- Tailwind CSS Engine -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        bisp: {
-                            primary: '#006633',    // Official BISP Green
-                            highlight: '#339933',  // Bright Highlight Green
-                            dark: '#004d26'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
     <!-- html2pdf.js library for generating high quality receipts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -44,8 +29,8 @@
 </head>
 <body class="bg-slate-50 min-h-screen pb-12">
 
-    <!-- Premium Government Style Header Area -->
-    <div class="bg-bisp-primary text-white py-8 px-4 text-center shadow-lg border-b-4 border-bisp-highlight">
+    <!-- Premium Government Style Header Area (Fixed with Direct Hex Codes) -->
+    <div class="bg-[#006633] text-white py-8 px-4 text-center shadow-lg border-b-4 border-[#339933]">
         <h1 class="text-2xl font-bold tracking-wide">صارف پروفائل رجسٹری</h1>
         <p class="text-emerald-100 text-xs mt-2 font-mono">Benazir Income Support Programme Portal</p>
     </div>
@@ -54,11 +39,11 @@
     <div class="max-w-md mx-auto mt-6 px-4">
         
         <!-- Success Banner Popup with Dynamic Reference ID -->
-        <div id="successBanner" class="hidden bg-emerald-50 border border-bisp-highlight text-emerald-900 rounded-2xl p-6 text-center shadow-sm mb-6">
-            <div class="w-12 h-12 bg-bisp-primary rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+        <div id="successBanner" class="hidden bg-emerald-50 border border-[#339933] text-emerald-900 rounded-2xl p-6 text-center shadow-sm mb-6">
+            <div class="w-12 h-12 bg-[#006633] rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
             </div>
-            <h3 class="text-lg font-bold text-bisp-primary">معلومات کامیابی کے ساتھ محفوظ ہو گئیں!</h3>
+            <h3 class="text-lg font-bold text-[#006633]">معلومات کامیابی کے ساتھ محفوظ ہو گئیں!</h3>
             <p class="text-sm text-emerald-700 mt-1">Data registry processed successfully!</p>
             
             <!-- Auto Generated ID Display Block -->
@@ -66,16 +51,16 @@
                 <p class="text-xs text-slate-500 font-semibold mb-1">آپ کا سسٹم ریفرنس نمبر (Profile ID)</p>
                 <div class="flex items-center justify-center space-x-2">
                     <span id="displayProfileId" class="text-xl font-mono font-bold text-slate-900 tracking-wider"></span>
-                    <button type="button" onclick="copyProfileId()" class="p-1.5 hover:bg-slate-100 rounded-lg transition text-slate-500 hover:text-bisp-primary" title="Copy ID">
+                    <button type="button" onclick="copyProfileId()" class="p-1.5 hover:bg-slate-100 rounded-lg transition text-slate-500 hover:text-[#006633]" title="Copy ID">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
                     </button>
                 </div>
-                <span id="copyFeedback" class="text-[10px] text-bisp-primary font-semibold block mt-1 opacity-0 transition duration-150">کاپی کر لیا گیا!</span>
+                <span id="copyFeedback" class="text-[10px] text-[#006633] font-semibold block mt-1 opacity-0 transition duration-150">کاپی کر لیا گیا!</span>
             </div>
 
             <!-- Action Buttons for PDF and Reset -->
             <div class="mt-4 grid grid-cols-2 gap-3">
-                <button type="button" onclick="downloadReceiptPDF()" class="w-full bg-bisp-primary text-white font-bold py-3 px-2 rounded-xl text-xs shadow hover:bg-bisp-dark transition cursor-pointer">
+                <button type="button" onclick="downloadReceiptPDF()" class="w-full bg-[#006633] text-white font-bold py-3 px-2 rounded-xl text-xs shadow hover:bg-[#004d26] transition cursor-pointer">
                     ڈاؤن لوڈ رسید (PDF)
                 </button>
                 <button type="button" onclick="resetRegistryForm()" class="w-full bg-slate-200 text-slate-800 font-bold py-3 px-2 rounded-xl text-xs hover:bg-slate-300 transition cursor-pointer">
@@ -90,7 +75,7 @@
             <div class="h-0.5 bg-slate-200 flex-1 mx-2"></div>
             <div id="ind-step2" class="px-2.5 py-1 rounded-full bg-slate-100">معاشی معلومات</div>
             <div class="h-0.5 bg-slate-200 flex-1 mx-2"></div>
-            <div id="ind-step1" class="px-2.5 py-1 rounded-full bg-bisp-primary text-white shadow-sm">بنیادی معلومات</div>
+            <div id="ind-step1" class="px-2.5 py-1 rounded-full bg-[#006633] text-white shadow-sm">بنیادی معلومات</div>
         </div>
 
         <!-- Form Card Start -->
@@ -105,21 +90,20 @@
                 <!-- ================= STEP 1: BASIC INFO ================= -->
                 <div id="step1-container" class="space-y-6">
                     <div class="border-b border-slate-100 pb-3 mb-4">
-                        <span class="bg-emerald-50 text-bisp-primary text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 1 / 3</span>
-                        <!-- Headings are now explicitly styled with Official BISP Colors for maximum visibility -->
-                        <h2 class="text-xl font-extrabold text-bisp-primary mt-2 text-right">خاندانی اور بنیادی معلومات</h2>
+                        <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 1 / 3</span>
+                        <h2 class="text-xl font-extrabold text-[#006633] mt-2 text-right">خاندانی اور بنیادی معلومات</h2>
                     </div>
 
                     <!-- 1. Full Name -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">صارف کا نام (Full Name)</label>
-                        <input type="text" id="fullName" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-right bg-slate-50/50" placeholder="نام لکھیں">
+                        <input type="text" id="fullName" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50" placeholder="نام لکھیں">
                     </div>
 
                     <!-- 2. Relationship Selector -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">رشتہ منتخب کریں</label>
-                        <select id="relationType" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-right bg-slate-50/50 direction-rtl">
+                        <select id="relationType" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
                             <option value="father">والد (Father)</option>
                             <option value="husband">شوہر (Husband)</option>
                         </select>
@@ -128,33 +112,33 @@
                     <!-- 3. Guardian / Relative Name -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">سرپرست کا نام (Guardian Name)</label>
-                        <input type="text" id="guardianName" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-right bg-slate-50/50" placeholder="والد یا شوہر کا نام لکھیں">
+                        <input type="text" id="guardianName" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50" placeholder="والد یا شوہر کا نام لکھیں">
                     </div>
 
                     <!-- 4. Mobile Contact Token -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">موبائل نمبر (Mobile Number)</label>
-                        <input type="tel" id="mobileNumber" maxlength="11" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-left bg-slate-50/50 font-mono" placeholder="03XXXXXXXXX">
+                        <input type="tel" id="mobileNumber" maxlength="11" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-left bg-slate-50/50 font-mono" placeholder="03XXXXXXXXX">
                         <span id="mobileError" class="text-xs text-red-600 text-right hidden">براہ کرم درست 11 ہندسوں کا موبائل نمبر لکھیں۔</span>
                     </div>
 
                     <!-- 5. Identity Card Number (CNIC) -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">شناختی کارڈ نمبر (ID Card Number)</label>
-                        <input type="text" id="cnicNumber" maxlength="15" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-left bg-slate-50/50 font-mono" placeholder="XXXXX-XXXXXXX-X">
+                        <input type="text" id="cnicNumber" maxlength="15" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-left bg-slate-50/50 font-mono" placeholder="XXXXX-XXXXXXX-X">
                         <span id="cnicError" class="text-xs text-red-600 text-right hidden">شناختی کارڈ فارمیٹ درست نہیں ہے یا پہلے سے رجسٹرڈ ہے۔</span>
                     </div>
 
                     <!-- 6. Age Input Field -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">عمر (Age)</label>
-                        <input type="text" id="userAge" inputmode="numeric" pattern="[0-9]*" maxlength="3" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-center bg-slate-50/50 font-mono" placeholder="سال لکھیں (e.g. 25)">
+                        <input type="text" id="userAge" inputmode="numeric" pattern="[0-9]*" maxlength="3" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-slate-50/50 font-mono" placeholder="سال لکھیں (e.g. 25)">
                     </div>
 
                     <!-- 7. Marital Status Dropdown -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">ازدواجی حیثیت (Marital Status)</label>
-                        <select id="maritalStatus" required onchange="toggleKidsFields()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-right bg-slate-50/50 direction-rtl">
+                        <select id="maritalStatus" required onchange="toggleKidsFields()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
                             <option value="single">غیر شادی شدہ (Single)</option>
                             <option value="married">شادی شدہ (Married)</option>
                         </select>
@@ -164,23 +148,23 @@
                     <div id="kidsSection" class="hidden space-y-4 pt-3 mt-3 border-t border-dashed border-slate-200">
                         <div class="flex flex-col space-y-1.5">
                             <label class="text-sm font-semibold text-slate-700 text-right">کل بچوں کی تعداد (Total Kids)</label>
-                            <input type="text" id="totalKids" inputmode="numeric" pattern="[0-9]*" value="0" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-center bg-slate-50/50 font-mono">
+                            <input type="text" id="totalKids" inputmode="numeric" pattern="[0-9]*" value="0" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-slate-50/50 font-mono">
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="flex flex-col space-y-1.5">
                                 <label class="text-sm font-semibold text-slate-700 text-center">بیٹیاں (Female)</label>
-                                <input type="text" id="femaleKids" inputmode="numeric" pattern="[0-9]*" value="0" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-center bg-slate-50/50 font-mono">
+                                <input type="text" id="femaleKids" inputmode="numeric" pattern="[0-9]*" value="0" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-slate-50/50 font-mono">
                             </div>
                             <div class="flex flex-col space-y-1.5">
                                 <label class="text-sm font-semibold text-slate-700 text-center">بیٹے (Male)</label>
-                                <input type="text" id="maleKids" inputmode="numeric" pattern="[0-9]*" value="0" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-center bg-slate-50/50 font-mono">
+                                <input type="text" id="maleKids" inputmode="numeric" pattern="[0-9]*" value="0" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-slate-50/50 font-mono">
                             </div>
                         </div>
                     </div>
 
                     <!-- Step 1 Actions -->
                     <div class="pt-2">
-                        <button type="button" onclick="validateAndGoToStep(2)" class="w-full bg-bisp-primary text-white font-bold py-3.5 px-4 rounded-xl shadow hover:bg-bisp-dark transition active:scale-[0.99] cursor-pointer">
+                        <button type="button" onclick="validateAndGoToStep(2)" class="w-full bg-[#006633] text-white font-bold py-3.5 px-4 rounded-xl shadow hover:bg-[#004d26] transition active:scale-[0.99] cursor-pointer">
                             اگلا مرحلہ (Next Step)
                         </button>
                     </div>
@@ -189,14 +173,14 @@
                 <!-- ================= STEP 2: SOCIO-ECONOMIC MATRIX ================= -->
                 <div id="step2-container" class="space-y-6 hidden">
                     <div class="border-b border-slate-100 pb-3 mb-4">
-                        <span class="bg-emerald-50 text-bisp-primary text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 2 / 3</span>
-                        <h2 class="text-xl font-extrabold text-bisp-primary mt-2 text-right">معاشی اور رہائشی معلومات</h2>
+                        <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 2 / 3</span>
+                        <h2 class="text-xl font-extrabold text-[#006633] mt-2 text-right">معاشی اور رہائشی معلومات</h2>
                     </div>
 
                     <!-- 1. Household Head Occupation -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">گھر کا سربراہ کیا کام کرتا ہے؟ (Occupation)</label>
-                        <select id="occupation" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-right bg-slate-50/50 direction-rtl">
+                        <select id="occupation" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
                             <option value="laborer">مزدور / ڈرائیور (Laborer)</option>
                             <option value="employee">ملازم / نوکری (Salaried Employee)</option>
                             <option value="agriculture">زراعت / زمیندار (Agriculture)</option>
@@ -209,7 +193,7 @@
                     <!-- 2. Monthly Income Brackets -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">ماہانہ آمدنی (Monthly Income)</label>
-                        <select id="monthlyIncome" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-right bg-slate-50/50 direction-rtl">
+                        <select id="monthlyIncome" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
                             <option value="under_20k">20,000 سے کم</option>
                             <option value="20k_30k">20,000 سے 30,000</option>
                             <option value="30k_40k">30,000 سے 40,000</option>
@@ -222,7 +206,7 @@
                     <!-- 3. Disability Status Setup -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">کیا گھر میں کوئی معذور فرد موجود ہے؟</label>
-                        <select id="disabilityStatus" onchange="toggleDisabilityField()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-right bg-slate-50/50 direction-rtl">
+                        <select id="disabilityStatus" onchange="toggleDisabilityField()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
                             <option value="no">نہیں (No)</option>
                             <option value="yes">ہاں (Yes)</option>
                         </select>
@@ -237,7 +221,7 @@
                     <!-- 4. House Ownership Status -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">مکان کی ملکیت (House Ownership)</label>
-                        <select id="houseOwnership" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-right bg-slate-50/50 direction-rtl">
+                        <select id="houseOwnership" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
                             <option value="owned">ذاتی گھر (Owned)</option>
                             <option value="rented">کرائے کا گھر (Rented)</option>
                             <option value="other">سرکاری یا دیگر (Other/Government)</option>
@@ -247,7 +231,7 @@
                     <!-- 5. House Construction Type -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">مکان کی ساخت (House Structure)</label>
-                        <select id="houseStructure" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-right bg-slate-50/50 direction-rtl">
+                        <select id="houseStructure" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
                             <option value="cemented">پکا مکان (Cemented / Bricks)</option>
                             <option value="mud">کچا مکان (Mud / Kacha)</option>
                             <option value="mixed">مکس / آدھا کچا پکا (Mixed)</option>
@@ -258,18 +242,18 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div class="flex flex-col space-y-1.5">
                             <label class="text-sm font-semibold text-slate-700 text-center">واش رومز کی تعداد</label>
-                            <input type="text" id="washroomsCount" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="1" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-center bg-slate-50/50 font-mono">
+                            <input type="text" id="washroomsCount" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="1" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-slate-50/50 font-mono">
                         </div>
                         <div class="flex flex-col space-y-1.5">
                             <label class="text-sm font-semibold text-slate-700 text-center">کمروں کی تعداد (Rooms)</label>
-                            <input type="text" id="roomsCount" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="2" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-center bg-slate-50/50 font-mono">
+                            <input type="text" id="roomsCount" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="2" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-slate-50/50 font-mono">
                         </div>
                     </div>
 
                     <!-- 7. Alternative Power Source Indicator -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">بجلی کا متبادل ذریعہ (Power Source)</label>
-                        <select id="powerSource" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-right bg-slate-50/50 direction-rtl">
+                        <select id="powerSource" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
                             <option value="wapda_only">صرف سرکاری بجلی (WAPDA / FESCO Only)</option>
                             <option value="solar">سولر سسٹم (Solar System Installed)</option>
                             <option value="ups">یو پی ایس / انورٹر (UPS / Inverter)</option>
@@ -279,7 +263,7 @@
                     <!-- 8. Vehicles Asset Ownership -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">گاڑی یا موٹر سائیکل کی موجودگی</label>
-                        <select id="vehiclesAsset" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-right bg-slate-50/50 direction-rtl">
+                        <select id="vehiclesAsset" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
                             <option value="none">کوئی گاڑی یا بائیک نہیں ہے (None)</option>
                             <option value="bike">صرف موٹر سائیکل ہے (Bike Only)</option>
                             <option value="car">صرف گاڑی ہے (Car Only)</option>
@@ -290,7 +274,7 @@
                     <!-- 9. Livestock Ownership Indicator -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">کیا گھر میں مال مویشی / جانور ہیں؟</label>
-                        <select id="livestock" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-right bg-slate-50/50 direction-rtl">
+                        <select id="livestock" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
                             <option value="no">نہیں (No)</option>
                             <option value="yes">ہاں (جانور موجود ہیں - Yes)</option>
                         </select>
@@ -301,7 +285,7 @@
                         <button type="button" onclick="goToStep(1)" class="w-full bg-slate-100 text-slate-800 font-bold py-3.5 px-4 rounded-xl hover:bg-slate-200 transition cursor-pointer">
                             پیچھے جائیں
                         </button>
-                        <button type="button" onclick="validateStep2AndGo()" class="w-full bg-bisp-primary text-white font-bold py-3.5 px-4 rounded-xl shadow hover:bg-bisp-dark transition cursor-pointer">
+                        <button type="button" onclick="validateStep2AndGo()" class="w-full bg-[#006633] text-white font-bold py-3.5 px-4 rounded-xl shadow hover:bg-[#004d26] transition cursor-pointer">
                             اگلا مرحلہ
                         </button>
                     </div>
@@ -310,14 +294,14 @@
                 <!-- ================= STEP 3: ADDRESS MATRIX ================= -->
                 <div id="step3-container" class="space-y-6 hidden">
                     <div class="border-b border-slate-100 pb-3 mb-4">
-                        <span class="bg-emerald-50 text-bisp-primary text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 3 / 3</span>
-                        <h2 class="text-xl font-extrabold text-bisp-primary mt-2 text-right">مکمل رہائشی پتہ (Address Matrix)</h2>
+                        <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 3 / 3</span>
+                        <h2 class="text-xl font-extrabold text-[#006633] mt-2 text-right">مکمل رہائشی پتہ (Address Matrix)</h2>
                     </div>
 
                     <!-- 1. Province Dropdown -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">صوبہ (Province)</label>
-                        <select id="provinceSelect" onchange="handleProvinceChange()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-right bg-slate-50/50 direction-rtl">
+                        <select id="provinceSelect" onchange="handleProvinceChange()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
                             <option value="">صوبہ منتخب کریں</option>
                             <option value="punjab">پنجاب (Punjab)</option>
                         </select>
@@ -326,7 +310,7 @@
                     <!-- 2. Division Dropdown -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">ڈویژن (Division)</label>
-                        <select id="divisionSelect" onchange="handleDivisionChange()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-right bg-slate-50/50 direction-rtl">
+                        <select id="divisionSelect" onchange="handleDivisionChange()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
                             <option value="">پہلے صوبہ منتخب کریں</option>
                         </select>
                     </div>
@@ -334,7 +318,7 @@
                     <!-- 3. District Dropdown -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">ضلع (District)</label>
-                        <select id="districtSelect" onchange="handleDistrictChange()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-right bg-slate-50/50 direction-rtl">
+                        <select id="districtSelect" onchange="handleDistrictChange()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
                             <option value="">پہلے ڈویژن منتخب کریں</option>
                         </select>
                     </div>
@@ -342,7 +326,7 @@
                     <!-- 4. Tehsil Dropdown -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">تحصیل (Tehsil)</label>
-                        <select id="tehsilSelect" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-right bg-slate-50/50 direction-rtl">
+                        <select id="tehsilSelect" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
                             <option value="">پہلے ضلع منتخب کریں</option>
                         </select>
                     </div>
@@ -350,19 +334,19 @@
                     <!-- 5. Union Council manual input -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">یونین کونسل / قصبہ (Union Council / Local Area)</label>
-                        <input type="text" id="localAreaInput" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-right bg-slate-50/50" placeholder="یونین کونسل یا قصبہ لکھیں">
+                        <input type="text" id="localAreaInput" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50" placeholder="یونین کونسل یا قصبہ لکھیں">
                     </div>
 
                     <!-- 6. City / Village Manual Input -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">شہر یا گاؤں کا نام (City / Village)</label>
-                        <input type="text" id="villageName" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-right bg-slate-50/50" placeholder="شہر یا گاؤں لکھیں">
+                        <input type="text" id="villageName" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50" placeholder="شہر یا گاؤں لکھیں">
                     </div>
 
                     <!-- 7. Residential Address on ID Card -->
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">شناختی کارڈ پر درج مکمل پتہ (Complete Address on ID Card)</label>
-                        <textarea id="cnicAddress" required rows="3" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-bisp-primary text-right bg-slate-50/50 resize-none" placeholder="شناختی کارڈ والا مکمل پتہ، گلی یا محلہ نمبر یہاں لکھیں"></textarea>
+                        <textarea id="cnicAddress" required rows="3" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 resize-none" placeholder="شناختی کارڈ والا مکمل پتہ، گلی یا محلہ نمبر یہاں لکھیں"></textarea>
                     </div>
 
                     <!-- Step 3 Navigation Actions -->
@@ -370,7 +354,7 @@
                         <button type="button" onclick="goToStep(2)" class="w-full bg-slate-100 text-slate-800 font-bold py-3.5 px-4 rounded-xl hover:bg-slate-200 transition cursor-pointer">
                             پیچھے جائیں
                         </button>
-                        <button type="submit" id="submitBtn" class="w-full bg-bisp-highlight text-white font-bold py-3.5 px-4 rounded-xl shadow hover:bg-bisp-primary transition active:scale-[0.99] flex items-center justify-center space-x-2 cursor-pointer">
+                        <button type="submit" id="submitBtn" class="w-full bg-[#339933] text-white font-bold py-3.5 px-4 rounded-xl shadow hover:bg-[#006633] transition active:scale-[0.99] flex items-center justify-center space-x-2 cursor-pointer">
                             <span id="btnLoader" class="btn-spinner hidden"></span>
                             <span id="btnText">جمع کریں (Submit)</span>
                         </button>
@@ -501,7 +485,7 @@
             for(let i=1; i<=3; i++) {
                 let ind = document.getElementById(`ind-step${i}`);
                 if(i === step) {
-                    ind.className = "px-2.5 py-1 rounded-full bg-bisp-primary text-white shadow-sm";
+                    ind.className = "px-2.5 py-1 rounded-full bg-[#006633] text-white shadow-sm";
                 } else {
                     ind.className = "px-2.5 py-1 rounded-full bg-slate-100 text-slate-400";
                 }
