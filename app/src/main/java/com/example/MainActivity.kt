@@ -1,6 +1,7 @@
 package com.example.kbclottery
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -14,9 +15,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 
-class MainActivity : ComponentActivity() {
+class MainActivity : Activity() {
 
     private lateinit var loginLayout: LinearLayout
     private lateinit var webViewContainer: LinearLayout
@@ -28,10 +28,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Setup traditional clean programmatic layout to avoid layout XML missing issues
+        // Pure native layout structure setup
         setupPureOldSchoolLayout()
 
-        // Core Login Trigger Logic
+        // Core Login Logic
         btnLogin.setOnClickListener {
             val username = etUsername.text.toString().trim()
             val password = etPassword.text.toString()
@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
         webView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView?, urlString: String?): Boolean {
                 if (urlString != null && (urlString.startsWith("http://") || urlString.startsWith("https://"))) {
-                    return false // Keep running inside the app frame safely
+                    return false
                 }
                 try {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(urlString))
@@ -78,7 +78,6 @@ class MainActivity : ComponentActivity() {
         webView.loadUrl(url)
     }
 
-    // Programmatic view builder that doesn't depend on Compose context or specific styles.xml themes
     private fun setupPureOldSchoolLayout() {
         val mainRoot = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -104,10 +103,12 @@ class MainActivity : ComponentActivity() {
             hint = "Enter ID"
             setHintTextColor(android.graphics.Color.GRAY)
             setTextColor(android.graphics.Color.BLACK)
-            layoutParams = LinearLayout.LayoutParams(
+            val params = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply { setMargins(0, 0, 0, 30) }
+            )
+            params.setMargins(0, 0, 0, 30)
+            layoutParams = params
         }
 
         etPassword = EditText(this).apply {
@@ -115,16 +116,18 @@ class MainActivity : ComponentActivity() {
             setHintTextColor(android.graphics.Color.GRAY)
             setTextColor(android.graphics.Color.BLACK)
             inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-            layoutParams = LinearLayout.LayoutParams(
+            val params = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply { setMargins(0, 0, 0, 40) }
+            )
+            params.setMargins(0, 0, 0, 40)
+            layoutParams = params
         }
 
         btnLogin = Button(this).apply {
             text = "Login"
-            setBackgroundColor(android.graphics.Color.parseColor("#1E3A8A"))
             setTextColor(android.graphics.Color.WHITE)
+            setBackgroundColor(android.graphics.Color.parseColor("#1E3A8A"))
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -153,7 +156,6 @@ class MainActivity : ComponentActivity() {
         }
         webViewContainer.addView(webView)
 
-        // Attach views to parent frame
         mainRoot.addView(loginLayout)
         mainRoot.addView(webViewContainer)
         setContentView(mainRoot)
