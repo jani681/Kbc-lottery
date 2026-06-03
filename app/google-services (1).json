@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "903902266705",
+    "firebase_url": "https://betone-live-default-rtdb.firebaseio.com",
+    "project_id": "betone-live",
+    "storage_bucket": "betone-live.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:903902266705:android:9fbcd09ac94232e299bf70",
+        "android_client_info": {
+          "package_name": "com.aistudio.kbcprank.umhzqh"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "903902266705-67m5jvena385te2tninj1a634irt9e6m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAM_S0CtxdzbWl1pAyJTVJeLjj7gfztuWo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "903902266705-67m5jvena385te2tninj1a634irt9e6m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
