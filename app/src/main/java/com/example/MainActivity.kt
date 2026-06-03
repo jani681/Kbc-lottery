@@ -36,7 +36,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.core.app.NotificationCompat
 import com.example.ui.theme.MyApplicationTheme
 import com.google.firebase.firestore.FirebaseFirestore
@@ -300,7 +299,7 @@ fun KbcPrankApp(
             // DYNAMIC VIEW SWAPPER BASED ON SELECTED TAB
             Column(
                 modifier = Modifier
-                    .fill someConstraints
+                    .fillMaxSize()
                     .weight(1f)
                     .padding(16.dp)
             ) {
