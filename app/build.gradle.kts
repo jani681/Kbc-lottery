@@ -69,8 +69,8 @@ dependencies {
   implementation(platform(libs.firebase.bom))
   implementation(libs.firebase.firestore)
   
-  // DIRECT INJECTION: Bina version catalog ke Realtime Database direct add kar diya hai
-  implementation("com.google.firebase:firebase-database-ktx")
+  // FIXED DIRECT INJECTION: Explicit version string specified to fix 'Could not find' error
+  implementation("com.google.firebase:firebase-database-ktx:21.0.0")
 
   implementation(libs.androidx.activity.compose)
   implementation(libs.androidx.compose.material.icons.core)
