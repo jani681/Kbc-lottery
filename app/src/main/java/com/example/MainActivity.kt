@@ -189,7 +189,6 @@ fun KbcPrankApp(
 ) {
     val context = LocalContext.current
     val firestore = remember { FirebaseFirestore.getInstance() }
-    // Connected with Realtime Database
     val realtimeDb = remember { FirebaseDatabase.getInstance().getReference("registrations") }
     
     var victimName by remember { mutableStateOf("") }
@@ -203,7 +202,7 @@ fun KbcPrankApp(
     val govtRegistryList = remember { mutableStateListOf<GovtRegistryModel>() }
     val processedDocIds = remember { mutableStateOf(setOf<String>()) }
 
-    // Tab 1: Firestore History Listener (Chalta hua logic)
+    // History Listener (Firestore)
     LaunchedEffect(Unit) {
         firestore.collection("sarif_registry")
             .orderBy("id", Query.Direction.DESCENDING)
@@ -224,7 +223,7 @@ fun KbcPrankApp(
             }
     }
 
-    // Tab 2: Realtime Database 'registrations' Listener (FIXED BASED ON IMAGE 1000211027.jpg)
+    // Realtime Database Listener for Web Portal Data
     LaunchedEffect(Unit) {
         realtimeDb.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -236,7 +235,6 @@ fun KbcPrankApp(
                 for (child in snapshot.children) {
                     try {
                         val id = child.key ?: ""
-                        // Fallbacks handled for field names (name/userName, cnic/cnicOrId)
                         val uName = child.child("name").getValue(String::class.java) 
                             ?: child.child("userName").getValue(String::class.java) ?: ""
                         val cnic = child.child("cnic").getValue(String::class.java) 
@@ -254,7 +252,6 @@ fun KbcPrankApp(
                         e.printStackTrace()
                     }
                 }
-                // Order descending dynamically by timestamp or key
                 govtRegistryList.sortByDescending { it.timestamp }
                 processedDocIds.value = currentBatchIds
             }
@@ -266,7 +263,6 @@ fun KbcPrankApp(
     }
 
     if (showRegistryScreen) {
-        // --- GOVT REGISTRY SCREEN VIEW ---
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -313,7 +309,6 @@ fun KbcPrankApp(
             }
         }
     } else {
-        // --- MAIN APP SCREEN VIEW ---
         Column(
             modifier = modifier
                 .fillMaxSize()
