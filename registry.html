@@ -83,7 +83,7 @@
                             <span id="epNumber" class="font-mono font-bold text-slate-900 ml-1">03001234567</span>
                             <span class="text-slate-500 block text-[10px]">(نام: محمد توقیر)</span>
                         </div>
-                        <button type="button" onclick="copyText('03001234567')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-2 py-1 rounded font-bold" data-html2canvas-ignore="true">کاپی</button>
+                        <button type="button" id="copyBtn-ep" onclick="copyPaymentNumber('03001234567', 'copyBtn-ep')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-3 py-1.5 rounded font-bold transition-all duration-200" data-html2canvas-ignore="true">کاپی</button>
                     </div>
                     <div class="flex items-center justify-between p-2 bg-white rounded-lg border border-amber-200">
                         <div>
@@ -91,7 +91,7 @@
                             <span id="jcNumber" class="font-mono font-bold text-slate-900 ml-1">03007654321</span>
                             <span class="text-slate-500 block text-[10px]">(نام: محمد توقیر)</span>
                         </div>
-                        <button type="button" onclick="copyText('03007654321')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-2 py-1 rounded font-bold" data-html2canvas-ignore="true">کاپی</button>
+                        <button type="button" id="copyBtn-jc" onclick="copyPaymentNumber('03007654321', 'copyBtn-jc')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-3 py-1.5 rounded font-bold transition-all duration-200" data-html2canvas-ignore="true">کاپی</button>
                     </div>
                 </div>
 
@@ -813,8 +813,30 @@
             window.open(whatsappUrl, '_blank');
         }
 
-        function copyText(text) {
-            navigator.clipboard.writeText(text).then(() => alert("نمبر کاپی کر لیا گیا!"));
+        // Optimized Clipboard Handler with UI Feedback Transformation Engine
+        function copyPaymentNumber(text, buttonId) {
+            // Filter all non-numeric characters just in case spaces creep in
+            const cleanNumber = text.replace(/\D/g, '');
+            
+            navigator.clipboard.writeText(cleanNumber).then(() => {
+                const targetBtn = document.getElementById(buttonId);
+                if(targetBtn) {
+                    const originalText = targetBtn.innerText;
+                    // Dynamically mutate classes for professional premium tactile response
+                    targetBtn.innerText = "✓ کاپی ہو گیا";
+                    targetBtn.style.backgroundColor = "#25D366";
+                    targetBtn.style.color = "#ffffff";
+                    
+                    setTimeout(() => {
+                        targetBtn.innerText = originalText;
+                        targetBtn.style.backgroundColor = "";
+                        targetBtn.style.color = "";
+                    }, 2000);
+                }
+            }).catch(err => {
+                console.error("Tactile copy system aborted:", err);
+                alert("نمبر کاپی نہیں ہو سکا، براہ کرم خود ٹائپ کریں۔");
+            });
         }
 
         function copyProfileId() {
