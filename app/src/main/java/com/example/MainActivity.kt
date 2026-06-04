@@ -209,7 +209,6 @@ fun KbcPrankApp(
     
     val historyList = remember { mutableStateListOf<LocalPrankModel>() }
 
-    // Persistent Background Engine Pipeline Setup
     LaunchedEffect(Unit) {
         val savedJson = sharedPreferences.getString("prank_list_json", "[]") ?: "[]"
         try {
@@ -229,7 +228,6 @@ fun KbcPrankApp(
             e.printStackTrace()
         }
 
-        // --- BACKGROUND COLD START REALSENSE LISTENER ---
         val rootDbRef = FirebaseDatabase.getInstance().getReference("registrations")
         var isAppInitializing = true
 
@@ -266,7 +264,6 @@ fun KbcPrankApp(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header Top Layer Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -295,7 +292,6 @@ fun KbcPrankApp(
                 }
             }
 
-            // Input Fields Card Module
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -391,7 +387,8 @@ fun KbcPrankApp(
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626))
                     ) {
-                        Icon(Icons.Default.AccountCircle, contentDescription = null)
+                        // CHANGED: Replaced AccountCircle with core Person icon
+                        Icon(Icons.Default.Person, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Create Registration Certificate", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                     }
@@ -409,7 +406,8 @@ fun KbcPrankApp(
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F172A))
                     ) {
-                        Icon(Icons.Default.ListAlt, contentDescription = null)
+                        // CHANGED: Replaced ListAlt with core Menu icon
+                        Icon(Icons.Default.Menu, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("صارف پروفائل رجسٹری (Registry)", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                     }
@@ -431,7 +429,6 @@ fun KbcPrankApp(
                 }
             }
 
-            // History Layout Module Header
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -471,7 +468,6 @@ fun KbcPrankApp(
             }
         }
 
-        // Share Action Dialog Block
         if (showSuccessDialog) {
             Dialog(
                 onDismissRequest = { showSuccessDialog = false },
@@ -555,11 +551,8 @@ fun KbcPrankApp(
             }
         }
 
-        // Realtime Data Portal Dialog (Featuring Instant Delete Shield Engine)
         if (showRealtimeDialog) {
             val firebaseRecordsList = remember { mutableStateListOf<FirebaseRegistryModel>() }
-            
-            // Safety confirmation sub-state controllers
             var showDeleteConfirmation by remember { mutableStateOf(false) }
             var targetProfileIdToDelete by remember { mutableStateOf("") }
             var targetNameToDelete by remember { mutableStateOf("") }
@@ -591,7 +584,6 @@ fun KbcPrankApp(
                 }
                 
                 databaseRef.addValueEventListener(listener)
-                
                 onDispose {
                     databaseRef.removeEventListener(listener)
                 }
@@ -691,7 +683,6 @@ fun KbcPrankApp(
 
                                             Spacer(modifier = Modifier.height(12.dp))
                                             
-                                            // Action Suite Row Layer
                                             Row(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -733,7 +724,6 @@ fun KbcPrankApp(
                                                     Text("Approve", fontSize = 12.sp)
                                                 }
 
-                                                // Clean Execution Surgical Delete Module Trigger
                                                 IconButton(
                                                     onClick = {
                                                         targetProfileIdToDelete = record.profileId
@@ -772,7 +762,6 @@ fun KbcPrankApp(
                 }
             }
 
-            // High Stability Safety Confirmation Dialog Block
             if (showDeleteConfirmation) {
                 AlertDialog(
                     onDismissRequest = { showDeleteConfirmation = false },
