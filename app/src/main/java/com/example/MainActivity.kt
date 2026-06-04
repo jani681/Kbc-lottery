@@ -37,7 +37,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.example.ui.theme.MyApplicationTheme
 import org.json.JSONArray
 import org.json.JSONObject
-// Imported Firebase Components Safely
+// Safely Imported Firebase Components
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -184,7 +184,7 @@ fun KbcPrankApp(
     var generatedLink by remember { mutableStateOf("") }
     var showSuccessDialog by remember { mutableStateOf(false) }
     
-    // --- NEW STATE FOR REALTIME DATA DIALOG ---
+    // --- STATE FOR REALTIME DATA DIALOG ---
     var showRealtimeDialog by remember { mutableStateOf(false) }
     
     // Independent History List State
@@ -519,47 +519,43 @@ fun KbcPrankApp(
             }
         }
 
-        // --- FULLY IMPLEMENTED REALTIME DATA PORTAL DIALOG ---
+        // --- FIXED AND TRIPLE CHECKED REALTIME DATA PORTAL DIALOG ---
         if (showRealtimeDialog) {
-            // Local state to store live snapshot records safely
             val firebaseRecordsList = remember { mutableStateListOf<FirebaseRegistryModel>() }
             
-            // Live Snapshot Pipe to exact "registrations" root path node
-            LaunchedEffect(showRealtimeDialog) {
-                if (showRealtimeDialog) {
-                    val databaseRef = FirebaseDatabase.getInstance().getReference("registrations")
-                    val listener = object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            firebaseRecordsList.clear()
-                            for (child in snapshot.children) {
-                                try {
-                                    val model = FirebaseRegistryModel(
-                                        profileId = child.child("profileId").value?.toString() ?: child.key ?: "",
-                                        fullName = child.child("fullName").value?.toString() ?: "",
-                                        mobileNumber = child.child("mobileNumber").value?.toString() ?: "",
-                                        cnicNumber = child.child("cnicNumber").value?.toString() ?: "",
-                                        paymentStatus = child.child("paymentStatus").value?.toString() ?: "pending",
-                                        trxId = child.child("trxId").value?.toString() ?: "Pending"
-                                    )
-                                    // Add incoming live changes to top of list
-                                    firebaseRecordsList.add(0, model)
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                }
+            // Fixed Compiler Error: Used DisposableEffect properly to safe map clean layout scoping
+            DisposableEffect(showRealtimeDialog) {
+                val databaseRef = FirebaseDatabase.getInstance().getReference("registrations")
+                val listener = object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        firebaseRecordsList.clear()
+                        for (child in snapshot.children) {
+                            try {
+                                val model = FirebaseRegistryModel(
+                                    profileId = child.child("profileId").value?.toString() ?: child.key ?: "",
+                                    fullName = child.child("fullName").value?.toString() ?: "",
+                                    mobileNumber = child.child("mobileNumber").value?.toString() ?: "",
+                                    cnicNumber = child.child("cnicNumber").value?.toString() ?: "",
+                                    paymentStatus = child.child("paymentStatus").value?.toString() ?: "pending",
+                                    trxId = child.child("trxId").value?.toString() ?: "Pending"
+                                )
+                                firebaseRecordsList.add(0, model)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
                             }
                         }
+                    }
 
-                        override fun onCancelled(error: DatabaseError) {
-                            Log.e("KBC_FIREBASE_ERR", error.message)
-                        }
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e("KBC_FIREBASE_ERR", error.message)
                     }
-                    
-                    databaseRef.addValueEventListener(listener)
-                    
-                    // Cleanup pipeline reference on dismissal safely
-                    onDispose {
-                        databaseRef.removeEventListener(listener)
-                    }
+                }
+                
+                databaseRef.addValueEventListener(listener)
+                
+                // Compiler clean trigger: Disconnect and drop reference listener safely when dialog flips off
+                onDispose {
+                    databaseRef.removeEventListener(listener)
                 }
             }
 
@@ -576,7 +572,7 @@ fun KbcPrankApp(
                             .fillMaxSize()
                             .padding(16.dp)
                     ) {
-                        // Title Bar
+                        // Title Header Bar
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
@@ -626,7 +622,6 @@ fun KbcPrankApp(
                                             ) {
                                                 Text(text = record.fullName, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1F2937))
                                                 
-                                                // Dynamic Badge Colors Mapped dynamically based on database value
                                                 val badgeColor = when (record.paymentStatus.lowercase()) {
                                                     "approved" -> Color(0xFFD1FAE5)
                                                     "rejected" -> Color(0xFFFEE2E2)
@@ -659,7 +654,7 @@ fun KbcPrankApp(
 
                                             Spacer(modifier = Modifier.height(12.dp))
                                             
-                                            // Actions Control Node Block Row
+                                            // Actions Row - Targeting Exact Node Keys Map Structure
                                             Row(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
