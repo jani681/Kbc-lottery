@@ -169,6 +169,9 @@ fun KbcPrankApp(
     var generatedLink by remember { mutableStateOf("") }
     var showSuccessDialog by remember { mutableStateOf(false) }
     
+    // --- NEW STATE FOR REALTIME DATA DIALOG ---
+    var showRealtimeDialog by remember { mutableStateOf(false) }
+    
     // Independent History List State
     val historyList = remember { mutableStateListOf<LocalPrankModel>() }
 
@@ -322,7 +325,7 @@ fun KbcPrankApp(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Second Button: Create Registration Certificate (Fixed Version)
+                    // Second Button: Create Registration Certificate
                     Button(
                         onClick = {
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://kbc-lottery.vercel.app/generator.html"))
@@ -332,7 +335,7 @@ fun KbcPrankApp(
                             .fillMaxWidth()
                             .height(50.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626)) // Eye-catching Red Color
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626))
                     ) {
                         Icon(Icons.Default.AccountBox, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
@@ -341,7 +344,7 @@ fun KbcPrankApp(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Third Button: User Profile Registry (Pointed to correct registry.html)
+                    // Third Button: User Profile Registry
                     Button(
                         onClick = {
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://kbc-lottery.vercel.app/registry.html"))
@@ -351,11 +354,27 @@ fun KbcPrankApp(
                             .fillMaxWidth()
                             .height(50.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F172A)) // Stylish Dark Slate Blue
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F172A))
                     ) {
                         Icon(Icons.Default.List, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("صارف پروفائل رجسٹری (Registry)", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // --- ADDED FOURTH BUTTON: REALTIME DATA VIEW ---
+                    Button(
+                        onClick = { showRealtimeDialog = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)) // Premium Teal/Green Color
+                    ) {
+                        Icon(Icons.Default.Refresh, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Realtime Data Portal", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -479,6 +498,71 @@ fun KbcPrankApp(
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text("Share")
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        // --- NEW DIALOG CONTAINER FOR REALTIME DATA PORTAL ---
+        if (showRealtimeDialog) {
+            Dialog(
+                onDismissRequest = { showRealtimeDialog = false },
+                properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            Icons.Default.Refresh,
+                            contentDescription = null,
+                            tint = Color(0xFF10B981),
+                            modifier = Modifier.size(44.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Realtime Active Records",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            color = Color(0xFF1F2937)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        
+                        // Placeholder for your Realtime List/Database incoming snapshots
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(150.dp)
+                                .background(Color(0xFFF3F4F6), shape = RoundedCornerShape(8.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Listening for live Vercel traffic / Database registries...",
+                                color = Color.Gray,
+                                fontSize = 13.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                        
+                        Spacer(modifier = Modifier.height(20.dp))
+                        
+                        Button(
+                            onClick = { showRealtimeDialog = false },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(10.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1F2937))
+                        ) {
+                            Text("Close Portal")
                         }
                     }
                 }
