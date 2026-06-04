@@ -541,15 +541,9 @@
 
     </div>
 
-    <footer class="mt-12 py-8 px-4 bg-slate-900 border-t border-slate-800 text-center text-slate-400 action-area" data-html2canvas-ignore="true">
-        <div class="max-w-md mx-auto space-y-4">
-            <p class="text-[11px] leading-relaxed direction-rtl text-right text-slate-400 border-r-2 border-emerald-600 pr-3">
-                یہ پورٹل ایک خودکار ایپلیکیشن مینجمنٹ سسٹم ہے، جو درخواست گزاروں کی معلومات کو ڈیجیٹل طریقے سے مرتب کرتا ہے۔ یہ پورٹل کسی بھی سرکاری ادارے سے براہِ راست منسلک نہیں ہے۔ تمام کوائف کی رازداری اور تحفظ ہماری اولین ترجیح ہے اور اسے انڈسٹری اسٹینڈرڈ انکرپشن کے تحت محفوظ کیا گیا ہے۔
-            </p>
-            <p class="text-[10px] leading-relaxed text-left text-slate-500 border-l-2 border-slate-700 pl-3">
-                This portal is an automated applicant management system designed to organize application data digitally. This portal is not directly affiliated with any government agency. All user data is handled with strict confidentiality and secured using industry-standard encryption protocols.
-            </p>
-            <div class="pt-4 border-t border-slate-800/60 text-[10px] font-bold text-slate-500 tracking-wider flex justify-between items-center font-mono">
+    <footer class="mt-12 py-6 px-4 bg-slate-900 border-t border-slate-800 text-center action-area" data-html2canvas-ignore="true">
+        <div class="max-w-md mx-auto">
+            <div class="text-[10px] font-bold tracking-wider flex justify-between items-center font-mono text-[#006633]">
                 <span>V2.4 PRODUCTION BASE</span>
                 <span>© 2026 DES SYSTEM • PRIVACY PROTECTED</span>
             </div>
@@ -820,7 +814,7 @@
         function handleFormSubmit(event) {
             event.preventDefault();
             
-            // SENIOR UX TOUCH: Loading UI Mutation State triggers on submit
+            // Loading UI Mutation State triggers on submit
             const submitBtn = document.getElementById("submitBtn");
             const btnText = document.getElementById("btnText");
             submitBtn.disabled = true;
@@ -1032,23 +1026,4 @@
             document.getElementById("receiptTrxDisplay").innerText = "پینڈنگ (Pending)";
             document.getElementById("receiptTrxDisplay").className = "py-2 text-red-600 font-mono font-bold";
             globalFormData = null; 
-            goToStep(1);
-        }
-
-        // ================= PREMIUM LIVE FEED DATA LOOP CORE ENGINE =================
-        const mockActivityData = [
-            { initials: "AM", name: "عاصم منیر", text: "بائیو میٹرک تصدیق مکمل ہو گئی ہے اور فنڈز کلیئرنس آرڈر جاری کر دیا گیا ہے! بہترین پورٹل۔", bg: "bg-emerald-600" },
-            { initials: "FK", name: "فرزانہ کوثر", text: "پہلے مجھے لگا فیک ہے، پر جیسے ہی ٹرانزیکشن ID سبمٹ کی، 15 منٹ میں سٹیٹس اپروو ہو گیا۔ شکریہ ٹیم کا۔", bg: "bg-teal-600" },
-            { initials: "TI", name: "کامران علی", text: "میری فیس جمع کرنے کی تصدیق ہو گئی ہے، رجسٹریشن پورٹل بہت تیز کام کر رہا ہے۔", bg: "bg-blue-600" },
-            { initials: "SN", name: "سجدہ پروین", text: "الحمدللہ ریفرنس آئی ڈی مل گئی ہے اور میرا ڈیٹا لائیو سسٹم میں ویریفائی ہو چکا ہے۔", bg: "bg-purple-600" },
-            { initials: "GZ", name: "غلام زینب", text: "بہت ہی آسان طریقہ کار ہے، گھر بیٹھے رجسٹریشن فارم جمع ہو گیا ہے۔ فیس وصولی میسیج بھی آگیا۔", bg: "bg-rose-600" },
-            { initials: "MR", name: "محمد رمضان", text: "قائدآباد ڈویژن سے میرا فارم فوری اپروو ہوا، کسٹمر سروس ٹیم کا بھی شکریہ۔", bg: "bg-amber-600" }
-        ];
-
-        let currentFeedIndex = 0;
-        function rotateLiveActivityFeed() {
-            currentFeedIndex = (currentFeedIndex + 1) % mockActivityData.length;
-            let nextIndex = (currentFeedIndex + 1) % mockActivityData.length;
-
-            let item1 = mockActivityData[currentFeedIndex];
-            let item2 = mockActivity
+            goToStep
