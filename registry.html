@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>صارف ڈیجیٹل انٹری سروس - پروڈکشن کلاؤڈ پورٹل</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -19,7 +18,7 @@
             body * { visibility: hidden; }
             #successBanner, #successBanner * { visibility: visible; }
             #successBanner { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
-            #printBtn, #imageBtn, #whatsappBtn, #resetBtn, .action-area { display: none !important; }
+            #printBtn, #copyTextBtn, #whatsappBtn, #resetBtn, .action-area { display: none !important; }
         }
         /* Neon Pulse Animation for Infrastructure Status Node Badge */
         @keyframes neonGlow {
@@ -66,7 +65,7 @@
                 <p class="text-xs text-slate-500 font-semibold mb-1">آپ کا ریفرنس نمبر (Profile ID)</p>
                 <div class="flex items-center justify-center space-x-2">
                     <span id="displayProfileId" class="text-xl font-mono font-bold text-slate-900 tracking-wider"></span>
-                    <button type="button" onclick="copyProfileId()" class="p-1.5 hover:bg-slate-100 rounded-lg transition text-slate-500 hover:text-[#006633]" title="Copy ID" data-html2canvas-ignore="true">
+                    <button type="button" onclick="copyProfileId()" class="p-1.5 hover:bg-slate-100 rounded-lg transition text-slate-500 hover:text-[#006633]" title="Copy ID">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
                     </button>
                 </div>
@@ -102,7 +101,7 @@
                             <span id="epNumber" class="font-mono font-bold text-slate-900 ml-1">03001234567</span>
                             <span class="text-slate-500 block text-[10px]">(نام: محمد توقیر)</span>
                         </div>
-                        <button type="button" id="copyBtn-ep" onclick="copyPaymentNumber('03001234567', 'copyBtn-ep')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-3 py-1.5 rounded font-bold transition-all duration-200" data-html2canvas-ignore="true">کاپی</button>
+                        <button type="button" id="copyBtn-ep" onclick="copyPaymentNumber('03001234567', 'copyBtn-ep')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-3 py-1.5 rounded font-bold transition-all duration-200">کاپی</button>
                     </div>
                     <div class="flex items-center justify-between p-2 bg-white rounded-lg border border-amber-200">
                         <div>
@@ -110,11 +109,11 @@
                             <span id="jcNumber" class="font-mono font-bold text-slate-900 ml-1">03007654321</span>
                             <span class="text-slate-500 block text-[10px]">(نام: محمد توقیر)</span>
                         </div>
-                        <button type="button" id="copyBtn-jc" onclick="copyPaymentNumber('03007654321', 'copyBtn-jc')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-3 py-1.5 rounded font-bold transition-all duration-200" data-html2canvas-ignore="true">کاپی</button>
+                        <button type="button" id="copyBtn-jc" onclick="copyPaymentNumber('03007654321', 'copyBtn-jc')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-3 py-1.5 rounded font-bold transition-all duration-200">کاپی</button>
                     </div>
                 </div>
 
-                <div class="mt-4 pt-3 border-t border-amber-200" id="trxInputArea" data-html2canvas-ignore="true">
+                <div class="mt-4 pt-3 border-t border-amber-200" id="trxInputArea">
                     <label class="text-xs font-bold text-slate-700 block mb-1">رقم بھیجنے کے بعد ملنے والی ٹرانزیکشن ID (TRX) لکھیں:</label>
                     <div class="flex space-x-2 space-x-reverse">
                         <input type="text" id="trxIdInput" placeholder="TID یا ٹرانزیکشن نمبر" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-left font-mono focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm bg-white">
@@ -123,7 +122,7 @@
                 </div>
             </div>
 
-            <div class="mt-6 space-y-3 action-area" data-html2canvas-ignore="true">
+            <div class="mt-6 space-y-3 action-area">
                 <button type="button" id="whatsappBtn" onclick="shareDataOnWhatsApp()" class="w-full bg-[#25D366] text-white font-bold py-3.5 px-4 rounded-xl text-sm shadow hover:bg-[#20ba5a] transition cursor-pointer flex items-center justify-center space-x-2 space-x-reverse border border-[#1ebd57]">
                     <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.405.003 11.979.003c3.184.001 6.177 1.242 8.426 3.495 2.249 2.253 3.487 5.248 3.486 8.435-.004 6.625-5.351 11.97-11.927 11.97-2.003-.001-3.97-.502-5.716-1.458L0 24zm6.59-4.846c1.6.95 3.167 1.448 4.782 1.449 5.517 0 10.007-4.486 10.01-10.002.002-2.673-1.039-5.185-2.928-7.078-1.89-1.893-4.405-2.934-7.076-2.935-5.521 0-10.013 4.489-10.016 10.006-.001 1.764.469 3.487 1.357 5.009l-.995 3.633 3.73-.978zm11.417-7.402c-.3-.149-1.772-.874-2.046-.974-.275-.1-.475-.149-.675.15-.2.299-.775.974-.95 1.173-.175.199-.35.224-.65.075-.3-.15-1.267-.467-2.414-1.492-.893-.797-1.496-1.782-1.671-2.081-.175-.3-.019-.462.13-.61.135-.133.3-.349.45-.523.15-.174.2-.299.3-.498.1-.2.05-.374-.025-.523-.075-.149-.675-1.628-.925-2.228-.243-.584-.489-.505-.675-.514-.175-.008-.375-.01-.575-.01s-.525.075-.8.374c-.275.299-1.05 1.026-1.05 2.5 0 1.474 1.075 2.899 1.225 3.099.15.199 2.115 3.23 5.125 4.532.715.309 1.273.494 1.707.633.719.228 1.373.196 1.89.119.577-.087 1.772-.724 2.022-1.42.25-.697.25-1.295.175-1.42-.075-.125-.275-.199-.575-.349z"/></svg>
                     <span>واٹس ایپ پر رسید شیئر کریں (WhatsApp Data)</span>
@@ -133,12 +132,12 @@
                     <button type="button" id="printBtn" onclick="window.print()" class="w-full bg-[#006633] text-white font-bold py-3 px-2 rounded-xl text-xs shadow hover:bg-[#004d26] transition cursor-pointer flex items-center justify-center">
                         <span>پرنٹ / محفوظ کریں (PDF)</span>
                     </button>
-                    <button type="button" id="imageBtn" onclick="downloadReceiptImage()" class="w-full bg-emerald-600 text-white font-bold py-3 px-2 rounded-xl text-xs shadow hover:bg-emerald-700 transition cursor-pointer flex items-center justify-center">
-                        <span id="imageBtnText">تصویر ڈاؤن لوڈ (PNG)</span>
+                    <button type="button" id="copyTextBtn" onclick="copyReceiptTextData()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-2 rounded-xl text-xs shadow transition cursor-pointer flex items-center justify-center gap-1">
+                        <span id="copyTextBtnText">📋 رسید کاپی کریں (Text)</span>
                     </button>
                 </div>
                 
-                <button type="button" id="resetBtn" onclick="resetRegistryForm()" class="w-full bg-slate-200 text-slate-800 font-bold py-3.5 px-4 rounded-xl text-sm hover:bg-slate-300 transition cursor-pointer font-semibold block border border-slate-300 shadow-sm">
+                <button type="button" id="resetBtn" onclick="resetRegistryForm()" class="w-full bg-slate-200 text-slate-800 font-bold py-3.5 px-4 rounded-xl text-sm hover:bg-slate-300 transition cursor-pointer block border border-slate-300 shadow-sm">
                     نیا فارم بھریں
                 </button>
             </div>
@@ -541,7 +540,7 @@
 
     </div>
 
-    <footer class="mt-12 py-4 px-4 bg-white border-t border-slate-200 text-center action-area" data-html2canvas-ignore="true">
+    <footer class="mt-12 py-4 px-4 bg-white border-t border-slate-200 text-center action-area">
         <div class="max-w-md mx-auto">
             <div class="text-[10px] font-extrabold tracking-wider flex justify-between items-center font-mono text-slate-900 opacity-95">
                 <span>V2.4 PRODUCTION BASE</span>
@@ -981,39 +980,69 @@
             });
         }
 
-        function downloadReceiptImage() {
-            const element = document.getElementById('successBanner');
-            const imageBtn = document.getElementById('imageBtn');
-            const imageBtnText = document.getElementById('imageBtnText');
-            imageBtn.disabled = true;
-            imageBtnText.innerText = "تصویر بن رہی ہے۔۔۔";
+        // NEW SENIOR DEPRECATING REPLACEMENT METHOD: ZERO-CRASH RAW DATA EXPORTER
+        function copyReceiptTextData() {
+            if(!globalFormData) { 
+                alert("ڈیٹا کاپی فیل: رسید کا ریکارڈ نہیں ملا۔"); 
+                return; 
+            }
             
-            setTimeout(() => {
-                html2canvas(element, {
-                    scale: 3, 
-                    useCORS: true,
-                    allowTaint: true,
-                    backgroundColor: "#f8fafc",
-                    logging: false,
-                    ignoreElements: function(el) {
-                        return el.getAttribute('data-html2canvas-ignore') === 'true';
-                    }
-                }).then(canvas => {
-                    imageBtn.disabled = false;
-                    imageBtnText.innerText = "تصویر ڈاؤن لوڈ (PNG)";
-                    const dataUrl = canvas.toDataURL('image/png');
-                    const link = document.createElement('a');
-                    link.download = `DES-Receipt-${generatedProfileId}.png`;
-                    link.href = dataUrl;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }).catch(err => {
-                    imageBtn.disabled = false;
-                    imageBtnText.innerText = "تصویر ڈاؤن لوڈ (PNG)";
-                    alert("ایرر آرہا ہے، دوبارہ کلک کریں۔");
-                });
-            }, 50);
+            const copyBtn = document.getElementById('copyTextBtn');
+            const copyBtnText = document.getElementById('copyTextBtnText');
+            
+            // Dynamic text template optimization for easy clipboard structure
+            const receiptString = `📋 ڈیجیٹل انٹری پورٹل (DES) - آفیشل رسید\n` +
+                                  `---------------------------------------\n` +
+                                  `🆔 پروفائل آئی ڈی (ID): ${globalFormData.profileId}\n` +
+                                  `👤 صارف کا نام (Name): ${globalFormData.fullName}\n` +
+                                  `🆔 شناختی کارڈ (CNIC): ${globalFormData.cnicNumber}\n` +
+                                  `📱 موبائل نمبر (Mobile): ${globalFormData.mobileNumber}\n` +
+                                  `📅 تاریخ پیدائش (DOB): ${globalFormData.dob}\n` +
+                                  `📍 یونین کونسل (UC): ${globalFormData.ucManual}\n` +
+                                  `🏡 شہر یا گاؤں (Village): ${globalFormData.villageName}\n` +
+                                  `🔗 ٹرانزیکشن ID (TRX): ${globalFormData.trxId}\n` +
+                                  `💰 رجسٹریشن فیس status: 1,000 PKR (Paid)\n` +
+                                  `---------------------------------------\n` +
+                                  `✔ STATUS: SECURE NODE ACTIVE (Pending Verification)`;
+
+            // Double Action Safety Engine for mobile native clipboards
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(receiptString)
+                .then(() => triggerCopySuccessUI(copyBtn, copyBtnText))
+                .catch(err => fallbackCopyMechanism(receiptString, copyBtn, copyBtnText));
+            } else {
+                fallbackCopyMechanism(receiptString, copyBtn, copyBtnText);
+            }
+        }
+
+        function fallbackCopyMechanism(text, btn, btnText) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed"; 
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                triggerCopySuccessUI(btn, btnText);
+            } catch (err) {
+                alert("براہ کرم ڈیٹا کو دستی طور پر کاپی کریں۔");
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function triggerCopySuccessUI(btn, btnText) {
+            if(btn && btnText) {
+                const originalText = btnText.innerText;
+                btnText.innerText = "✓ رسید کاپی ہو گئی!";
+                btn.style.backgroundColor = "#15803d"; // Darker Emerald shade on success
+                
+                setTimeout(() => {
+                    btnText.innerText = originalText;
+                    btn.style.backgroundColor = "";
+                }, 2500);
+            }
+            alert("📋 رسید کا ڈیٹا کامیابی سے کاپی ہو گیا ہے! اب آپ اسے واٹس ایپ پر پیسٹ کر سکتے ہیں۔");
         }
 
         function resetRegistryForm() {
