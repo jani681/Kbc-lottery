@@ -391,7 +391,7 @@ fun KbcPrankApp(
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626))
                     ) {
-                        Icon(Icons.Default.AccountBox, contentDescription = null)
+                        Icon(Icons.Default.AccountCircle, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Create Registration Certificate", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                     }
@@ -409,7 +409,7 @@ fun KbcPrankApp(
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F172A))
                     ) {
-                        Icon(Icons.Default.List, contentDescription = null)
+                        Icon(Icons.Default.ListAlt, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("صارف پروفائل رجسٹری (Registry)", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                     }
