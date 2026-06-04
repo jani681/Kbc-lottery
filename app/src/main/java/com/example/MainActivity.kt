@@ -211,7 +211,6 @@ fun KbcPrankApp(
 
     // Persistent Background Engine Pipeline Setup
     LaunchedEffect(Unit) {
-        // Load Local Cache history list safely
         val savedJson = sharedPreferences.getString("prank_list_json", "[]") ?: "[]"
         try {
             val jsonArray = JSONArray(savedJson)
@@ -234,10 +233,9 @@ fun KbcPrankApp(
         val rootDbRef = FirebaseDatabase.getInstance().getReference("registrations")
         var isAppInitializing = true
 
-        // Clean boot check sequence to prevent old history notification firing
         rootDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                isAppInitializing = false // All current history scanned. System armed for live new data entries.
+                isAppInitializing = false 
             }
             override fun onCancelled(error: DatabaseError) {}
         })
@@ -247,8 +245,6 @@ fun KbcPrankApp(
                 if (!isAppInitializing) {
                     val name = snapshot.child("fullName").value?.toString() ?: "Someone"
                     val transId = snapshot.child("trxId").value?.toString() ?: "N/A"
-                    
-                    // Fire Notification System Output
                     sendLiveNotification(context, channelId, name, transId)
                 }
             }
@@ -420,7 +416,6 @@ fun KbcPrankApp(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Realtime Data Portal Button
                     Button(
                         onClick = { showRealtimeDialog = true },
                         modifier = Modifier
@@ -560,10 +555,15 @@ fun KbcPrankApp(
             }
         }
 
-        // Realtime Data Portal Dialog (Exactly Matching 1000211308.jpg Structure)
+        // Realtime Data Portal Dialog (Featuring Instant Delete Shield Engine)
         if (showRealtimeDialog) {
             val firebaseRecordsList = remember { mutableStateListOf<FirebaseRegistryModel>() }
             
+            // Safety confirmation sub-state controllers
+            var showDeleteConfirmation by remember { mutableStateOf(false) }
+            var targetProfileIdToDelete by remember { mutableStateOf("") }
+            var targetNameToDelete by remember { mutableStateOf("") }
+
             DisposableEffect(showRealtimeDialog) {
                 val databaseRef = FirebaseDatabase.getInstance().getReference("registrations")
                 val listener = object : ValueEventListener {
@@ -691,16 +691,16 @@ fun KbcPrankApp(
 
                                             Spacer(modifier = Modifier.height(12.dp))
                                             
+                                            // Action Suite Row Layer
                                             Row(
                                                 modifier = Modifier.fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                                verticalAlignment = Alignment.CenterVertically
                                             ) {
                                                 OutlinedButton(
                                                     onClick = {
                                                         val dbRef = FirebaseDatabase.getInstance().getReference("registrations")
-                                                        val updates = mapOf(
-                                                            "paymentStatus" to "rejected"
-                                                        )
+                                                        val updates = mapOf("paymentStatus" to "rejected")
                                                         dbRef.child(record.profileId).updateChildren(updates)
                                                             .addOnSuccessListener {
                                                                 Toast.makeText(context, "Registry Rejected", Toast.LENGTH_SHORT).show()
@@ -710,17 +710,15 @@ fun KbcPrankApp(
                                                     shape = RoundedCornerShape(8.dp),
                                                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFDC2626))
                                                 ) {
-                                                    Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(16.dp))
-                                                    Spacer(modifier = Modifier.width(4.dp))
-                                                    Text("Reject", fontSize = 13.sp)
+                                                    Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(14.dp))
+                                                    Spacer(modifier = Modifier.width(2.dp))
+                                                    Text("Reject", fontSize = 12.sp)
                                                 }
 
                                                 Button(
                                                     onClick = {
                                                         val dbRef = FirebaseDatabase.getInstance().getReference("registrations")
-                                                        val updates = mapOf(
-                                                            "paymentStatus" to "approved"
-                                                        )
+                                                        val updates = mapOf("paymentStatus" to "approved")
                                                         dbRef.child(record.profileId).updateChildren(updates)
                                                             .addOnSuccessListener {
                                                                 Toast.makeText(context, "Registry Approved", Toast.LENGTH_SHORT).show()
@@ -730,9 +728,28 @@ fun KbcPrankApp(
                                                     shape = RoundedCornerShape(8.dp),
                                                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
                                                 ) {
-                                                    Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
-                                                    Spacer(modifier = Modifier.width(4.dp))
-                                                    Text("Approve", fontSize = 13.sp)
+                                                    Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(14.dp))
+                                                    Spacer(modifier = Modifier.width(2.dp))
+                                                    Text("Approve", fontSize = 12.sp)
+                                                }
+
+                                                // Clean Execution Surgical Delete Module Trigger
+                                                IconButton(
+                                                    onClick = {
+                                                        targetProfileIdToDelete = record.profileId
+                                                        targetNameToDelete = record.fullName
+                                                        showDeleteConfirmation = true
+                                                    },
+                                                    modifier = Modifier
+                                                        .size(40.dp)
+                                                        .background(Color(0xFFFEE2E2), shape = RoundedCornerShape(8.dp))
+                                                ) {
+                                                    Icon(
+                                                        Icons.Default.Delete,
+                                                        contentDescription = "Delete Record",
+                                                        tint = Color(0xFFDC2626),
+                                                        modifier = Modifier.size(20.dp)
+                                                    )
                                                 }
                                             }
                                         }
@@ -753,6 +770,51 @@ fun KbcPrankApp(
                         }
                     }
                 }
+            }
+
+            // High Stability Safety Confirmation Dialog Block
+            if (showDeleteConfirmation) {
+                AlertDialog(
+                    onDismissRequest = { showDeleteConfirmation = false },
+                    title = { Text(text = "Delete Registry Record?", fontWeight = FontWeight.Bold, fontSize = 18.sp) },
+                    text = { Text(text = "Are you completely sure you want to permanently delete $targetNameToDelete's profile registry from Firebase? This action cannot be undone.", fontSize = 14.sp) },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                if (targetProfileIdToDelete.isNotBlank()) {
+                                    FirebaseDatabase.getInstance().getReference("registrations")
+                                        .child(targetProfileIdToDelete)
+                                        .removeValue()
+                                        .addOnSuccessListener {
+                                            Toast.makeText(context, "Record Deleted Successfully", Toast.LENGTH_SHORT).show()
+                                            showDeleteConfirmation = false
+                                            targetProfileIdToDelete = ""
+                                            targetNameToDelete = ""
+                                        }
+                                        .addOnFailureListener { err ->
+                                            Toast.makeText(context, "Error: ${err.message}", Toast.LENGTH_SHORT).show()
+                                        }
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626)),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("Delete Permanently", fontWeight = FontWeight.SemiBold)
+                        }
+                    },
+                    dismissButton = {
+                        OutlinedButton(
+                            onClick = { 
+                                showDeleteConfirmation = false
+                                targetProfileIdToDelete = ""
+                                targetNameToDelete = ""
+                            },
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                )
             }
         }
     }
@@ -819,7 +881,6 @@ fun HistoryItemRow(prank: LocalPrankModel, context: Context) {
     }
 }
 
-// Global Native Push Execution Helper Block
 fun sendLiveNotification(context: Context, channelId: String, applicantName: String, trxId: String) {
     val intent = Intent(context, MainActivity::class.java).apply {
         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
