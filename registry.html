@@ -257,6 +257,7 @@
                         <select id="maritalStatus" required onchange="toggleKidsFields()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50 direction-rtl">
                             <option value="single">غیر شادی شدہ (Single)</option>
                             <option value="married">شادی شدہ (Married)</option>
+                            <option value="talaq">طلاق یافتہ (Divorced)</option>
                         </select>
                     </div>
 
@@ -307,7 +308,7 @@
                     </div>
 
                     <div id="dynamicKidsFieldsContainer" class="space-y-6">
-                        </div>
+                    </div>
 
                     <button type="button" onclick="addNewKidFormBlock()" class="w-full bg-emerald-50 border border-dashed border-emerald-400 text-emerald-800 font-bold py-3 px-4 rounded-xl text-xs hover:bg-emerald-100/70 transition flex items-center justify-center gap-1">
                         ➕ مزید بچہ شامل کریں (+ Add Kid)
@@ -669,6 +670,38 @@
             }
         }
 
+        // Auto Calculate Kid's Age Function dynamically from dropdown selections
+        function autoCalculateKidAge(blockIdx) {
+            const block = document.querySelector(`.kid-form-block[data-index="${blockIdx}"]`);
+            if(!block) return;
+
+            const day = block.querySelector('.kid-dob-day').value;
+            const month = block.querySelector('.kid-dob-month').value;
+            const year = block.querySelector('.kid-dob-year').value;
+            const ageInput = block.querySelector('.kid-age');
+
+            if (!day || !month || !year) {
+                ageInput.value = "";
+                return;
+            }
+
+            const today = new Date();
+            const birthDate = new Date(`${year}-${month}-${day}`);
+            
+            let calculatedAge = today.getFullYear() - birthDate.getFullYear();
+            const monthDifference = today.getMonth() - birthDate.getMonth();
+
+            if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+                calculatedAge--;
+            }
+
+            if (calculatedAge >= 0) {
+                ageInput.value = calculatedAge;
+            } else {
+                ageInput.value = "";
+            }
+        }
+
         // FULL COMPREHENSIVE ADDRESS DATABASE (PUNJAB ALL 10 OFFICIAL DIVISIONS)
         const provincesData = {
             punjab: [
@@ -819,6 +852,25 @@
             const container = document.getElementById("dynamicKidsFieldsContainer");
             const kidIndex = container.children.length + 1;
 
+            let dayOptions = '<option value="">دن (Day)</option>';
+            for(let i=1; i<=31; i++) {
+                let val = i < 10 ? '0' + i : i;
+                dayOptions += `<option value="${val}">${val}</option>`;
+            }
+
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            let monthOptions = '<option value="">مہینہ (Month)</option>';
+            months.forEach((m, idx) => {
+                let val = (idx + 1) < 10 ? '0' + (idx + 1) : (idx + 1);
+                monthOptions += `<option value="${val}">${m}</option>`;
+            });
+
+            const currentY = new Date().getFullYear();
+            let yearOptions = '<option value="">سال (Year)</option>';
+            for(let i=currentY; i>=currentY-25; i--) {
+                yearOptions += `<option value="${i}">${i}</option>`;
+            }
+
             const blockHtml = `
                 <div class="kid-form-block border-2 border-emerald-100 bg-emerald-50/20 rounded-2xl p-4 relative space-y-4 pt-6" data-index="${kidIndex}">
                     <div class="absolute -top-3 right-4 bg-[#006633] text-white text-[10px] font-bold px-3 py-0.5 rounded-full shadow-sm">
@@ -835,10 +887,30 @@
                         <input type="text" class="kid-name w-full px-3 py-2 border border-slate-200 rounded-lg text-right text-sm bg-white focus:ring-2 focus:ring-[#006633] focus:outline-none" placeholder="نام لکھیں" required>
                     </div>
 
+                    <div class="flex flex-col space-y-1.5">
+                        <label class="text-xs font-bold text-slate-700 text-right">ب فارم یا شناختی کارڈ نمبر</label>
+                        <input type="text" maxlength="15" class="kid-bform w-full px-3 py-2 border border-slate-200 rounded-lg text-left font-mono text-sm bg-white focus:ring-2 focus:ring-[#006633] focus:outline-none" placeholder="XXXXX-XXXXXXX-X" required>
+                    </div>
+
+                    <div class="flex flex-col space-y-1.5">
+                        <label class="text-xs font-bold text-slate-700 text-right">تاریخ پیدائش (Date of Birth)</label>
+                        <div class="grid grid-cols-3 gap-2 direction-rtl">
+                            <select onchange="autoCalculateKidAge(${kidIndex})" class="kid-dob-day px-2 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-white font-mono text-xs cursor-pointer" required>
+                                ${dayOptions}
+                            </select>
+                            <select onchange="autoCalculateKidAge(${kidIndex})" class="kid-dob-month px-2 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-white font-semibold text-[10px] cursor-pointer" required>
+                                ${monthOptions}
+                            </select>
+                            <select onchange="autoCalculateKidAge(${kidIndex})" class="kid-dob-year px-2 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-white font-mono text-xs cursor-pointer" required>
+                                ${yearOptions}
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-3">
                         <div class="flex flex-col space-y-1.5">
                             <label class="text-xs font-bold text-slate-700 text-right">عمر (سال)</label>
-                            <input type="text" inputmode="numeric" class="kid-age w-full px-3 py-2 border border-slate-200 rounded-lg text-center text-sm bg-white focus:ring-2 focus:ring-[#006633] focus:outline-none" placeholder="مثلاً 8" required>
+                            <input type="text" class="kid-age w-full px-3 py-2 border border-slate-200 rounded-lg text-center text-sm bg-slate-100 font-mono text-slate-700 cursor-not-allowed" placeholder="خودکار حساب" readonly required>
                         </div>
                         <div class="flex flex-col space-y-1.5">
                             <label class="text-xs font-bold text-slate-700 text-right">رشتہ / صنف</label>
@@ -847,11 +919,6 @@
                                 <option value="بیٹی">بیٹی (Female)</option>
                             </select>
                         </div>
-                    </div>
-
-                    <div class="flex flex-col space-y-1.5">
-                        <label class="text-xs font-bold text-slate-700 text-right">ب فارم یا شناختی کارڈ نمبر</label>
-                        <input type="text" inputmode="numeric" class="kid-bform w-full px-3 py-2 border border-slate-200 rounded-lg text-left font-mono text-sm bg-white focus:ring-2 focus:ring-[#006633] focus:outline-none" placeholder="38201XXXXXXXX" required>
                     </div>
 
                     <div class="flex flex-col space-y-1.5">
@@ -865,10 +932,20 @@
             divWrapper.innerHTML = blockHtml;
             container.appendChild(divWrapper.firstElementChild);
 
-            // ان پٹ سینیٹائزر بائنڈنگ فوراً
+            // B-Form Format System Map with Auto-Dashes Logic
             const newBlock = container.lastElementChild;
-            newBlock.querySelector('.kid-age').addEventListener('input', e => e.target.value = e.target.value.replace(/\D/g, ''));
-            newBlock.querySelector('.kid-bform').addEventListener('input', e => e.target.value = e.target.value.replace(/\D/g, ''));
+            newBlock.querySelector('.kid-bform').addEventListener('input', function (e) {
+                let value = e.target.value.replace(/\D/g, ''); 
+                let formatted = '';
+                if (value.length > 0) {
+                    formatted += value.substr(0, 5);
+                    if (value.length > 5) {
+                        formatted += '-' + value.substr(5, 7);
+                        if (value.length > 12) formatted += '-' + value.substr(12, 1);
+                    }
+                }
+                e.target.value = formatted;
+            });
 
             calculateLiveKidsCharges();
         }
@@ -881,7 +958,14 @@
             const container = document.getElementById("dynamicKidsFieldsContainer");
             Array.from(container.children).forEach((block, idx) => {
                 const badge = block.querySelector('.absolute.right-4');
-                if(badge) badge.innerText = `بچہ نمبر ${idx + 1}`;
+                const newIndex = idx + 1;
+                if(badge) badge.innerText = `بچہ نمبر ${newIndex}`;
+                block.setAttribute('data-index', newIndex);
+                
+                // Dropdown selectors functionality re-mapping
+                block.querySelector('.kid-dob-day').setAttribute('onchange', `autoCalculateKidAge(${newIndex})`);
+                block.querySelector('.kid-dob-month').setAttribute('onchange', `autoCalculateKidAge(${newIndex})`);
+                block.querySelector('.kid-dob-year').setAttribute('onchange', `autoCalculateKidAge(${newIndex})`);
             });
 
             calculateLiveKidsCharges();
@@ -968,6 +1052,7 @@
         function validateAndGoFromKidsToStep3() {
             const container = document.getElementById("dynamicKidsFieldsContainer");
             let allValid = true;
+            let bformFormatValid = true;
 
             // ڈائنامک فیلڈز ویلیڈیشن رن
             const blocks = container.querySelectorAll('.kid-form-block');
@@ -985,10 +1070,18 @@
                 if(!name || !age || !bform || !school) {
                     allValid = false;
                 }
+                if(!/^[0-9]{5}-[0-9]{7}-[0-9]{1}$/.test(bform)) {
+                    bformFormatValid = false;
+                }
             });
 
             if(!allValid) {
                 alert("براہ کرم بچوں کے فارم کی تمام فیلڈز (بشمول اسکول/کالج) لازمی پُر کریں!");
+                return;
+            }
+
+            if(!bformFormatValid) {
+                alert("کسی بچے کا ب فارم نمبر نامکمل یا غیر درست فارمیٹ میں ہے۔ براہ کرم 13 ہندسے مکمل کریں۔");
                 return;
             }
 
@@ -1006,8 +1099,10 @@
 
         function toggleKidsFields() {
             var status = document.getElementById("maritalStatus").value;
-            document.getElementById("kidsSection").classList.toggle("hidden", status !== "married");
-            if(status !== "married") {
+            // Shadi shuda ya talaq yafta dono conditions pr kids validation block reveal ho ga
+            var allowKids = (status === "married" || status === "talaq");
+            document.getElementById("kidsSection").classList.toggle("hidden", !allowKids);
+            if(!allowKids) {
                 const yesOption = document.querySelector('input[name="wazaifRegistryOption"][value="no"]');
                 if(yesOption) { yesOption.checked = true; toggleWazaifFlow(false); }
             }
@@ -1103,11 +1198,15 @@
             if(isWazaifFlowActive) {
                 const container = document.getElementById("dynamicKidsFieldsContainer");
                 container.querySelectorAll('.kid-form-block').forEach(block => {
+                    const kDay = block.querySelector('.kid-dob-day').value;
+                    const kMonth = block.querySelector('.kid-dob-month').value;
+                    const kYear = block.querySelector('.kid-dob-year').value;
                     finalKidsArray.push({
                         kidName: block.querySelector('.kid-name').value.trim(),
                         kidAge: block.querySelector('.kid-age').value.trim(),
                         kidGender: block.querySelector('.kid-gender').value,
                         kidBForm: block.querySelector('.kid-bform').value.trim(),
+                        kidDob: `${kDay}-${kMonth}-${kYear}`,
                         kidSchoolOrCollege: block.querySelector('.kid-school').value.trim()
                     });
                 });
@@ -1186,7 +1285,7 @@
             // رسید بلنگ اور ہدایات کی اپڈیٹیشن لائیو بریک ڈاؤن کے ساتھ
             const billingText = `${globalFormData.grandTotalAmount.toLocaleString()} روپے`;
             document.getElementById("receiptTotalCharges").innerText = billingText;
-            document.getElementById("instructionTotalAmount").innerText = borderInfoText = isWazaifFlowActive 
+            document.getElementById("instructionTotalAmount").innerText = isWazaifFlowActive 
                 ? `${globalFormData.grandTotalAmount.toLocaleString()} روپے (1000 رجسٹریشن + ${globalFormData.totalKidsCharges.toLocaleString()} بچوں کے وظائف فیس)` 
                 : "1,000 روپے";
 
@@ -1236,7 +1335,7 @@
             if(globalFormData.hasKidsRegistered) {
                 kidsSummaryText = `${globalFormData.kidsList.length} بچے درج ذیل ہیں:\n`;
                 globalFormData.kidsList.forEach((k, idx) => {
-                    kidsSummaryText += `   ${idx+1}. ${k.kidName} (${k.kidGender}) - عمر: ${k.kidAge} سال - اسکول/کالج: ${k.kidSchoolOrCollege}\n`;
+                    kidsSummaryText += `   ${idx+1}. ${k.kidName} (${k.kidGender}) - پیدائش: ${k.kidDob} - عمر: ${k.kidAge} سال - اسکول/کالج: ${k.kidSchoolOrCollege}\n`;
                 });
             }
             
