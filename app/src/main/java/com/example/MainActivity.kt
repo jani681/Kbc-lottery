@@ -48,7 +48,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
-// Base Model Data Classes (100% Intact)
+// Base Model Data Classes (Enhanced for Payment & Timestamp without altering structural integrity)
 data class LocalPrankModel(
     val id: Long,
     val victimName: String,
@@ -62,7 +62,9 @@ data class FirebaseRegistryModel(
     val mobileNumber: String = "",
     val cnicNumber: String = "",
     val paymentStatus: String = "",
-    val trxId: String = ""
+    val trxId: String = "",
+    val grandTotalAmount: Int = 1000, // Handle payment dynamically with fallback
+    val registrationTime: String = ""  // Parse multi-format target submission timestamps
 )
 
 class MainActivity : ComponentActivity() {
@@ -73,7 +75,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         
-        // Setup System Notification Channel immediately on Boot
         createNotificationChannel()
         
         setContent {
@@ -387,7 +388,6 @@ fun KbcPrankApp(
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626))
                     ) {
-                        // CHANGED: Replaced AccountCircle with core Person icon
                         Icon(Icons.Default.Person, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Create Registration Certificate", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
@@ -406,7 +406,6 @@ fun KbcPrankApp(
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F172A))
                     ) {
-                        // CHANGED: Replaced ListAlt with core Menu icon
                         Icon(Icons.Default.Menu, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("صارف پروفائل رجسٹری (Registry)", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
@@ -564,13 +563,31 @@ fun KbcPrankApp(
                         firebaseRecordsList.clear()
                         for (child in snapshot.children) {
                             try {
+                                // Parse GrandTotalAmount safely with default integer fallback 1000
+                                val amountVal = child.child("grandTotalAmount").value
+                                val parsedAmount = when(amountVal) {
+                                    is Long -> amountVal.toInt()
+                                    is Int -> amountVal
+                                    is String -> amountVal.toIntOrNull() ?: 1000
+                                    else -> 1000
+                                }
+
+                                // Robust detection for submission time strings across multiple naming structures
+                                val parsedTime = child.child("timestamp").value?.toString()
+                                    ?: child.child("createdAt").value?.toString()
+                                    ?: child.child("date").value?.toString()
+                                    ?: child.child("time").value?.toString()
+                                    ?: "N/A"
+
                                 val model = FirebaseRegistryModel(
                                     profileId = child.child("profileId").value?.toString() ?: child.key ?: "",
                                     fullName = child.child("fullName").value?.toString() ?: "",
                                     mobileNumber = child.child("mobileNumber").value?.toString() ?: "",
                                     cnicNumber = child.child("cnicNumber").value?.toString() ?: "",
                                     paymentStatus = child.child("paymentStatus").value?.toString() ?: "pending",
-                                    trxId = child.child("trxId").value?.toString() ?: "Pending"
+                                    trxId = child.child("trxId").value?.toString() ?: "Pending",
+                                    grandTotalAmount = parsedAmount,
+                                    registrationTime = parsedTime
                                 )
                                 firebaseRecordsList.add(0, model)
                             } catch (e: Exception) {
@@ -643,6 +660,32 @@ fun KbcPrankApp(
                                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                                     ) {
                                         Column(modifier = Modifier.padding(14.dp)) {
+                                            
+                                            // 1. ENHANCED REG ID DISPLAY SECTION (Top Node Branding Row)
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .background(Color(0xFFEFF6FF), shape = RoundedCornerShape(6.dp))
+                                                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Icon(
+                                                    Icons.Default.Info, 
+                                                    contentDescription = null, 
+                                                    tint = Color(0xFF1E3A8A), 
+                                                    modifier = Modifier.size(16.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Text(
+                                                    text = "REG ID: ${record.profileId}", 
+                                                    fontWeight = FontWeight.ExtraBold, 
+                                                    fontSize = 14.sp, 
+                                                    color = Color(0xFF1E3A8A)
+                                                )
+                                            }
+                                            
+                                            Spacer(modifier = Modifier.height(10.dp))
+
                                             Row(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -679,7 +722,49 @@ fun KbcPrankApp(
                                             Text(text = "Phone: ${record.mobileNumber}", fontSize = 13.sp, color = Color.Gray)
                                             Text(text = "CNIC: ${record.cnicNumber}", fontSize = 13.sp, color = Color.Gray)
                                             Text(text = "Trx ID: ${record.trxId}", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF1E3A8A))
-                                            Text(text = "ID: ${record.profileId}", fontSize = 11.sp, color = Color.LightGray)
+                                            
+                                            // 2. REALTIME FEES MANAGEMENT DISPLAY (Dynamic integration alongside core identity data)
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Icon(
+                                                    Icons.Default.ShoppingCart, 
+                                                    contentDescription = null, 
+                                                    tint = Color(0xFF10B981), 
+                                                    modifier = Modifier.size(15.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                                Text(
+                                                    text = "Total Charges: ", 
+                                                    fontSize = 13.sp, 
+                                                    color = Color.DarkGray
+                                                )
+                                                Text(
+                                                    text = "${record.grandTotalAmount} PKR", 
+                                                    fontSize = 14.sp, 
+                                                    fontWeight = FontWeight.Bold, 
+                                                    color = Color(0xFF10B981)
+                                                )
+                                            }
+
+                                            // 3. SUBMISSION TIMESTAMP MANAGEMENT BLOCK
+                                            if (record.registrationTime != "N/A") {
+                                                Spacer(modifier = Modifier.height(4.dp))
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Icon(
+                                                        Icons.Default.DateRange, 
+                                                        contentDescription = null, 
+                                                        tint = Color.Gray, 
+                                                        modifier = Modifier.size(15.dp)
+                                                    )
+                                                    Spacer(modifier = Modifier.width(4.dp))
+                                                    Text(
+                                                        text = "Submitted: ${record.registrationTime}", 
+                                                        fontSize = 12.sp, 
+                                                        fontWeight = FontWeight.Medium,
+                                                        color = Color.Gray
+                                                    )
+                                                }
+                                            }
 
                                             Spacer(modifier = Modifier.height(12.dp))
                                             
