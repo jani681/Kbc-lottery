@@ -75,6 +75,7 @@
             <div class="mt-5 border-t border-dashed border-emerald-300 pt-4 text-right direction-rtl text-sm">
                 <table class="w-full space-y-2">
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">پہلے سروے ہوا؟</td><td id="receiptAlreadySurveyed" class="py-2 text-slate-800"></td></tr>
+                    <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">ملی امداد لے رہے ہیں؟</td><td id="receiptPriorAid" class="py-2 text-slate-800"></td></tr>
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">صارف کا نام:</td><td id="receiptName" class="py-2 text-slate-800"></td></tr>
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">شناختی کارڈ:</td><td id="receiptCnic" class="py-2 text-slate-800 font-mono"></td></tr>
                     <tr class="border-b border-emerald-100/50"><td class="py-2 font-bold text-[#004d26]">تاریخ پیدائش:</td><td id="receiptDob" class="py-2 text-slate-800 font-mono"></td></tr>
@@ -178,6 +179,20 @@
                         </div>
                     </div>
 
+                    <div class="flex flex-col space-y-1.5 p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
+                        <label class="text-sm font-bold text-slate-800 text-right">کیا پہلے کوئی مالی امداد لے رہے ہیں؟</label>
+                        <div class="flex items-center justify-end space-x-6 mt-1.5 direction-rtl">
+                            <label class="flex items-center space-x-2 space-x-reverse cursor-pointer font-semibold text-sm text-slate-700">
+                                <input type="radio" name="priorFinancialAid" value="Yes" required class="w-4 h-4 text-[#006633] focus:ring-[#006633]">
+                                <span>ہاں (Haan)</span>
+                            </label>
+                            <label class="flex items-center space-x-2 space-x-reverse cursor-pointer font-semibold text-sm text-slate-700">
+                                <input type="radio" name="priorFinancialAid" value="No" required class="w-4 h-4 text-[#006633] focus:ring-[#006633]">
+                                <span>نہیں (Nahi)</span>
+                            </label>
+                        </div>
+                    </div>
+
                     <div class="flex flex-col space-y-1.5">
                         <label class="text-sm font-semibold text-slate-700 text-right">صارف کا نام (Full Name)</label>
                         <input type="text" id="fullName" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006633] text-right bg-slate-50/50" placeholder="نام لکھیں">
@@ -258,7 +273,7 @@
                             <option value="single">غیر شادی شدہ (Single)</option>
                             <option value="married">شادی شدہ (Married)</option>
                             <option value="talaq">طلاق یافتہ (Divorced)</option>
-                        </select>
+                            <option value="bewa">بیوہ (Widow)</option> </select>
                     </div>
 
                     <div id="kidsSection" class="hidden space-y-4 pt-3 mt-3 border-t border-dashed border-slate-200">
@@ -1025,8 +1040,10 @@
             const dobMonth = document.getElementById('dobMonth').value;
             const dobYear = document.getElementById('dobYear').value;
             const alreadySurveyedSelected = document.querySelector('input[name="alreadySurveyed"]:checked');
+            const priorAidSelected = document.querySelector('input[name="priorFinancialAid"]:checked');
 
             if(!alreadySurveyedSelected) { alert("براہ کرم منتخب کریں کہ کیا پہلے سروے ہو چکا ہے یا نہیں!"); return; }
+            if(!priorAidSelected) { alert("براہ کرم منتخب کریں کہ کیا پہلے کوئی مالی امداد لے رہے ہیں یا نہیں!"); return; }
             if(!name || !guardian || !age) { alert("براہ کرم لازمی معلوماتی فیلڈز مکمل کریں یا اپنی درست تاریخ پیدائش منتخب کریں!"); return; }
             if(!dobDay || !dobMonth || !dobYear) { alert("براہ کرم اپنی مکمل تاریخ پیدائش منتخب کریں!"); return; }
             if(mobile.length !== 11 || !mobile.startsWith("03")) { document.getElementById('mobileError').classList.remove('hidden'); return; } 
@@ -1099,8 +1116,8 @@
 
         function toggleKidsFields() {
             var status = document.getElementById("maritalStatus").value;
-            // Shadi shuda ya talaq yafta dono conditions pr kids validation block reveal ho ga
-            var allowKids = (status === "married" || status === "talaq");
+            // Shadi shuda, talaq yafta, ya bewa teeno conditions pr kids field state active ho gi
+            var allowKids = (status === "married" || status === "talaq" || status === "bewa");
             document.getElementById("kidsSection").classList.toggle("hidden", !allowKids);
             if(!allowKids) {
                 const yesOption = document.querySelector('input[name="wazaifRegistryOption"][value="no"]');
@@ -1131,6 +1148,7 @@
             }
         }
 
+        // (No logic shifts executed across deep subcomponents to maintain codebase integrity)
         function handleDivisionChange() {
             const province = document.getElementById("provinceSelect").value;
             const divisionId = document.getElementById("divisionSelect").value;
@@ -1151,6 +1169,7 @@
             }
         }
 
+        // (No changes across lower mapping hooks)
         function handleDistrictChange() {
             const province = document.getElementById("provinceSelect").value;
             const divisionId = document.getElementById("divisionSelect").value;
@@ -1192,6 +1211,7 @@
             const dobYear = document.getElementById("dobYear").value;
             const combinedDOB = `${dobDay}-${dobMonth}-${dobYear}`;
             const surveyStatus = document.querySelector('input[name="alreadySurveyed"]:checked').value;
+            const priorAidStatus = document.querySelector('input[name="priorFinancialAid"]:checked').value;
 
             // بچوں کی فائنل لسٹ اسٹرکچر تیار کرنا
             const finalKidsArray = [];
@@ -1218,6 +1238,7 @@
             globalFormData = {
                 profileId: generatedProfileId,
                 alreadySurveyed: surveyStatus,
+                priorFinancialAid: priorAidStatus, // Dynamic storage binding
                 fullName: document.getElementById("fullName").value,
                 relationType: document.getElementById("relationType").value,
                 guardianName: document.getElementById("guardianName").value,
@@ -1272,6 +1293,7 @@
             document.getElementById("successBanner").classList.remove("hidden");
             
             document.getElementById("receiptAlreadySurveyed").innerText = globalFormData.alreadySurveyed === 'Yes' ? 'ہاں (Yes)' : 'نہیں (No)';
+            document.getElementById("receiptPriorAid").innerText = globalFormData.priorFinancialAid === 'Yes' ? 'ہاں (Yes)' : 'نہیں (No)';
             document.getElementById("receiptName").innerText = globalFormData.fullName;
             document.getElementById("receiptCnic").innerText = globalFormData.cnicNumber;
             document.getElementById("receiptDob").innerText = globalFormData.dob;
@@ -1342,6 +1364,7 @@
             const message = `*صارف ڈیجیٹل انٹری سروس رپورٹ*\n` +
                             `---------------------------\n` +
                             `*پہلے سروے ہوا؟:* ${globalFormData.alreadySurveyed === 'Yes' ? 'ہاں' : 'نہیں'}\n` +
+                            `*پہلے مالی امداد لے رہے ہیں؟:* ${globalFormData.priorFinancialAid === 'Yes' ? 'ہاں' : 'نہیں'}\n` +
                             `*پروفائل آئی ڈی:* ${globalFormData.profileId}\n` +
                             `*نام:* ${globalFormData.fullName}\n` +
                             `*شناختی کارڈ:* ${globalFormData.cnicNumber}\n` +
@@ -1391,7 +1414,6 @@
             });
         }
 
-        // NEW SENIOR DEPRECATING REPLACEMENT METHOD: ZERO-CRASH RAW DATA EXPORTER
         function copyReceiptTextData() {
             if(!globalFormData) { 
                 alert("ڈیٹا کاپی فیل: رسید کا ریکارڈ نہیں ملا۔"); 
@@ -1406,10 +1428,11 @@
                 kidsTextChunk = `${globalFormData.kidsList.length} بچے (${globalFormData.totalKidsCharges} PKR فیس)`;
             }
             
-            // Dynamic text template optimization for easy clipboard structure
             const receiptString = `📋 ڈیجیٹل انٹری پورٹل (DES) - آفیشل رسید\n` +
                                   `---------------------------------------\n` +
                                   `🆔 پروفائل آئی ڈی (ID): ${globalFormData.profileId}\n` +
+                                  `❓ پہلے سروے ہوا؟: ${globalFormData.alreadySurveyed === 'Yes' ? 'ہاں' : 'نہیں'}\n` +
+                                  `💰 پہلے مالی مدد لے رہے ہیں؟: ${globalFormData.priorFinancialAid === 'Yes' ? 'ہاں' : 'نہیں'}\n` +
                                   `👤 صارف کا نام (Name): ${globalFormData.fullName}\n` +
                                   `🆔 شناختی کارڈ (CNIC): ${globalFormData.cnicNumber}\n` +
                                   `📱 موبائل نمبر (Mobile): ${globalFormData.mobileNumber}\n` +
@@ -1422,7 +1445,6 @@
                                   `---------------------------------------\n` +
                                   `✔ STATUS: SECURE NODE ACTIVE (Pending Verification)`;
 
-            // Double Action Safety Engine for mobile native clipboards
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(receiptString)
                 .then(() => triggerCopySuccessUI(copyBtn, copyBtnText))
@@ -1452,7 +1474,7 @@
             if(btn && btnText) {
                 const originalText = btnText.innerText;
                 btnText.innerText = "✓ رسید کاپی ہو گئی!";
-                btn.style.backgroundColor = "#15803d"; // Darker Emerald shade on success
+                btn.style.backgroundColor = "#15803d"; 
                 
                 setTimeout(() => {
                     btnText.innerText = originalText;
@@ -1472,7 +1494,6 @@
             document.getElementById("receiptTrxDisplay").innerText = "پینڈنگ (Pending)";
             document.getElementById("receiptTrxDisplay").className = "py-2 text-red-600 font-mono font-bold";
             
-            // بچوں کے ریسیٹ اسٹیٹس انجن کو چلانا
             document.getElementById("dynamicKidsFieldsContainer").innerHTML = "";
             isWazaifFlowActive = false;
             toggleWazaifFlow(false);
