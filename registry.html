@@ -54,6 +54,28 @@
 
     <div class="max-w-md mx-auto mt-6 px-4">
         
+        <div id="trackingPanel" class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm mb-6 text-right direction-rtl">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+                <h3 class="text-sm font-extrabold text-slate-900">🔍 اپنی رجسٹریشن کا اسٹیٹس چیک کریں</h3>
+                <span class="text-[9px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-mono">Live Search</span>
+            </div>
+            <div class="flex gap-2">
+                <input type="text" id="trackProfileIdInput" placeholder="REG-2606-XXXX" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-left font-mono focus:outline-none focus:ring-2 focus:ring-[#006633] text-sm bg-white">
+                <button type="button" onclick="trackApplicationStatus()" class="bg-[#006633] text-white px-4 py-2 rounded-xl font-bold text-xs hover:bg-[#004d26] transition shrink-0">اسٹیٹس دیکھیں</button>
+            </div>
+            
+            <div id="trackingResultArea" class="hidden mt-4 pt-4 border-t border-dashed border-slate-200 space-y-3">
+                <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <span class="text-xs font-bold text-slate-700">موجودہ اسٹیٹس (Current Status):</span>
+                    <span id="trackStatusBadge" class="text-xs font-black px-3 py-1 rounded-full shadow-sm font-mono"></span>
+                </div>
+                <div id="trackRemarksCard" class="p-3.5 rounded-xl border text-xs leading-relaxed">
+                    <span class="font-extrabold block mb-1">📋 ریمارکس / ہدایات:</span>
+                    <p id="trackRemarksText" class="font-medium"></p>
+                </div>
+            </div>
+        </div>
+        
         <div id="successBanner" class="hidden bg-emerald-50 border border-[#339933] text-emerald-900 rounded-2xl p-6 text-center shadow-sm mb-6">
             <div class="w-12 h-12 bg-[#006633] rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
@@ -596,7 +618,7 @@
                                 <span id="feedName2" class="font-bold text-slate-200">فرزانہ کوثر</span>
                                 <span class="text-sky-400 text-[10px]">✓</span>
                             </div>
-                            <p id="feedText2" class="text-slate-400 leading-relaxed text-[11px]">پہلے مجھے لگا فیک ہے، پر جیسے ہی ٹرانزیکشن ID سبمٹ کی، 15 منٹ میں سٹیٹس اپروو ہو گیا۔ شکریہ ٹیم کا۔</p>
+                            <p id="feedText2" class="text-slate-400 leading-relaxed text-[11px]">پہلے مجھے لگا فیک ہے، پر جیسے ہی ٹرانزیکشن ID سبمٹ کی، 15 منٹ میں اسٹیٹس اپروو ہو گیا۔ شکریہ ٹیم کا۔</p>
                             <span class="text-[9px] text-slate-500 block font-mono">2 منٹ پہلے</span>
                         </div>
                     </div>
@@ -1259,6 +1281,7 @@
                 villageName: document.getElementById("villageName").value,
                 paymentStatus: "pending",
                 trxId: "Pending",
+                remarks: "فیس کی ادائیگی پینڈنگ ہے۔EasyPaisa یا JazzCash پر رقم بھیج کر ٹرانزیکشن ID (TRX) درج کریں۔", // Smart Fallback Remarks Initial State
                 timestamp: now.toISOString(),
                 // نئے فیلڈز برائے کلاؤڈ انٹری وظائف پراجیکٹ
                 hasKidsRegistered: isWazaifFlowActive,
@@ -1288,6 +1311,7 @@
             document.getElementById("formCard").style.display = "none";
             document.getElementById("stepIndicatorBar").style.display = "none";
             document.getElementById("trustVerificationBlock").style.display = "none"; 
+            document.getElementById("trackingPanel").style.display = "none"; // Hide search panel on success view
             
             document.getElementById("displayProfileId").innerText = generatedProfileId;
             document.getElementById("successBanner").classList.remove("hidden");
@@ -1329,8 +1353,10 @@
                 return;
             }
 
+            const updatedRemarks = "آپ کی ٹرانزیکشن ID موصول ہو چکی ہے۔ ہماری ٹیم 15 سے 30 منٹ کے اندر آپ کے فنڈز اور بائیو میٹرک اسٹیٹس کی تصدیق مکمل کر کے فائل اپروو کر دے گی۔";
             globalFormData.trxId = trxId;
             globalFormData.paymentStatus = "submitted";
+            globalFormData.remarks = updatedRemarks;
 
             document.getElementById("receiptTrxDisplay").innerText = trxId;
             document.getElementById("receiptTrxDisplay").className = "py-2 text-red-600 font-mono font-bold";
@@ -1338,7 +1364,8 @@
             if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
                 firebase.database().ref('registrations/' + generatedProfileId).update({
                     trxId: trxId,
-                    paymentStatus: "submitted"
+                    paymentStatus: "submitted",
+                    remarks: updatedRemarks
                 }).then(() => {
                     alert("ٹرانزیکشن ID کامیابی سے اپڈیٹ ہو گئی ہے۔");
                 }).catch(err => alert("سرور آپڈیٹ فیل: " + err.message));
@@ -1346,6 +1373,72 @@
                 alert("لوکل موڈ: ٹرانزیکشن رسید پر لاگو کر دی گئی ہے۔");
             }
             document.getElementById("trxInputArea").style.display = "none";
+        }
+
+        // ================= APPLICATION LIVE TRACKING CONTROLLER FUNCTION =================
+        function trackApplicationStatus() {
+            const searchId = document.getElementById("trackProfileIdInput").value.trim();
+            const resultArea = document.getElementById("trackingResultArea");
+            const badge = document.getElementById("trackStatusBadge");
+            const card = document.getElementById("trackRemarksCard");
+            const remarksText = document.getElementById("trackRemarksText");
+
+            if(!searchId) {
+                alert("براہ کرم سرچ کرنے کے لیے پروفائل ریفرنس ID درج کریں!");
+                return;
+            }
+
+            if (firebaseConfig.apiKey === "YOUR_API_KEY") {
+                alert("لوکل پینل الرٹ: فائر بیس کنفیگریشن لائیو سیٹ نہیں ہے۔");
+                return;
+            }
+
+            // Realtime Firebase Tracking Node Listener Fetch
+            firebase.database().ref('registrations/' + searchId).once('value')
+            .then(snapshot => {
+                if(snapshot.exists()) {
+                    const data = snapshot.val();
+                    resultArea.classList.remove("hidden");
+                    
+                    // UI badge mutation based on paymentStatus parameters
+                    if(data.paymentStatus === "pending") {
+                        badge.innerText = "PENDING VERIFICATION";
+                        badge.className = "text-xs font-black px-3 py-1 rounded-full shadow-sm font-mono bg-amber-100 text-amber-800 border border-amber-200";
+                        card.className = "p-3.5 rounded-xl border text-xs leading-relaxed bg-amber-50/50 border-amber-200 text-amber-900";
+                    } else if(data.paymentStatus === "submitted") {
+                        badge.innerText = "TRX PROCESSING";
+                        badge.className = "text-xs font-black px-3 py-1 rounded-full shadow-sm font-mono bg-blue-100 text-blue-800 border border-blue-200";
+                        card.className = "p-3.5 rounded-xl border text-xs leading-relaxed bg-blue-50/50 border-blue-200 text-blue-900";
+                    } else if(data.paymentStatus === "verified" || data.paymentStatus === "approved") {
+                        badge.innerText = "VERIFIED / APPROVED";
+                        badge.className = "text-xs font-black px-3 py-1 rounded-full shadow-sm font-mono bg-emerald-100 text-emerald-800 border border-emerald-200 animate-pulse";
+                        card.className = "p-3.5 rounded-xl border text-xs leading-relaxed bg-emerald-50/30 border-emerald-200 text-emerald-900";
+                    } else {
+                        badge.innerText = String(data.paymentStatus).toUpperCase();
+                        badge.className = "text-xs font-black px-3 py-1 rounded-full shadow-sm font-mono bg-slate-100 text-slate-800 border border-slate-200";
+                        card.className = "p-3.5 rounded-xl border text-xs leading-relaxed bg-slate-50 border-slate-200 text-slate-800";
+                    }
+
+                    // Smart Fallback Remarks Evaluator Engine
+                    if (data.remarks) {
+                        remarksText.innerText = data.remarks;
+                    } else {
+                        // Fallback logic routes based on current properties structural checks
+                        if(data.paymentStatus === "pending") {
+                            remarksText.innerText = "آپ کا شناختی ڈیٹا ڈیٹا بیس سرور پر اپلوڈ ہو چکا ہے۔ فائل کی باقاعدہ منظوری کے لیے اکاؤنٹ پر " + (data.grandTotalAmount ? data.grandTotalAmount.toLocaleString() : "1,000") + " روپے رجسٹریشن فیس جمع کروا کر ٹرانزیکشن ID (TRX) لازمی سبمٹ کریں۔";
+                        } else {
+                            remarksText.innerText = "آپ کی فائل سسٹم ہینڈلر نوڈ پر موصول ہو چکی ہے۔ متعلقہ تحصیل کنٹرولر آفیسر بائیو میٹرک اور فنڈز ریکارڈ کی جانچ پڑتال کر رہا ہے۔ براہ کرم کچھ دیر بعد دوبارہ اسٹیٹس چیک کریں۔";
+                        }
+                    }
+                } else {
+                    resultArea.classList.add("hidden");
+                    alert("درج کردہ پروفائل آئی ڈی کلاؤڈ سسٹم پر نہیں ملی۔ براہ کرم ریفرنس نمبر دوبارہ چیک کریں۔");
+                }
+            })
+            .catch(err => {
+                console.error("Tracking Engine Query Crash:", err);
+                alert("سیسٹم ایرر: ڈیٹا لوڈ کرنے میں ناکامی۔ " + err.message);
+            });
         }
 
         function shareDataOnWhatsApp() {
@@ -1491,10 +1584,13 @@
             document.getElementById("stepIndicatorBar").style.display = "flex";
             document.getElementById("trustVerificationBlock").style.display = "block"; 
             document.getElementById("trxInputArea").style.display = "block";
+            document.getElementById("trackingPanel").style.display = "block"; // Show tracking panel on return
             document.getElementById("receiptTrxDisplay").innerText = "پینڈنگ (Pending)";
             document.getElementById("receiptTrxDisplay").className = "py-2 text-red-600 font-mono font-bold";
             
             document.getElementById("dynamicKidsFieldsContainer").innerHTML = "";
+            document.getElementById("trackingResultArea").classList.add("hidden");
+            document.getElementById("trackProfileIdInput").value = "";
             isWazaifFlowActive = false;
             toggleWazaifFlow(false);
             calculateLiveKidsCharges();
@@ -1506,7 +1602,7 @@
         // ================= PREMIUM LIVE FEED DATA LOOP CORE ENGINE =================
         const mockActivityData = [
             { initials: "AM", name: "عاصم منیر", text: "بائیو میٹرک تصدیق مکمل ہو گئی ہے اور فنڈز کلیئرنس آرڈر جاری کر دیا گیا ہے! بہترین پورٹل۔", bg: "bg-emerald-600" },
-            { initials: "FK", name: "فرزانہ کوثر", text: "پہلے مجھے لگا فیک ہے، پر جیسے ہی ٹرانزیکشن ID سبمٹ کی، 15 منٹ میں سٹیٹس اپروو ہو گیا۔ شکریہ ٹیم کا۔", bg: "bg-teal-600" },
+            { initials: "FK", name: "فرزانہ کوثر", text: "پہلے مجھے لگا فیک ہے، پر جیسے ہی ٹرانزیکشن ID سبمٹ کی، 15 منٹ میں اسٹیٹس اپروو ہو گیا۔ شکریہ ٹیم کا۔", bg: "bg-teal-600" },
             { initials: "TI", name: "کامران علی", text: "میری فیس جمع کرنے کی تصدیق ہو گئی ہے، رجسٹریشن پورٹل بہت تیز کام کر رہا ہے۔", bg: "bg-blue-600" },
             { initials: "SN", name: "سجدہ پروین", text: "الحمدللہ ریفرنس آئی ڈی مل گئی ہے اور میرا ڈیٹا لائیو systeem میں ویریفائی ہو چکا ہے۔", bg: "bg-purple-600" },
             { initials: "GZ", name: "غلام زینب", text: "بہت ہی آسان طریقہ کار ہے، گھر بیٹھے رجسٹریشن فارم جمع ہو گیا ہے۔ فیس وصولی میسیج بھی آگیا۔", bg: "bg-rose-600" },
