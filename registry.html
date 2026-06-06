@@ -640,14 +640,14 @@
 
     </div>
 
-    <footer class="mt-12 py-4 px-4 bg-white border-t border-slate-200 text-center action-area">
+    <header class="mt-12 py-4 px-4 bg-white border-t border-slate-200 text-center action-area">
         <div class="max-w-md mx-auto">
             <div class="text-[10px] font-extrabold tracking-wider flex justify-between items-center font-mono text-slate-900 opacity-95">
                 <span>V2.4 PRODUCTION BASE</span>
                 <span>© 2026 DES SYSTEM • PRIVACY PROTECTED</span>
             </div>
         </div>
-    </footer>
+    </header>
 
     <script>
         // LATEST CONFIGURATION VARIABLES FOR BETONE-LIVE 
@@ -690,6 +690,7 @@
             }
 
             const today = new Date();
+            // standard ISO parsing compatible formatting (YYYY-MM-DD)
             const birthDate = new Date(`${year}-${month}-${day}`);
             
             let calculatedAge = today.getFullYear() - birthDate.getFullYear();
@@ -699,7 +700,6 @@
                 calculatedAge--;
             }
 
-            // Negative values handle krny k liye validation check
             if (calculatedAge >= 0) {
                 ageInput.value = calculatedAge;
             } else {
@@ -825,7 +825,7 @@
                         { distId: "dg_khan", distName: "ڈیرہ غازی خان", tehsils: ["ڈی جی خان", "کوٹ چھٹہ"] },
                         { distId: "muzaffargarh", distName: "مظفر گڑھ (Muzaffargarh)", tehsils: ["مظفر گڑھ", "علی پور", "جتوئی", "کوٹ ادو"] },
                         { distId: "layyah", distName: "لیہ (Layyah)", tehsils: ["لیہ", "چوبارہ", "کروڑ لعل عیسن"] },
-                        { distId: "rajanpur", distName: "راجن پور (Rajanpur)", tehsils: ["راجن پور", "جام پور", "رcommand"] }
+                        { distId: "rajanpur", distName: "راجن پور (Rajanpur)", tehsils: ["راجن پور (Rajanpur)", "جام پور (Jampur)", "فاضل پور (Fazilpur)"] }
                     ]
                 }
             ],
@@ -843,7 +843,7 @@
         let currentStep = 1;
         let generatedProfileId = '';
         let globalFormData = null; 
-        let isWazaifFlowActive = false; // ٹریکر برائے تعلیمی وظائف راستہ
+        let isWazaifFlowActive = false; 
 
         // Input Sanitizer Engine
         ['mobileNumber', 'totalKids', 'maleKids', 'femaleKids', 'roomsCount', 'washroomsCount'].forEach(id => {
@@ -864,7 +864,6 @@
             e.target.value = formatted;
         });
 
-        // تعلیمی وظائف ڈائنامک فارم کے فلو کو کنٹرول کرنے کا مینیجر
         function toggleWazaifFlow(isActive) {
             isWazaifFlowActive = isActive;
             const stepKidsInd = document.getElementById("ind-stepkids");
@@ -873,7 +872,6 @@
             if(isActive) {
                 stepKidsInd.classList.remove("hidden");
                 kidsLine.classList.remove("hidden");
-                // اگر پہلے سے کوئی کارڈ نہیں بنا ہوا تو کم از کم 1 کارڈ خودکار جنریٹ کر دیں
                 const container = document.getElementById("dynamicKidsFieldsContainer");
                 if(container.children.length === 0) {
                     addNewKidFormBlock();
@@ -884,7 +882,6 @@
             }
         }
 
-        // بچوں کے ڈائنامک کارڈ بنانے کا انجن
         function addNewKidFormBlock() {
             const container = document.getElementById("dynamicKidsFieldsContainer");
             const kidIndex = container.children.length + 1;
@@ -969,7 +966,6 @@
             divWrapper.innerHTML = blockHtml;
             container.appendChild(divWrapper.firstElementChild);
 
-            // B-Form Format System Map with Auto-Dashes Logic
             const newBlock = container.lastElementChild;
             newBlock.querySelector('.kid-bform').addEventListener('input', function (e) {
                 let value = e.target.value.replace(/\D/g, ''); 
@@ -987,11 +983,9 @@
             calculateLiveKidsCharges();
         }
 
-        // بچہ بلاک ڈیلیٹ کرنا
         function removeKidFormBlock(buttonElement) {
             buttonElement.closest('.kid-form-block').remove();
             
-            // انڈیکسز کو دوبارہ ترتیب دینا
             const container = document.getElementById("dynamicKidsFieldsContainer");
             Array.from(container.children).forEach((block, idx) => {
                 const badge = block.querySelector('.absolute.right-4');
@@ -999,7 +993,6 @@
                 if(badge) badge.innerText = `بچہ نمبر ${newIndex}`;
                 block.setAttribute('data-index', newIndex);
                 
-                // Dropdown selectors functionality re-mapping
                 block.querySelector('.kid-dob-day').setAttribute('onchange', `autoCalculateKidAge(${newIndex})`);
                 block.querySelector('.kid-dob-month').setAttribute('onchange', `autoCalculateKidAge(${newIndex})`);
                 block.querySelector('.kid-dob-year').setAttribute('onchange', `autoCalculateKidAge(${newIndex})`);
@@ -1008,7 +1001,6 @@
             calculateLiveKidsCharges();
         }
 
-        // لائیو فیس کیلکولیشن انجن
         function calculateLiveKidsCharges() {
             const container = document.getElementById("dynamicKidsFieldsContainer");
             const kidsCount = isWazaifFlowActive ? container.children.length : 0;
@@ -1034,7 +1026,6 @@
                 document.getElementById(`step${step}-container`).classList.remove('hidden');
             }
             
-            // انڈیکیٹر ہائی لائٹنگ
             for(let i=1; i<=3; i++) {
                 let ind = document.getElementById(`ind-step${i}`);
                 if(i === step) ind.className = "px-2.5 py-1 rounded-full bg-[#006633] text-white shadow-sm";
@@ -1077,7 +1068,6 @@
             goToStep(targetStep);
         }
 
-        // سٹیپ 2 کے بٹن کا روٹر مینیجر
         function handleStep2NextRoute() {
             if(isWazaifFlowActive) {
                 calculateLiveKidsCharges();
@@ -1087,13 +1077,11 @@
             }
         }
 
-        // بچوں کے سٹیپ سے سٹیپ 3 پر جانے کی تصدیقی لاجک
         function validateAndGoFromKidsToStep3() {
             const container = document.getElementById("dynamicKidsFieldsContainer");
             let allValid = true;
             let bformFormatValid = true;
 
-            // ڈائنامک فیلڈز ویلیڈیشن رن
             const blocks = container.querySelectorAll('.kid-form-block');
             if(blocks.length === 0) {
                 alert("براہ کرم کم از کم ایک بچے کی تفصیلات شامل کریں یا پیچھے جا کر بچوں کی انٹری کو بند کریں۔");
@@ -1127,7 +1115,6 @@
             goToStep(3);
         }
 
-        // بیک بٹن روٹر مینیجر برائے سٹیپ 3
         function handleStep3BackRoute() {
             if(isWazaifFlowActive) {
                 goToStep('kids');
@@ -1138,7 +1125,6 @@
 
         function toggleKidsFields() {
             var status = document.getElementById("maritalStatus").value;
-            // Shadi shuda, talaq yafta, ya bewa teeno conditions pr kids field state active ho gi
             var allowKids = (status === "married" || status === "talaq" || status === "bewa");
             document.getElementById("kidsSection").classList.toggle("hidden", !allowKids);
             if(!allowKids) {
@@ -1152,7 +1138,6 @@
             document.getElementById("disabilityNatureSection").classList.toggle("hidden", status !== "yes");
         }
 
-        // Dropdown Mapping Logic
         function handleProvinceChange() {
             const province = document.getElementById("provinceSelect").value;
             const divisionSelect = document.getElementById("divisionSelect");
@@ -1170,7 +1155,6 @@
             }
         }
 
-        // (No logic shifts executed across deep subcomponents to maintain codebase integrity)
         function handleDivisionChange() {
             const province = document.getElementById("provinceSelect").value;
             const divisionId = document.getElementById("divisionSelect").value;
@@ -1191,7 +1175,6 @@
             }
         }
 
-        // (No changes across lower mapping hooks)
         function handleDistrictChange() {
             const province = document.getElementById("provinceSelect").value;
             const divisionId = document.getElementById("divisionSelect").value;
@@ -1202,7 +1185,7 @@
             if (province && divisionId && districtId && provincesData[province]) {
                 const targetDiv = provincesData[province].find(d => d.divId === divisionId);
                 if (targetDiv) {
-                    const targetDist = targetDiv.districts.find(dst => dst.distId === districtId);
+                    const targetDist = targetDiv.districts.find(dst => dst.dstId === districtId);
                     if (targetDist && targetDist.tehsils) {
                         targetDist.tehsils.forEach(tehsil => {
                             const opt = document.createElement("option");
@@ -1218,7 +1201,6 @@
         function handleFormSubmit(event) {
             event.preventDefault();
             
-            // Loading UI Mutation State triggers on submit
             const submitBtn = document.getElementById("submitBtn");
             const btnText = document.getElementById("btnText");
             submitBtn.disabled = true;
@@ -1235,7 +1217,6 @@
             const surveyStatus = document.querySelector('input[name="alreadySurveyed"]:checked').value;
             const priorAidStatus = document.querySelector('input[name="priorFinancialAid"]:checked').value;
 
-            // بچوں کی فائنل لسٹ اسٹرکچر تیار کرنا
             const finalKidsArray = [];
             if(isWazaifFlowActive) {
                 const container = document.getElementById("dynamicKidsFieldsContainer");
@@ -1256,11 +1237,10 @@
 
             const billing = calculateLiveKidsCharges();
 
-            // Gather Object Parameters (شاملِ فائر بیس محفوظ ماڈل)
             globalFormData = {
                 profileId: generatedProfileId,
                 alreadySurveyed: surveyStatus,
-                priorFinancialAid: priorAidStatus, // Dynamic storage binding
+                priorFinancialAid: priorAidStatus, 
                 fullName: document.getElementById("fullName").value,
                 relationType: document.getElementById("relationType").value,
                 guardianName: document.getElementById("guardianName").value,
@@ -1281,22 +1261,20 @@
                 villageName: document.getElementById("villageName").value,
                 paymentStatus: "pending",
                 trxId: "Pending",
-                remarks: "فیس کی ادائیگی پینڈنگ ہے۔EasyPaisa یا JazzCash پر رقم بھیج کر ٹرانزیکشن ID (TRX) درج کریں۔", // Smart Fallback Remarks Initial State
+                remarks: "فیس کی ادائیگی پینڈنگ ہے۔EasyPaisa یا JazzCash پر رقم بھیج کر ٹرانزیکشن ID (TRX) درج کریں۔", 
                 timestamp: now.toISOString(),
-                // نئے فیلڈز برائے کلاؤڈ انٹری وظائف پراجیکٹ
                 hasKidsRegistered: isWazaifFlowActive,
                 totalKidsCharges: billing.chargesOnly,
                 grandTotalAmount: billing.total,
                 kidsList: finalKidsArray
             };
 
-            // Async Push Firebase
             if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
                 firebase.database().ref('registrations/' + generatedProfileId).set(globalFormData)
                 .then(() => executeUIRendering(now))
                 .catch(err => {
                     console.error("Firebase Sync Fail:", err);
-                    executeUIRendering(now); // Graceful recovery layout strategy
+                    executeUIRendering(now); 
                 });
             } else {
                 executeUIRendering(now);
@@ -1307,11 +1285,10 @@
             const submitBtn = document.getElementById("submitBtn");
             const btnText = document.getElementById("btnText");
             
-            // Interface Rendering
             document.getElementById("formCard").style.display = "none";
             document.getElementById("stepIndicatorBar").style.display = "none";
             document.getElementById("trustVerificationBlock").style.display = "none"; 
-            document.getElementById("trackingPanel").style.display = "none"; // Hide search panel on success view
+            document.getElementById("trackingPanel").style.display = "none"; 
             
             document.getElementById("displayProfileId").innerText = generatedProfileId;
             document.getElementById("successBanner").classList.remove("hidden");
@@ -1328,7 +1305,6 @@
             document.getElementById("receiptTrxDisplay").className = "py-2 text-red-600 font-mono font-bold";
             document.getElementById("receiptDateTime").innerText = `${now.toLocaleTimeString()} @ ${now.toISOString().split('T')[0]}`;
             
-            // رسید بلنگ اور ہدایات کی اپڈیٹیشن لائیو بریک ڈاؤن کے ساتھ
             const billingText = `${globalFormData.grandTotalAmount.toLocaleString()} روپے`;
             document.getElementById("receiptTotalCharges").innerText = billingText;
             document.getElementById("instructionTotalAmount").innerText = isWazaifFlowActive 
@@ -1375,7 +1351,6 @@
             document.getElementById("trxInputArea").style.display = "none";
         }
 
-        // ================= APPLICATION LIVE TRACKING CONTROLLER FUNCTION =================
         function trackApplicationStatus() {
             const searchId = document.getElementById("trackProfileIdInput").value.trim();
             const resultArea = document.getElementById("trackingResultArea");
@@ -1393,14 +1368,12 @@
                 return;
             }
 
-            // Realtime Firebase Tracking Node Listener Fetch
             firebase.database().ref('registrations/' + searchId).once('value')
             .then(snapshot => {
                 if(snapshot.exists()) {
                     const data = snapshot.val();
                     resultArea.classList.remove("hidden");
                     
-                    // UI badge mutation based on paymentStatus parameters
                     if(data.paymentStatus === "pending") {
                         badge.innerText = "PENDING VERIFICATION";
                         badge.className = "text-xs font-black px-3 py-1 rounded-full shadow-sm font-mono bg-amber-100 text-amber-800 border border-amber-200";
@@ -1419,11 +1392,9 @@
                         card.className = "p-3.5 rounded-xl border text-xs leading-relaxed bg-slate-50 border-slate-200 text-slate-800";
                     }
 
-                    // Smart Fallback Remarks Evaluator Engine
                     if (data.remarks) {
                         remarksText.innerText = data.remarks;
                     } else {
-                        // Fallback logic routes based on current properties structural checks
                         if(data.paymentStatus === "pending") {
                             remarksText.innerText = "آپ کا شناختی ڈیٹا ڈیٹا بیس سرور پر اپلوڈ ہو چکا ہے۔ فائل کی باقاعدہ منظوری کے لیے اکاؤنٹ پر " + (data.grandTotalAmount ? data.grandTotalAmount.toLocaleString() : "1,000") + " روپے رجسٹریشن فیس جمع کروا کر ٹرانزیکشن ID (TRX) لازمی سبمٹ کریں۔";
                         } else {
@@ -1547,6 +1518,7 @@
             }
         }
 
+        // Tactile fallback matrix strategy for compatibility
         function fallbackCopyMechanism(text, btn, btnText) {
             const textArea = document.createElement("textarea");
             textArea.value = text;
@@ -1584,7 +1556,7 @@
             document.getElementById("stepIndicatorBar").style.display = "flex";
             document.getElementById("trustVerificationBlock").style.display = "block"; 
             document.getElementById("trxInputArea").style.display = "block";
-            document.getElementById("trackingPanel").style.display = "block"; // Show tracking panel on return
+            document.getElementById("trackingPanel").style.display = "block"; 
             document.getElementById("receiptTrxDisplay").innerText = "پینڈنگ (Pending)";
             document.getElementById("receiptTrxDisplay").className = "py-2 text-red-600 font-mono font-bold";
             
@@ -1599,7 +1571,7 @@
             goToStep(1);
         }
 
-        // ================= PREMIUM LIVE FEED DATA LOOP CORE ENGINE =================
+        // PREMIUM LIVE FEED DATA LOOP CORE ENGINE
         const mockActivityData = [
             { initials: "AM", name: "عاصم منیر", text: "بائیو میٹرک تصدیق مکمل ہو گئی ہے اور فنڈز کلیئرنس آرڈر جاری کر دیا گیا ہے! بہترین پورٹل۔", bg: "bg-emerald-600" },
             { initials: "FK", name: "فرزانہ کوثر", text: "پہلے مجھے لگا فیک ہے، پر جیسے ہی ٹرانزیکشن ID سبمٹ کی، 15 منٹ میں اسٹیٹس اپروو ہو گیا۔ شکریہ ٹیم کا۔", bg: "bg-teal-600" },
