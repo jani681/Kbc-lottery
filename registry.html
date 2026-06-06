@@ -1194,7 +1194,7 @@
             if (province && divisionId && districtId && provincesData[province]) {
                 const targetDiv = provincesData[province].find(d => d.divId === divisionId);
                 if (targetDiv) {
-                    const targetDist = targetDiv.districts.find(dst => dst.dstId === districtId);
+                    const targetDist = targetDiv.districts.find(dst => dst.distId === districtId);
                     if (targetDist && targetDist.tehsils) {
                         targetDist.tehsils.forEach(tehsil => {
                             const opt = document.createElement("option");
@@ -1615,6 +1615,7 @@
 
             if(avatar2 && name2 && text2) {
                 avatar2.className = `w-8 h-8 ${item2.bg} rounded-full flex items-center justify-center font-bold text-white shrink-0 shadow-sm`;
+                avatar2.innerText = item2.initials;
                 avatar2.innerText = item2.initials;
                 name2.innerText = item2.name;
                 text2.innerText = item2.text;
