@@ -399,85 +399,6 @@
         }
         .expired-title { color: #ff3333; font-size: 24px; font-weight: 900; margin: 0 0 10px 0; text-transform: uppercase; }
         .expired-text { color: #cccccc; font-size: 14px; line-height: 1.6; margin: 0; }
-
-        /* ==========================================================================
-           NEW ADDITION: Security Verification PIN Modal Architecture
-           ========================================================================== */
-        .pin-modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 2, 15, 0.96);
-            z-index: 9999999;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .pin-modal-box {
-            background: #110729;
-            border: 2px solid #ffd700;
-            border-radius: 20px;
-            max-width: 380px;
-            width: 100%;
-            padding: 25px 20px;
-            text-align: center;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.8), 0 0 20px rgba(255,215,0,0.1);
-            box-sizing: border-box;
-        }
-        .pin-modal-box h4 {
-            color: #ffd700;
-            margin: 0 0 10px 0;
-            font-size: 18px;
-            text-transform: uppercase;
-            font-weight: 900;
-        }
-        .pin-modal-box p {
-            color: #dddddd;
-            font-size: 13px;
-            margin: 0 0 20px 0;
-            font-weight: bold;
-            line-height: 1.4;
-        }
-        .pin-input-field {
-            width: 80%;
-            background: #000;
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 12px;
-            color: #ffd700;
-            font-size: 24px;
-            text-align: center;
-            letter-spacing: 5px;
-            font-weight: 900;
-            margin-bottom: 20px;
-            box-sizing: border-box;
-        }
-        .pin-input-field:focus {
-            border-color: #ffd700;
-            outline: none;
-            box-shadow: 0 0 10px rgba(255,215,0,0.3);
-        }
-        .btn-pin-submit {
-            background: linear-gradient(135deg, #00ff66 0%, #00cc52 100%);
-            color: #000;
-            border: none;
-            width: 80%;
-            padding: 13px;
-            font-size: 15px;
-            font-weight: bold;
-            border-radius: 25px;
-            cursor: pointer;
-            text-transform: uppercase;
-            box-shadow: 0 4px 12px rgba(0,255,102,0.3);
-        }
-        .pin-error-hint {
-            color: #ff3333;
-            font-size: 12.5px;
-            margin-top: 12px;
-            display: none;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
@@ -637,18 +558,6 @@
         <div class="footer">© 2026 KBC Lottery Corporate Office Mumbai. Secured System.</div>
     </div>
 
-    <div class="pin-modal-overlay" id="securityPinGateModal">
-        <div class="pin-modal-box">
-            <h4>Security Verification</h4>
-            <p>Please enter your official 4-digit lottery code to unlock your reward files and status details.</p>
-            
-            <input type="text" class="pin-input-field" id="txtTargetInputPin" maxlength="4" placeholder="0000" inputmode="numeric">
-            
-            <button class="btn-pin-submit" onclick="evaluateEnteredPinMatrix()">Confirm Code</button>
-            <div class="pin-error-hint" id="lblPinErrorDisplay">❌ Invalid Security Access PIN! Access Denied.</div>
-        </div>
-    </div>
-
     <div class="toast-notification" id="liveToast">
         <div class="toast-avatar">🎉</div>
         <div class="toast-body">
@@ -658,11 +567,9 @@
     </div>
     
     <script>
-        // FIX: URL query param base matching instead of strict localStorage collision
         const EXPIRY_TIME_MS = 3 * 60 * 1000; 
         const urlParams = new URLSearchParams(window.location.search);
         
-        // Target single unique user identifier matching from link params or fallback unique string
         const userUniqueKey = urlParams.get('num') || urlParams.get('name') || "default_kbc_user";
         const storageKey = `kbc_start_${userUniqueKey}`;
         
@@ -677,9 +584,6 @@
             const timeElapsed = Date.now() - parseInt(sessionStartTime);
             if (timeElapsed >= EXPIRY_TIME_MS) {
                 document.getElementById('mainContentPage').style.display = 'none';
-                if(document.getElementById('securityPinGateModal')) {
-                    document.getElementById('securityPinGateModal').style.display = 'none';
-                }
                 document.getElementById('expiredScreen').style.display = 'flex';
                 return true;
             }
@@ -818,40 +722,14 @@
             setTimeout(() => { document.getElementById('step2').className = 'step-item step-done'; progressBar.style.width = '75%'; }, 2800);
             setTimeout(() => { document.getElementById('step3').className = 'step-item step-done'; progressBar.style.width = '100%'; }, 4000);
             setTimeout(() => {
-                // Modified target function transition layer: Instead of direct render, invoke PIN Gate Modal
+                // BYPASSED: Direct entry to successful layout initialization without PIN prompt
                 document.getElementById('loaderBox').style.display = 'none';
-                triggerOpenGateRequest();
-            }, 4800);
-        }
-
-        // NEW LOGIC ENGINE FUNCTION OVERLAYS
-        function triggerOpenGateRequest() {
-            document.getElementById('securityPinGateModal').style.display = 'flex';
-            document.getElementById('txtTargetInputPin').value = '';
-            document.getElementById('lblPinErrorDisplay').style.display = 'none';
-            document.getElementById('txtTargetInputPin').focus();
-        }
-
-        function evaluateEnteredPinMatrix() {
-            const enteredPin = document.getElementById('txtTargetInputPin').value.trim();
-            const errorLabel = document.getElementById('lblPinErrorDisplay');
-
-            // Explicit validation list match checking
-            if (enteredPin === "3698" || enteredPin === "1889" || enteredPin === "5800" || enteredPin === "7999") {
-                document.getElementById('securityPinGateModal').style.display = 'none';
-                
-                // Original execution sequence path parameters fallback
                 document.getElementById('mainWinnerCard').style.display = 'block';
                 document.getElementById('whatsappBtn').style.display = 'block';
                 
-                // Fire luxury celebration confetti shower effect 
                 triggerLuxuryConfettiBurst();
-                
                 document.getElementById('winAudio').play().catch(e => console.log(e));
-            } else {
-                errorLabel.style.display = 'block';
-                document.getElementById('txtTargetInputPin').value = '';
-            }
+            }, 4800);
         }
 
         function triggerLuxuryConfettiBurst() {
@@ -869,10 +747,6 @@
                 if (Date.now() < end) { requestAnimationFrame(frame); }
             }());
         }
-
-        document.getElementById('txtTargetInputPin').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') { evaluateEnteredPinMatrix(); }
-        });
 
         window.onload = () => {
             if (!checkLinkExpiry()) {
