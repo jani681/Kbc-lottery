@@ -212,7 +212,7 @@
     
     <button class="btn-primary" onclick="generateCertificate()">Generate Certificate</button>
     
-    <!-- NEW UTILITY BUTTON TO COPY TEXT DIRECTLY -->
+    <!-- TIMEOUT & PASSWORD CHECKS COMPLETELY REMOVED FROM THIS IMPLEMENTATION -->
     <button class="btn-utility" onclick="copyWinnerSummary()">📋 Copy Winner Summary</button>
 
     <div class="vip-tools-container">
@@ -280,7 +280,7 @@
         return `${day}-${months[dateObj.getMonth()]}-${dateObj.getFullYear()}`;
     }
 
-    // FUNCTION FOR THE NEW COPY BUTTON
+    // DIRECT AND IMMEDIATE COPY WITH NO TIME GATES OR DIALOGS
     function copyWinnerSummary() {
         const name = document.getElementById('winnerName').value || "---";
         const regNo = document.getElementById('regNo').value || "---";
